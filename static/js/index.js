@@ -321,41 +321,16 @@ function applyLightFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
 
-  // More pronounced red and blue tints
-  const redTint = [255, 150, 150];  // Stronger light red
-  const blueTint = [150, 150, 255]; // Stronger light blue
-
-  // Adjust these parameters to control the effect strength
-  const tintStrength = 0.4;  // Increased for visibility
-  const contrastBoost = 1.2; // More contrast
+  // Adjust this value to control the strength of the red tint
+  const redTintStrength = 0.3; // 0 = no effect, 1 = full red
 
   for (let i = 0; i < data.length; i += 4) {
-    // Get original pixel values
-    let r = data[i];
-    let g = data[i + 1];
-    let b = data[i + 2];
-
-    // Calculate luminance (perceived brightness)
-    const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-
-    // Apply contrast boost
-    r = Math.min(255, Math.max(0, (r - 128) * contrastBoost + 128));
-    g = Math.min(255, Math.max(0, (g - 128) * contrastBoost + 128));
-    b = Math.min(255, Math.max(0, (b - 128) * contrastBoost + 128));
-
-    // Apply tint based on luminance
-    const tintFactor = luminance / 255;
-    const redFactor = Math.pow(tintFactor, 1.5) * tintStrength; // Emphasize red in brighter areas
-    const blueFactor = Math.pow(1 - tintFactor, 1.5) * tintStrength; // Emphasize blue in darker areas
-
-    r = Math.round(r * (1 - tintStrength) + redTint[0] * redFactor + blueTint[0] * blueFactor);
-    g = Math.round(g * (1 - tintStrength) + redTint[1] * redFactor + blueTint[1] * blueFactor);
-    b = Math.round(b * (1 - tintStrength) + redTint[2] * redFactor + blueTint[2] * blueFactor);
-
-    // Ensure values are within 0-255 range
-    data[i] = Math.min(255, Math.max(0, r));
-    data[i + 1] = Math.min(255, Math.max(0, g));
-    data[i + 2] = Math.min(255, Math.max(0, b));
+    // Increase red channel
+    data[i] = Math.min(255, data[i] + (255 - data[i]) * redTintStrength);
+    
+    // Slightly decrease green and blue channels to emphasize the red
+    data[i + 1] = Math.max(0, data[i + 1] - data[i + 1] * redTintStrength * 0.1);
+    data[i + 2] = Math.max(0, data[i + 2] - data[i + 2] * redTintStrength * 0.1);
   }
 
   context.putImageData(imageData, 0, 0);
