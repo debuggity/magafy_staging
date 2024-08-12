@@ -326,7 +326,7 @@ function applyLightFilter(context, width, height) {
   const blueColor = [150, 170, 200]; // Light blue
 
   // Blending factor to preserve original image colors (0 to 1, where 1 is full filter color)
-  const blendFactor = 0.5;
+  const blendFactor = 0.7;
 
   // Apply gradient map with blending
   for (let i = 0; i < data.length; i += 4) {
@@ -349,6 +349,7 @@ function applyLightFilter(context, width, height) {
 
   context.putImageData(imageData, 0, 0);
 }
+
 
 function applyFullResGradientMapFilter(context, width, height) {
   if (currentFilter === 'dark') {
