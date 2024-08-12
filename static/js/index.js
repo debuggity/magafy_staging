@@ -274,22 +274,27 @@ function applyClassicRedFilter(context, width, height) {
   const data = imageData.data;
 
   const overlayColor = [216, 40, 27]; // #d8281b
-  const redBoostFactor = 2.5; // Increase the influence of red
+  const redBoostFactor = 1.5; // Increase the influence of red
   const blendFactor = 0.4; // Control the blending with the overlay color
+  const darkenFactor = 0.5; // Reduce brightness (half as much as the dark filter)
 
   for (let i = 0; i < data.length; i += 4) {
     // Boost the red channel while preserving image details
     data[i] = Math.min(255, data[i] * redBoostFactor);
 
-    // Apply a subtle overlay effect
+    // Apply a subtle red overlay effect
     data[i] = data[i] * (1 - blendFactor) + overlayColor[0] * blendFactor;
     data[i + 1] = data[i + 1] * (1 - blendFactor) + overlayColor[1] * blendFactor;
     data[i + 2] = data[i + 2] * (1 - blendFactor) + overlayColor[2] * blendFactor;
+
+    // Apply a subtle darkening effect
+    data[i] = data[i] * (1 - darkenFactor);
+    data[i + 1] = data[i + 1] * (1 - darkenFactor);
+    data[i + 2] = data[i + 2] * (1 - darkenFactor);
   }
 
   context.putImageData(imageData, 0, 0);
 }
-
 
 function applyLightFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
