@@ -273,36 +273,36 @@ function applyClassicRedFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
 
-  const overlayColor = [216, 40, 27]; // #d8281b
-  const redBoostFactor = 1.2; // Increase the influence of red
-  const blueBoostFactor = 1.2;
-  const blendFactor = 0.65; // Control the blending with the overlay color
-  const contrastFactor = 1.8; // Increase contrast (1 is no change, >1 increases contrast)
+  const raspberryRed = [227, 11, 93]; // Raspberry Red: #E30B5D
+  const blueEnhancementFactor = 1.5; // Enhance the blue channel
+  const redEnhancementFactor = 1.2; // Enhance the red channel slightly
+  const blendFactor = 0.5; // Blend with the raspberry red color
+  const darkenFactor = 0.15; // Subtle darkening effect
 
-  // Helper function to apply contrast
+  // Helper function to apply contrast and slight darkening
   function adjustContrast(value, factor) {
     return ((value - 128) * factor) + 128;
   }
 
   for (let i = 0; i < data.length; i += 4) {
-    // Boost the red channel while preserving image details
-    data[i] = Math.min(255, data[i] * redBoostFactor);
-    data[i + 2] = Math.min(255, data[i + 2] * blueBoostFactor);
-    
-    // Apply a subtle red overlay effect
-    data[i] = data[i] * (1 - blendFactor) + overlayColor[0] * blendFactor;
-    data[i + 1] = data[i + 1] * (1 - blendFactor) + overlayColor[1] * blendFactor;
-    data[i + 2] = data[i + 2] * (1 - blendFactor) + overlayColor[2] * blendFactor;
+    // Enhance the red channel slightly
+    data[i] = Math.min(255, data[i] * redEnhancementFactor);
+    // Enhance the blue channel to make it pop
+    data[i + 2] = Math.min(255, data[i + 2] * blueEnhancementFactor);
 
-    // Apply contrast adjustment
-    data[i] = adjustContrast(data[i], contrastFactor);
-    data[i + 1] = adjustContrast(data[i + 1], contrastFactor);
-    data[i + 2] = adjustContrast(data[i + 2], contrastFactor);
+    // Blend with the raspberry red overlay
+    data[i] = data[i] * (1 - blendFactor) + raspberryRed[0] * blendFactor;
+    data[i + 1] = data[i + 1] * (1 - blendFactor) + raspberryRed[1] * blendFactor;
+    data[i + 2] = data[i + 2] * (1 - blendFactor) + raspberryRed[2] * blendFactor;
+
+    // Apply a subtle darkening effect
+    data[i] = adjustContrast(data[i], 1 - darkenFactor);
+    data[i + 1] = adjustContrast(data[i + 1], 1 - darkenFactor);
+    data[i + 2] = adjustContrast(data[i + 2], 1 - darkenFactor);
   }
 
   context.putImageData(imageData, 0, 0);
 }
-
 
 function applyLightFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
