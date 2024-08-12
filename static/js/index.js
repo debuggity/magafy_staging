@@ -332,14 +332,12 @@ function applyLightFilter(context, width, height) {
   for (let i = 0; i < data.length; i += 4) {
     const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
 
-    const factor = brightness / 255;
-    const adjustedFactor = Math.pow(factor, 0.8);
+    // Adjust brightness factor to increase impact of red/blue tones
+    const factor = Math.pow(brightness / 255, 0.5);
 
-    const newRed = blueColor[0] + adjustedFactor * (redColor[0] - blueColor[0]);
-    const newGreen =
-      blueColor[1] + adjustedFactor * (redColor[1] - blueColor[1]);
-    const newBlue =
-      blueColor[2] + adjustedFactor * (redColor[2] - blueColor[2]);
+    const newRed = (blueColor[0] * (1 - factor) + redColor[0] * factor);
+    const newGreen = (blueColor[1] * (1 - factor) + redColor[1] * factor);
+    const newBlue = (blueColor[2] * (1 - factor) + redColor[2] * factor);
 
     // Blend with the original colors
     data[i] = data[i] * (1 - blendFactor) + newRed * blendFactor;
