@@ -15,6 +15,16 @@ const MAX_HEIGHT = 480;
 let originalImageWidth, originalImageHeight;
 let currentFilter = 'classic';
 
+window.addEventListener('DOMContentLoaded', () => {
+  // Set resize slider to the middle
+  const resizeSlider = document.getElementById('resize-slider');
+  resizeSlider.value = '1.25';  // Middle value between 0.5 and 2
+
+  // Set rotate slider to the middle
+  const rotateSlider = document.getElementById('rotate-slider');
+  rotateSlider.value = '0';  // Middle value between 0 and 360
+});
+
 document.getElementById("image-upload").addEventListener("change", function (e) {
   const reader = new FileReader();
   reader.onload = function (event) {
@@ -312,7 +322,8 @@ function applyLightFilter(context, width, height) {
   const data = imageData.data;
 
   for (let i = 0; i < data.length; i += 4) {
-    data[i] = data[i] + 80; // Increase red channel
+    data[i] = data[i] + 90; // Increase red channel
+    data[i + 2] = data[i + 2] + 30; 
   }
 
   context.putImageData(imageData, 0, 0);
