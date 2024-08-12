@@ -274,7 +274,7 @@ function applyClassicRedFilter(context, width, height) {
   const data = imageData.data;
 
   const overlayColor = [216, 40, 27]; // #d8281b
-  const overlayStrength = 0.8; // Adjust the strength of the overlay (0 to 1)
+  const overlayStrength = 0.4; // Adjust the strength of the overlay (0 to 1)
 
   for (let i = 0; i < data.length; i += 4) {
     data[i] = data[i] * (1 - overlayStrength) + overlayColor[0] * overlayStrength;
