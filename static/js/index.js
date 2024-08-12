@@ -274,8 +274,8 @@ function applyClassicRedFilter(context, width, height) {
   const data = imageData.data;
 
   const overlayColor = [216, 40, 27]; // #d8281b
-  const redBoostFactor = 1.5; // Increase the influence of red
-  const blendFactor = 0.6; // Control the blending with the overlay color
+  const redBoostFactor = 2.5; // Increase the influence of red
+  const blendFactor = 0.4; // Control the blending with the overlay color
 
   for (let i = 0; i < data.length; i += 4) {
     // Boost the red channel while preserving image details
