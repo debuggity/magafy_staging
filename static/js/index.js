@@ -321,16 +321,42 @@ function applyLightFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
 
-  // Adjust this value to control the strength of the red tint
-  const redTintStrength = 0.3; // 0 = no effect, 1 = full red
+  // Adjust these values to fine-tune the effect
+  const redFlareStrength = 0.4;   // Strength of the red flare (0-1)
+  const blueHintStrength = 0.1;   // Strength of the blue hints (0-1)
+  const saturationBoost = 1.2;    // Increase overall color saturation
+  const contrastBoost = 1.1;      // Slight increase in contrast
 
   for (let i = 0; i < data.length; i += 4) {
-    // Increase red channel
-    data[i] = Math.min(255, data[i] + (255 - data[i]) * redTintStrength);
+    let r = data[i];
+    let g = data[i + 1];
+    let b = data[i + 2];
+
+    // Apply contrast boost
+    r = Math.min(255, Math.max(0, (r - 128) * contrastBoost + 128));
+    g = Math.min(255, Math.max(0, (g - 128) * contrastBoost + 128));
+    b = Math.min(255, Math.max(0, (b - 128) * contrastBoost + 128));
+
+    // Calculate luminance
+    const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
     
-    // Slightly decrease green and blue channels to emphasize the red
-    data[i + 1] = Math.max(0, data[i + 1] - data[i + 1] * redTintStrength * 0.1);
-    data[i + 2] = Math.max(0, data[i + 2] - data[i + 2] * redTintStrength * 0.1);
+    // Apply red flare
+    r = Math.min(255, r + (255 - r) * redFlareStrength);
+    
+    // Apply subtle blue hints to darker areas
+    const blueFactor = Math.pow(1 - luminance / 255, 2) * blueHintStrength;
+    b = Math.min(255, b + (255 - b) * blueFactor);
+
+    // Boost saturation
+    const avg = (r + g + b) / 3;
+    r = Math.min(255, avg + (r - avg) * saturationBoost);
+    g = Math.min(255, avg + (g - avg) * saturationBoost);
+    b = Math.min(255, avg + (b - avg) * saturationBoost);
+
+    // Set the new pixel values
+    data[i] = Math.round(r);
+    data[i + 1] = Math.round(g);
+    data[i + 2] = Math.round(b);
   }
 
   context.putImageData(imageData, 0, 0);
