@@ -321,23 +321,22 @@ function applyLightFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
 
-  // Lightened colors
-  const redColor = [230, 150, 160]; // Light red
-  const blueColor = [150, 170, 200]; // Light blue
+  // Stronger red and blue colors
+  const redColor = [255, 100, 120]; // Stronger red
+  const blueColor = [80, 120, 200]; // Stronger blue
 
-  // Blending factor to preserve original image colors (0 to 1, where 1 is full filter color)
-  const blendFactor = 0.7;
+  // Increase the blend factor to allow more red and blue
+  const blendFactor = 0.9; // Stronger blend with the filter colors
 
-  // Apply gradient map with blending
   for (let i = 0; i < data.length; i += 4) {
     const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
 
-    // Adjust brightness factor to increase impact of red/blue tones
-    const factor = Math.pow(brightness / 255, 0.5);
+    // Adjust brightness factor to emphasize red/blue tones more strongly
+    const factor = Math.pow(brightness / 255, 0.4);
 
-    const newRed = (blueColor[0] * (1 - factor) + redColor[0] * factor);
-    const newGreen = (blueColor[1] * (1 - factor) + redColor[1] * factor);
-    const newBlue = (blueColor[2] * (1 - factor) + redColor[2] * factor);
+    const newRed = blueColor[0] * (1 - factor) + redColor[0] * factor;
+    const newGreen = blueColor[1] * (1 - factor) + redColor[1] * factor;
+    const newBlue = blueColor[2] * (1 - factor) + redColor[2] * factor;
 
     // Blend with the original colors
     data[i] = data[i] * (1 - blendFactor) + newRed * blendFactor;
