@@ -321,13 +321,13 @@ function applyLightFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
 
-  // Subtle red and blue tints
-  const redTint = [255, 200, 200];  // Light red
-  const blueTint = [200, 200, 255]; // Light blue
+  // More pronounced red and blue tints
+  const redTint = [255, 150, 150];  // Stronger light red
+  const blueTint = [150, 150, 255]; // Stronger light blue
 
-  // Adjust these parameters to fine-tune the effect
-  const tintStrength = 0.2;  // Reduced for subtlety
-  const contrastBoost = 1.1; // Slight contrast increase
+  // Adjust these parameters to control the effect strength
+  const tintStrength = 0.4;  // Increased for visibility
+  const contrastBoost = 1.2; // More contrast
 
   for (let i = 0; i < data.length; i += 4) {
     // Get original pixel values
@@ -345,17 +345,17 @@ function applyLightFilter(context, width, height) {
 
     // Apply tint based on luminance
     const tintFactor = luminance / 255;
-    const redFactor = tintFactor * tintStrength;
-    const blueFactor = (1 - tintFactor) * tintStrength;
+    const redFactor = Math.pow(tintFactor, 1.5) * tintStrength; // Emphasize red in brighter areas
+    const blueFactor = Math.pow(1 - tintFactor, 1.5) * tintStrength; // Emphasize blue in darker areas
 
-    r = Math.min(255, r * (1 - tintStrength) + redTint[0] * redFactor + blueTint[0] * blueFactor);
-    g = Math.min(255, g * (1 - tintStrength) + redTint[1] * redFactor + blueTint[1] * blueFactor);
-    b = Math.min(255, b * (1 - tintStrength) + redTint[2] * redFactor + blueTint[2] * blueFactor);
+    r = Math.round(r * (1 - tintStrength) + redTint[0] * redFactor + blueTint[0] * blueFactor);
+    g = Math.round(g * (1 - tintStrength) + redTint[1] * redFactor + blueTint[1] * blueFactor);
+    b = Math.round(b * (1 - tintStrength) + redTint[2] * redFactor + blueTint[2] * blueFactor);
 
-    // Set new pixel values
-    data[i] = r;
-    data[i + 1] = g;
-    data[i + 2] = b;
+    // Ensure values are within 0-255 range
+    data[i] = Math.min(255, Math.max(0, r));
+    data[i + 1] = Math.min(255, Math.max(0, g));
+    data[i + 2] = Math.min(255, Math.max(0, b));
   }
 
   context.putImageData(imageData, 0, 0);
