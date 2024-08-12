@@ -322,23 +322,23 @@ function applyLightFilter(context, width, height) {
   const data = imageData.data;
 
   // Stronger red and blue colors
-  const redColor = [255, 100, 120]; // Stronger red
-  const blueColor = [80, 120, 200]; // Stronger blue
+  const redColor = [255, 100, 120]; // Strong red
+  const blueColor = [80, 120, 200]; // Strong blue
 
-  // Increase the blend factor to allow more red and blue
-  const blendFactor = 0.9; // Stronger blend with the filter colors
+  // Lower blend factor to preserve the original image colors more
+  const blendFactor = 0.3; // Blend factor significantly reduced
 
   for (let i = 0; i < data.length; i += 4) {
     const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
 
-    // Adjust brightness factor to emphasize red/blue tones more strongly
-    const factor = Math.pow(brightness / 255, 0.4);
+    // Keep the brightness factor moderate to ensure a noticeable effect without overpowering the original colors
+    const factor = Math.pow(brightness / 255, 0.6);
 
     const newRed = blueColor[0] * (1 - factor) + redColor[0] * factor;
     const newGreen = blueColor[1] * (1 - factor) + redColor[1] * factor;
     const newBlue = blueColor[2] * (1 - factor) + redColor[2] * factor;
 
-    // Blend with the original colors
+    // Blend with the original colors, allowing the original image to dominate
     data[i] = data[i] * (1 - blendFactor) + newRed * blendFactor;
     data[i + 1] = data[i + 1] * (1 - blendFactor) + newGreen * blendFactor;
     data[i + 2] = data[i + 2] * (1 - blendFactor) + newBlue * blendFactor;
@@ -346,7 +346,6 @@ function applyLightFilter(context, width, height) {
 
   context.putImageData(imageData, 0, 0);
 }
-
 
 function applyFullResGradientMapFilter(context, width, height) {
   if (currentFilter === 'dark') {
