@@ -282,20 +282,20 @@ function applyGradientMapFilter(context, width, height) {
   context.putImageData(imageData, 0, 0);
 }
 
-function applyClassicRedFilter(context, width, height) {
+function applyClassicBlueFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
 
-  // Adjusted colors with reduced saturation
-  const redColor = [210, 50, 60]; // Slightly desaturated and darkened red
-  const blueColor = [5, 8, 20];   // Darker blue
+  // Adjusted colors with more emphasis on blue
+  const redColor = [190, 50, 60]; // Slightly desaturated and darkened red with less influence
+  const blueColor = [10, 20, 60]; // More intense blue to give a stronger blue tint
 
   // Apply gradient map
   for (let i = 0; i < data.length; i += 4) {
     const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
 
     const factor = brightness / 255;
-    const adjustedFactor = Math.pow(factor, 0.8); // Slightly adjusted gamma for more contrast
+    const adjustedFactor = Math.pow(factor, 0.8); // Gamma for contrast
 
     data[i] = blueColor[0] + adjustedFactor * (redColor[0] - blueColor[0]);
     data[i + 1] =
@@ -307,12 +307,25 @@ function applyClassicRedFilter(context, width, height) {
   context.putImageData(imageData, 0, 0);
 }
 
+
 function applyLightFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
 
+  // Subtle gradient colors with reduced saturation
+  const lightRedColor = [230, 100, 110]; // Softened light red
+  const lightBlueColor = [50, 60, 90];   // Softened light blue
+
+  // Apply subtle gradient map
   for (let i = 0; i < data.length; i += 4) {
-    data[i] = data[i] + 100; // Increase red channel
+    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+
+    const factor = brightness / 255;
+    const adjustedFactor = factor; // Linear blend for subtle effect
+
+    data[i] = data[i] * (1 - adjustedFactor) + lightRedColor[0] * adjustedFactor;
+    data[i + 1] = data[i + 1] * (1 - adjustedFactor) + lightRedColor[1] * adjustedFactor;
+    data[i + 2] = data[i + 2] * (1 - adjustedFactor) + lightRedColor[2] * adjustedFactor;
   }
 
   context.putImageData(imageData, 0, 0);
