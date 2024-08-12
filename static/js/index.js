@@ -13,7 +13,7 @@ const MAX_WIDTH = 640;
 const MAX_HEIGHT = 480;
 
 let originalImageWidth, originalImageHeight;
-let currentFilter = 'dark';
+let currentFilter = 'classic';
 
 document.getElementById("image-upload").addEventListener("change", function (e) {
   const reader = new FileReader();
