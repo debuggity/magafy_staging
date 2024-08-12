@@ -249,15 +249,16 @@ function applyGradientMapFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
 
-  const redColor = [243, 4, 13]; // #f3040d
-  const blueColor = [7, 11, 40]; // #070b28
+  // Adjusted colors with reduced saturation
+  const redColor = [210, 50, 60]; // Slightly desaturated and darkened red
+  const blueColor = [5, 8, 20];   // Darker blue
 
   // Apply gradient map
   for (let i = 0; i < data.length; i += 4) {
     const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
 
     const factor = brightness / 255;
-    const adjustedFactor = Math.pow(factor, 0.9);
+    const adjustedFactor = Math.pow(factor, 0.8); // Slightly adjusted gamma for more contrast
 
     data[i] = blueColor[0] + adjustedFactor * (redColor[0] - blueColor[0]);
     data[i + 1] =
@@ -277,7 +278,7 @@ function applyClassicRedFilter(context, width, height) {
   const blueEnhancementFactor = 1.5; // Enhance the blue channel
   const redEnhancementFactor = 1.2; // Enhance the red channel slightly
   const blendFactor = 0.5; // Blend with the raspberry red color
-  const darkenFactor = 0.15; // Subtle darkening effect
+  const darkenFactor = 0.25; // Subtle darkening effect
 
   // Helper function to apply contrast and slight darkening
   function adjustContrast(value, factor) {
