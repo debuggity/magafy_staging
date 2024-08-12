@@ -284,21 +284,8 @@ function applyLightFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
 
-  const redColor = [243, 4, 13]; // #f3040d
-  const blueColor = [7, 11, 40]; // #070b28
-
-  // Apply a lighter gradient map
   for (let i = 0; i < data.length; i += 4) {
-    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
-
-    const factor = brightness / 255;
-    const adjustedFactor = Math.pow(factor, 0.9) * 0.5; // Lighten the effect
-
-    data[i] = blueColor[0] + adjustedFactor * (redColor[0] - blueColor[0]);
-    data[i + 1] =
-      blueColor[1] + adjustedFactor * (redColor[1] - blueColor[1]);
-    data[i + 2] =
-      blueColor[2] + adjustedFactor * (redColor[2] - blueColor[2]);
+    data[i] = data[i] + 100; // Increase red channel
   }
 
   context.putImageData(imageData, 0, 0);
