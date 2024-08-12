@@ -274,16 +274,16 @@ function applyClassicRedFilter(context, width, height) {
   const data = imageData.data;
 
   const overlayColor = [216, 40, 27]; // #d8281b
+  const overlayStrength = 0.8; // Adjust the strength of the overlay (0 to 1)
 
   for (let i = 0; i < data.length; i += 4) {
-    data[i] = overlayColor[0];
-    data[i + 1] = overlayColor[1];
-    data[i + 2] = overlayColor[2];
+    data[i] = data[i] * (1 - overlayStrength) + overlayColor[0] * overlayStrength;
+    data[i + 1] = data[i + 1] * (1 - overlayStrength) + overlayColor[1] * overlayStrength;
+    data[i + 2] = data[i + 2] * (1 - overlayStrength) + overlayColor[2] * overlayStrength;
   }
 
   context.putImageData(imageData, 0, 0);
 }
-
 
 function applyLightFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
