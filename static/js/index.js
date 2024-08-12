@@ -274,10 +274,10 @@ function applyClassicRedFilter(context, width, height) {
   const data = imageData.data;
 
   const overlayColor = [216, 40, 27]; // #d8281b
-  const redBoostFactor = 2; // Increase the influence of red
-  const blueBoostFactor = 1.5;
-  const blendFactor = 0.6; // Control the blending with the overlay color
-  const contrastFactor = 1.2; // Increase contrast (1 is no change, >1 increases contrast)
+  const redBoostFactor = 1.2; // Increase the influence of red
+  const blueBoostFactor = 1.2;
+  const blendFactor = 0.8; // Control the blending with the overlay color
+  const contrastFactor = 1.8; // Increase contrast (1 is no change, >1 increases contrast)
 
   // Helper function to apply contrast
   function adjustContrast(value, factor) {
