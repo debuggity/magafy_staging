@@ -262,6 +262,30 @@ function applyGradientMapFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
 
+  const redColor = [243, 4, 13]; // #f3040d
+  const blueColor = [7, 11, 40]; // #070b28
+
+  // Apply gradient map
+  for (let i = 0; i < data.length; i += 4) {
+    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+
+    const factor = brightness / 255;
+    const adjustedFactor = Math.pow(factor, 0.9);
+
+    data[i] = blueColor[0] + adjustedFactor * (redColor[0] - blueColor[0]);
+    data[i + 1] =
+      blueColor[1] + adjustedFactor * (redColor[1] - blueColor[1]);
+    data[i + 2] =
+      blueColor[2] + adjustedFactor * (redColor[2] - blueColor[2]);
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
+function applyClassicRedFilter(context, width, height) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
   // Adjusted colors with reduced saturation
   const redColor = [210, 50, 60]; // Slightly desaturated and darkened red
   const blueColor = [5, 8, 20];   // Darker blue
@@ -278,41 +302,6 @@ function applyGradientMapFilter(context, width, height) {
       blueColor[1] + adjustedFactor * (redColor[1] - blueColor[1]);
     data[i + 2] =
       blueColor[2] + adjustedFactor * (redColor[2] - blueColor[2]);
-  }
-
-  context.putImageData(imageData, 0, 0);
-}
-
-function applyClassicRedFilter(context, width, height) {
-  const imageData = context.getImageData(0, 0, width, height);
-  const data = imageData.data;
-
-  const raspberryRed = [227, 11, 93]; // Raspberry Red: #E30B5D
-  const blueEnhancementFactor = 1.5; // Enhance the blue channel
-  const redEnhancementFactor = 1.2; // Enhance the red channel slightly
-  const blendFactor = 0.5; // Blend with the raspberry red color
-  const darkenFactor = 0.45; // Subtle darkening effect
-
-  // Helper function to apply contrast and slight darkening
-  function adjustContrast(value, factor) {
-    return ((value - 128) * factor) + 128;
-  }
-
-  for (let i = 0; i < data.length; i += 4) {
-    // Enhance the red channel slightly
-    data[i] = Math.min(255, data[i] * redEnhancementFactor);
-    // Enhance the blue channel to make it pop
-    data[i + 2] = Math.min(255, data[i + 2] * blueEnhancementFactor);
-
-    // Blend with the raspberry red overlay
-    data[i] = data[i] * (1 - blendFactor) + raspberryRed[0] * blendFactor;
-    data[i + 1] = data[i + 1] * (1 - blendFactor) + raspberryRed[1] * blendFactor;
-    data[i + 2] = data[i + 2] * (1 - blendFactor) + raspberryRed[2] * blendFactor;
-
-    // Apply a subtle darkening effect
-    data[i] = adjustContrast(data[i], 1 - darkenFactor);
-    data[i + 1] = adjustContrast(data[i + 1], 1 - darkenFactor);
-    data[i + 2] = adjustContrast(data[i + 2], 1 - darkenFactor);
   }
 
   context.putImageData(imageData, 0, 0);
