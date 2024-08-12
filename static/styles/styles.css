@@ -39,6 +39,28 @@ body {
   .control input[type="range"] {
     flex-grow: 1;
   }
+  .filter-options {
+      display: flex;
+      gap: 10px;
+  }
+
+  .filter-option {
+      padding: 5px 10px;
+      background-color: #333;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+  }
+
+  .filter-option.selected {
+      background-color: #f3040d;
+      transform: scale(1.1);
+  }
+
+  .filter-option:hover {
+      background-color: #555;
+  }
   button {
     padding: 10px 20px;
     border: none;
