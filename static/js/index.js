@@ -65,10 +65,13 @@ document.getElementById("add-laser-button").addEventListener("click", function (
 document.getElementById("resize-slider").addEventListener("input", function (e) {
   const scale = e.target.value;
   lasers.forEach((laser) => {
+    const aspectRatio = laser.image.width / laser.image.height;
     const centerX = laser.x + laser.width / 2;
     const centerY = laser.y + laser.height / 2;
+
     laser.width = (canvas.width / 5) * scale * 2;
-    laser.height = (canvas.height / 5) * scale * 2;
+    laser.height = laser.width / aspectRatio;
+
     laser.x = centerX - laser.width / 2;
     laser.y = centerY - laser.height / 2;
   });
