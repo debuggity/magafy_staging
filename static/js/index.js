@@ -275,13 +275,15 @@ function applyClassicRedFilter(context, width, height) {
 
   const overlayColor = [216, 40, 27]; // #d8281b
   const redBoostFactor = 2; // Increase the influence of red
-  const blendFactor = 0.5; // Control the blending with the overlay color
-  const darkenFactor = 0.2; // Reduce brightness (half as much as the dark filter)
+  const blueBoostFactor = 1.5;
+  const blendFactor = 0.6; // Control the blending with the overlay color
+  const darkenFactor = 0.1; // Reduce brightness (half as much as the dark filter)
 
   for (let i = 0; i < data.length; i += 4) {
     // Boost the red channel while preserving image details
     data[i] = Math.min(255, data[i] * redBoostFactor);
-
+    data[i + 2] = Math.min(255, data[i+2] * blueBoostFactor);
+    
     // Apply a subtle red overlay effect
     data[i] = data[i] * (1 - blendFactor) + overlayColor[0] * blendFactor;
     data[i + 1] = data[i + 1] * (1 - blendFactor) + overlayColor[1] * blendFactor;
