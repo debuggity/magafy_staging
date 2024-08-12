@@ -40,12 +40,22 @@ document.getElementById("image-upload").addEventListener("change", function (e) 
 });
 
 document.getElementById("add-laser-button").addEventListener("click", function () {
+  const aspectRatio = laserImageTemplate.width / laserImageTemplate.height;
+  
+  let laserWidth = (canvas.width / 5) * 3; // Double the size
+  let laserHeight = laserWidth / aspectRatio; // Adjust height based on aspect ratio
+
+  if (laserHeight > canvas.height) {
+    laserHeight = (canvas.height / 5) * 3;
+    laserWidth = laserHeight * aspectRatio;
+  }
+  
   const laser = {
     image: laserImageTemplate,
-    width: (canvas.width / 5) * 3, // Double the size
-    height: (canvas.height / 5) * 3, // Double the size
-    x: canvas.width / 2 - canvas.width / 10,
-    y: canvas.height / 2 - canvas.height / 10,
+    width: laserWidth,
+    height: laserHeight,
+    x: canvas.width / 2 - laserWidth / 2,
+    y: canvas.height / 2 - laserHeight / 2,
     rotation: 0,
   };
   lasers.push(laser);
@@ -278,7 +288,7 @@ function applyClassicRedFilter(context, width, height) {
   const blueEnhancementFactor = 1.5; // Enhance the blue channel
   const redEnhancementFactor = 1.2; // Enhance the red channel slightly
   const blendFactor = 0.5; // Blend with the raspberry red color
-  const darkenFactor = 0.25; // Subtle darkening effect
+  const darkenFactor = 0.45; // Subtle darkening effect
 
   // Helper function to apply contrast and slight darkening
   function adjustContrast(value, factor) {
