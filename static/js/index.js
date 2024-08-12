@@ -326,7 +326,7 @@ function applyLightFilter(context, width, height) {
   const blueColor = [80, 120, 200]; // Strong blue
 
   // Lower blend factor to preserve the original image colors more
-  const blendFactor = 0.4; // Blend factor significantly reduced
+  const blendFactor = 0.6; // Blend factor significantly reduced
 
   for (let i = 0; i < data.length; i += 4) {
     const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
