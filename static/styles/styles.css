@@ -1,117 +1,80 @@
 body {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  background-color: #000;
-}
-
-#canvas-container {
-  position: relative;
-  display: inline-block;
-  margin-bottom: 20px;
-}
-
-canvas {
-  border: 1px solid #000;
-}
-
-.button-container {
-  display: flex;
-  gap: 10px;
-}
-
-.controls-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
-  width: 100%;
-  max-width: 300px;
-}
-
-.control {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.control span {
-  color: white;
-  margin-right: 10px;
-}
-
-.control input[type="range"] {
-  flex-grow: 1;
-}
-
-.filter-options {
-  display: flex;
-  gap: 10px;
-}
-
-.filter-option {
-  padding: 5px 10px;
-  background-color: #333;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-.filter-option.selected {
-  background-color: #f3040d;
-  transform: scale(1.1);
-}
-
-.filter-option:hover {
-  background-color: #555;
-}
-
-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background-color: #333;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-button:hover {
-  background-color: #555;
-}
-
-button:active {
-  transform: scale(0.95);
-}
-
-input[type="file"] {
-  display: none;
-}
-
-label {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background-color: #333;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-label:hover {
-  background-color: #E3A61D;
-}
-
-label:active {
-  transform: scale(0.95);
-}
-
-h1 {
-  color: white;
-}
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #000;
+  }
+  #canvas-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+  canvas {
+    border: 1px solid #000;
+  }
+  .button-container {
+    display: flex;
+    gap: 10px;
+  }
+  .controls-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%;
+    max-width: 300px;
+  }
+  .control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .control span {
+    color: white;
+    margin-right: 10px;
+  }
+  .control input[type="range"] {
+    flex-grow: 1;
+  }
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  button:hover {
+    background-color: #E3A61D;
+  }
+  button:active {
+    transform: scale(0.95);
+  }
+  input[type="file"] {
+    display: none;
+  }
+  label {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  label:hover {
+    background-color: #E3A61D;
+  }
+  label:active {
+    transform: scale(0.95);
+  }
+  h1 {
+    color: white;
+  }
+  
