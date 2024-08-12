@@ -321,27 +321,41 @@ function applyLightFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
 
-  // Stronger red and blue colors
-  const redColor = [255, 100, 120]; // Strong red
-  const blueColor = [80, 120, 200]; // Strong blue
+  // Subtle red and blue tints
+  const redTint = [255, 200, 200];  // Light red
+  const blueTint = [200, 200, 255]; // Light blue
 
-  // Lower blend factor to preserve the original image colors more
-  const blendFactor = 0.6; // Blend factor significantly reduced
+  // Adjust these parameters to fine-tune the effect
+  const tintStrength = 0.2;  // Reduced for subtlety
+  const contrastBoost = 1.1; // Slight contrast increase
 
   for (let i = 0; i < data.length; i += 4) {
-    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    // Get original pixel values
+    let r = data[i];
+    let g = data[i + 1];
+    let b = data[i + 2];
 
-    // Keep the brightness factor moderate to ensure a noticeable effect without overpowering the original colors
-    const factor = Math.pow(brightness / 255, 0.5);
+    // Calculate luminance (perceived brightness)
+    const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
 
-    const newRed = blueColor[0] * (1 - factor) + redColor[0] * factor;
-    const newGreen = blueColor[1] * (1 - factor) + redColor[1] * factor;
-    const newBlue = blueColor[2] * (1 - factor) + redColor[2] * factor;
+    // Apply contrast boost
+    r = Math.min(255, Math.max(0, (r - 128) * contrastBoost + 128));
+    g = Math.min(255, Math.max(0, (g - 128) * contrastBoost + 128));
+    b = Math.min(255, Math.max(0, (b - 128) * contrastBoost + 128));
 
-    // Blend with the original colors, allowing the original image to dominate
-    data[i] = data[i] * (1 - blendFactor) + newRed * blendFactor;
-    data[i + 1] = data[i + 1] * (1 - blendFactor) + newGreen * blendFactor;
-    data[i + 2] = data[i + 2] * (1 - blendFactor) + newBlue * blendFactor;
+    // Apply tint based on luminance
+    const tintFactor = luminance / 255;
+    const redFactor = tintFactor * tintStrength;
+    const blueFactor = (1 - tintFactor) * tintStrength;
+
+    r = Math.min(255, r * (1 - tintStrength) + redTint[0] * redFactor + blueTint[0] * blueFactor);
+    g = Math.min(255, g * (1 - tintStrength) + redTint[1] * redFactor + blueTint[1] * blueFactor);
+    b = Math.min(255, b * (1 - tintStrength) + redTint[2] * redFactor + blueTint[2] * blueFactor);
+
+    // Set new pixel values
+    data[i] = r;
+    data[i + 1] = g;
+    data[i + 2] = b;
   }
 
   context.putImageData(imageData, 0, 0);
