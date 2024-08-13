@@ -109,18 +109,27 @@ canvas.addEventListener("mousedown", function (e) {
   const mouseX = e.offsetX;
   const mouseY = e.offsetY;
   currentLaser = null;
+  let closestDistance = Infinity;
 
   lasers.forEach((laser) => {
+    const centerX = laser.x + laser.width / 2;
+    const centerY = laser.y + laser.height / 2;
+    const distance = Math.sqrt(
+      Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2)
+    );
+
     if (
       mouseX > laser.x &&
       mouseX < laser.x + laser.width &&
       mouseY > laser.y &&
-      mouseY < laser.y + laser.height
+      mouseY < laser.y + laser.height &&
+      distance < closestDistance
     ) {
       laser.isDragging = true;
       offsetX = mouseX - laser.x;
       offsetY = mouseY - laser.y;
       currentLaser = laser;
+      closestDistance = distance;
     }
   });
 
@@ -157,18 +166,27 @@ canvas.addEventListener("touchstart", function (e) {
   const mouseX = (touch.clientX - rect.left) * scaleX;
   const mouseY = (touch.clientY - rect.top) * scaleY;
   currentLaser = null;
+  let closestDistance = Infinity;
 
   lasers.forEach((laser) => {
+    const centerX = laser.x + laser.width / 2;
+    const centerY = laser.y + laser.height / 2;
+    const distance = Math.sqrt(
+      Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2)
+    );
+
     if (
       mouseX > laser.x &&
       mouseX < laser.x + laser.width &&
       mouseY > laser.y &&
-      mouseY < laser.y + laser.height
+      mouseY < laser.y + laser.height &&
+      distance < closestDistance
     ) {
       laser.isDragging = true;
       offsetX = mouseX - laser.x;
       offsetY = mouseY - laser.y;
       currentLaser = laser;
+      closestDistance = distance;
     }
   });
 
