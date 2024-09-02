@@ -1,7 +1,7 @@
 const canvas = document.getElementById("meme-canvas");
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 const laserImageTemplate = new Image();
-laserImageTemplate.src = "https://dmagafy-staging.netlify.app/laser_large.png";
+laserImageTemplate.src = "https://dmagafy.netlify.app/laser_large.png";
 laserImageTemplate.crossOrigin = "anonymous";
 
 let canvasImage = new Image();
@@ -14,6 +14,14 @@ const MAX_HEIGHT = 480;
 
 let originalImageWidth, originalImageHeight;
 let currentFilter = 'classic';
+
+// Set initial values for color sliders
+const redColorSlider = document.getElementById('red-color-slider');
+const blueColorSlider = document.getElementById('blue-color-slider');
+
+redColorSlider.addEventListener('input', updateFilters);
+blueColorSlider.addEventListener('input', updateFilters);
+
 
 window.addEventListener('DOMContentLoaded', () => {
   // Set resize slider to the middle
@@ -326,10 +334,13 @@ function drawCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas before redrawing
   ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
 
+  const redColor = [parseInt(redColorSlider.value), 4, 13];
+  const blueColor = [parseInt(blueColorSlider.value), 11, 40];
+
   if (currentFilter === 'dark') {
-    applyGradientMapFilter(ctx, canvas.width, canvas.height);
+    applyGradientMapFilter(ctx, canvas.width, canvas.height, redColor, blueColor);
   } else if (currentFilter === 'classic') {
-    applyClassicRedFilter(ctx, canvas.width, canvas.height);
+    applyClassicRedFilter(ctx, canvas.width, canvas.height, redColor, blueColor);
   } else if (currentFilter === 'light') {
     applyLightFilter(ctx, canvas.width, canvas.height);
   }
@@ -349,12 +360,10 @@ function drawCanvas() {
   });
 }
 
-function applyGradientMapFilter(context, width, height) {
+
+function applyGradientMapFilter(context, width, height, redColor = [243, 4, 13], blueColor = [7, 11, 40]) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
-
-  const redColor = [243, 4, 13]; // #f3040d
-  const blueColor = [7, 11, 40]; // #070b28
 
   // Apply gradient map
   for (let i = 0; i < data.length; i += 4) {
@@ -373,20 +382,16 @@ function applyGradientMapFilter(context, width, height) {
   context.putImageData(imageData, 0, 0);
 }
 
-function applyClassicRedFilter(context, width, height) {
+function applyClassicRedFilter(context, width, height, redColor = [210, 50, 60], blueColor = [5, 8, 20]) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
-
-  // Adjusted colors with reduced saturation
-  const redColor = [210, 50, 60]; // Slightly desaturated and darkened red
-  const blueColor = [5, 8, 20];   // Darker blue
 
   // Apply gradient map
   for (let i = 0; i < data.length; i += 4) {
     const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
 
     const factor = brightness / 255;
-    const adjustedFactor = Math.pow(factor, 0.8); // Slightly adjusted gamma for more contrast
+    const adjustedFactor = Math.pow(factor, 0.8);
 
     data[i] = blueColor[0] + adjustedFactor * (redColor[0] - blueColor[0]);
     data[i + 1] =
