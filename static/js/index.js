@@ -1,7 +1,7 @@
 const canvas = document.getElementById("meme-canvas");
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 const laserImageTemplate = new Image();
-laserImageTemplate.src = "https://dmagafy.netlify.app/laser_large.png";
+laserImageTemplate.src = "https://dmagafy-staging.netlify.app/laser_large.png";
 laserImageTemplate.crossOrigin = "anonymous";
 
 let canvasImage = new Image();
