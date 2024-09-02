@@ -15,6 +15,28 @@ const MAX_HEIGHT = 480;
 let originalImageWidth, originalImageHeight;
 let currentFilter = 'classic';
 
+function updateFilters() {
+  const redValue = redColorSlider.value;
+  const blueValue = blueColorSlider.value;
+
+  // Update the colors used in the filters
+  const redColor = [parseInt(redValue), 4, 13];
+  const blueColor = [parseInt(blueValue), 11, 40];
+
+  applyFullResGradientMapFilter = function (context, width, height) {
+    if (currentFilter === 'dark') {
+      applyGradientMapFilter(context, width, height, redColor, blueColor);
+    } else if (currentFilter === 'classic') {
+      applyClassicRedFilter(context, width, height, redColor, blueColor);
+    } else if (currentFilter === 'light') {
+      applyLightFilter(context, width, height);
+    }
+  }
+
+  drawCanvas();
+}
+
+
 // Set initial values for color sliders
 const redColorSlider = document.getElementById('red-color-slider');
 const blueColorSlider = document.getElementById('blue-color-slider');
