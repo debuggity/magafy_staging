@@ -201,21 +201,23 @@ body {
   
   #add-hat-button {
     padding: 10px 20px;
-    background-color: #ff0055;
+    background-color: #333; /* Match the color of your other buttons */
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
   }
   
   #add-hat-button:hover {
-    background-color: #ff3366;
+    background-color: #E3A61D; /* Match hover effect with your other buttons */
   }
+  
 
   .separator {
     border: 0;
     height: 2px;
-    background: linear-gradient(to right, #ff0055, #000);
+    background: linear-gradient(to right, #ff0055, #f8cc65);
     margin: 20px 0;
   }  
   
