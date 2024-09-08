@@ -192,6 +192,32 @@ body {
   .hat-option:hover, .hat-option.selected {
     border: 2px solid #ff0000;
   }
+
+  .add-hat-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  #add-hat-button {
+    padding: 10px 20px;
+    background-color: #ff0055;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  #add-hat-button:hover {
+    background-color: #ff3366;
+  }
+
+  .separator {
+    border: 0;
+    height: 2px;
+    background: linear-gradient(to right, #ff0055, #000);
+    margin: 20px 0;
+  }  
   
   @media (max-width: 600px) {
       #canvas-container {
