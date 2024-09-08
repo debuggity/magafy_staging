@@ -185,9 +185,11 @@ document.querySelectorAll('.filter-option').forEach(option => {
 canvas.addEventListener("mousedown", function (e) {
   const mouseX = e.offsetX;
   const mouseY = e.offsetY;
-  currentLaser = null;
   let closestDistance = Infinity;
+  currentLaser = null;
+  currentHat = null;
 
+  // Check lasers for closest
   lasers.forEach((laser) => {
     const centerX = laser.x + laser.width / 2;
     const centerY = laser.y + laser.height / 2;
@@ -202,43 +204,15 @@ canvas.addEventListener("mousedown", function (e) {
       mouseY < laser.y + laser.height &&
       distance < closestDistance
     ) {
-      laser.isDragging = true;
+      closestDistance = distance;
+      currentLaser = laser;
+      currentHat = null; // Reset currentHat to ensure only one is selected
       offsetX = mouseX - laser.x;
       offsetY = mouseY - laser.y;
-      currentLaser = laser;
-      closestDistance = distance;
     }
   });
 
-  if (currentLaser) {
-    isDragging = true;
-  }
-});
-
-canvas.addEventListener("mousemove", function (e) {
-  if (isDragging && currentLaser) {
-    const mouseX = e.offsetX;
-    const mouseY = e.offsetY;
-    currentLaser.x = mouseX - offsetX;
-    currentLaser.y = mouseY - offsetY;
-    drawCanvas();
-  }
-});
-
-canvas.addEventListener("mouseup", function () {
-  if (currentLaser) {
-    currentLaser.isDragging = false;
-    isDragging = false;
-    currentLaser = null;
-  }
-});
-
-canvas.addEventListener("mousedown", function (e) {
-  const mouseX = e.offsetX;
-  const mouseY = e.offsetY;
-  currentHat = null;
-  let closestDistance = Infinity;
-
+  // Check hats for closest, only if closer than the closest laser
   hats.forEach((hat) => {
     const centerX = hat.x + hat.width / 2;
     const centerY = hat.y + hat.height / 2;
@@ -253,34 +227,54 @@ canvas.addEventListener("mousedown", function (e) {
       mouseY < hat.y + hat.height &&
       distance < closestDistance
     ) {
-      hat.isDragging = true;
+      closestDistance = distance;
+      currentHat = hat;
+      currentLaser = null; // Reset currentLaser to ensure only one is selected
       offsetX = mouseX - hat.x;
       offsetY = mouseY - hat.y;
-      currentHat = hat;
-      closestDistance = distance;
     }
   });
 
-  if (currentHat) {
+  // Set dragging flag if either laser or hat is selected
+  if (currentLaser || currentHat) {
     isDragging = true;
   }
 });
 
 canvas.addEventListener("mousemove", function (e) {
-  if (isDragging && currentHat) {
+  if (isDragging) {
     const mouseX = e.offsetX;
     const mouseY = e.offsetY;
-    currentHat.x = mouseX - offsetX;
-    currentHat.y = mouseY - offsetY;
-    drawCanvas();
+
+    // If dragging a laser
+    if (currentLaser) {
+      currentLaser.x = mouseX - offsetX;
+      currentLaser.y = mouseY - offsetY;
+    }
+
+    // If dragging a hat
+    if (currentHat) {
+      currentHat.x = mouseX - offsetX;
+      currentHat.y = mouseY - offsetY;
+    }
+
+    drawCanvas(); // Redraw canvas with updated positions
   }
 });
 
 canvas.addEventListener("mouseup", function () {
-  if (currentHat) {
-    currentHat.isDragging = false;
+  if (isDragging) {
+    if (currentLaser) {
+      currentLaser.isDragging = false;
+    }
+
+    if (currentHat) {
+      currentHat.isDragging = false;
+    }
+
     isDragging = false;
-    currentHat = null;
+    currentLaser = null;
+    currentHat = null; // Reset everything after mouse release
   }
 });
 

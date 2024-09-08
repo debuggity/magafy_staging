@@ -217,7 +217,7 @@ body {
   .separator {
     border: 0;
     height: 2px;
-    background: linear-gradient(to right, #ff0055, #f8cc65);
+    background: linear-gradient(to right, #ff0055, #4e4c4c);
     margin: 20px 0;
   }  
   
