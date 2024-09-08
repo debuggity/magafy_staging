@@ -177,6 +177,22 @@ body {
   h1 {
     color: white;
   }
+
+  .hat-options {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .hat-option {
+    width: 50px;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  
+  .hat-option:hover, .hat-option.selected {
+    border: 2px solid #ff0000;
+  }
+  
   @media (max-width: 600px) {
       #canvas-container {
           max-width: 100%;

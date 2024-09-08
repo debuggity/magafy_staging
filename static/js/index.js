@@ -9,6 +9,11 @@ let lasers = [];
 let isDragging = false;
 let currentLaser = null;
 let offsetX, offsetY;
+
+let selectedHatImage = null;
+let hats = [];
+let currentHat = null;
+
 const MAX_WIDTH = 640;
 const MAX_HEIGHT = 480;
 
@@ -72,6 +77,32 @@ document.getElementById("add-laser-button").addEventListener("click", function (
   drawCanvas();
 });
 
+document.getElementById("add-hat-button").addEventListener("click", function () {
+  if (!selectedHatImage) return;
+
+  const aspectRatio = selectedHatImage.width / selectedHatImage.height;
+  
+  let hatWidth = (canvas.width / 5) * 2;
+  let hatHeight = hatWidth / aspectRatio;
+
+  if (hatHeight > canvas.height) {
+    hatHeight = (canvas.height / 5) * 2;
+    hatWidth = hatHeight * aspectRatio;
+  }
+
+  const hat = {
+    image: selectedHatImage,
+    width: hatWidth,
+    height: hatHeight,
+    x: canvas.width / 2 - hatWidth / 2,
+    y: canvas.height / 2 - hatHeight / 2,
+    rotation: 0,
+  };
+  hats.push(hat);
+  drawCanvas();
+});
+
+
 document.getElementById("resize-slider").addEventListener("input", function (e) {
   const scale = e.target.value;
   lasers.forEach((laser) => {
@@ -88,12 +119,58 @@ document.getElementById("resize-slider").addEventListener("input", function (e) 
   drawCanvas();
 });
 
+document.getElementById("hat-resize-slider").addEventListener("input", function (e) {
+  const scale = e.target.value;
+  hats.forEach((hat) => {
+    const aspectRatio = hat.image.width / hat.image.height;
+    const centerX = hat.x + hat.width / 2;
+    const centerY = hat.y + hat.height / 2;
+
+    hat.width = (canvas.width / 5) * scale * 2;
+    hat.height = hat.width / aspectRatio;
+
+    hat.x = centerX - hat.width / 2;
+    hat.y = centerY - hat.height / 2;
+  });
+  drawCanvas();
+});
+
 document.getElementById("rotate-slider").addEventListener("input", function (e) {
   const rotation = (e.target.value * Math.PI) / 180;
   lasers.forEach((laser) => {
     laser.rotation = rotation;
   });
   drawCanvas();
+});
+
+document.getElementById("hat-rotate-slider").addEventListener("input", function (e) {
+  const rotation = (e.target.value * Math.PI) / 180;
+  hats.forEach((hat) => {
+    hat.rotation = rotation;
+  });
+  drawCanvas();
+});
+
+
+document.querySelectorAll('.hat-option').forEach(option => {
+  option.addEventListener('click', function () {
+    document.querySelectorAll('.hat-option').forEach(opt => opt.classList.remove('selected'));
+    this.classList.add('selected');
+
+    selectedHatImage = new Image();
+    
+    // Set the URL of the hat image
+    const hatUrl = {
+      'hat1': "https://dmagafy-staging.netlify.app/hat_front_1.png",
+      'hat2': "https://dmagafy-staging.netlify.app/hat_front_2.png",
+      'hatLeft': "https://dmagafy-staging.netlify.app/hat_left.png",
+      'hatRight': "https://dmagafy-staging.netlify.app/hat_right.png"
+    };
+
+    const hatType = this.getAttribute('data-hat');
+    selectedHatImage.src = hatUrl[hatType];
+    selectedHatImage.crossOrigin = 'anonymous';  // Add this if images are hosted on a different domain
+  });
 });
 
 document.querySelectorAll('.filter-option').forEach(option => {
@@ -153,6 +230,57 @@ canvas.addEventListener("mouseup", function () {
     currentLaser.isDragging = false;
     isDragging = false;
     currentLaser = null;
+  }
+});
+
+canvas.addEventListener("mousedown", function (e) {
+  const mouseX = e.offsetX;
+  const mouseY = e.offsetY;
+  currentHat = null;
+  let closestDistance = Infinity;
+
+  hats.forEach((hat) => {
+    const centerX = hat.x + hat.width / 2;
+    const centerY = hat.y + hat.height / 2;
+    const distance = Math.sqrt(
+      Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2)
+    );
+
+    if (
+      mouseX > hat.x &&
+      mouseX < hat.x + hat.width &&
+      mouseY > hat.y &&
+      mouseY < hat.y + hat.height &&
+      distance < closestDistance
+    ) {
+      hat.isDragging = true;
+      offsetX = mouseX - hat.x;
+      offsetY = mouseY - hat.y;
+      currentHat = hat;
+      closestDistance = distance;
+    }
+  });
+
+  if (currentHat) {
+    isDragging = true;
+  }
+});
+
+canvas.addEventListener("mousemove", function (e) {
+  if (isDragging && currentHat) {
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
+    currentHat.x = mouseX - offsetX;
+    currentHat.y = mouseY - offsetY;
+    drawCanvas();
+  }
+});
+
+canvas.addEventListener("mouseup", function () {
+  if (currentHat) {
+    currentHat.isDragging = false;
+    isDragging = false;
+    currentHat = null;
   }
 });
 
@@ -334,6 +462,7 @@ function drawCanvas() {
     applyLightFilter(ctx, canvas.width, canvas.height);
   }
 
+  // Draw lasers
   lasers.forEach((laser) => {
     ctx.save();
     ctx.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
@@ -347,7 +476,23 @@ function drawCanvas() {
     );
     ctx.restore();
   });
+
+  // Draw hats
+  hats.forEach((hat) => {
+    ctx.save();
+    ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
+    ctx.rotate(hat.rotation);
+    ctx.drawImage(
+      hat.image,
+      -hat.width / 2,
+      -hat.height / 2,
+      hat.width,
+      hat.height
+    );
+    ctx.restore();
+  });
 }
+
 
 function applyGradientMapFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);

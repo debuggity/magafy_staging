@@ -41,6 +41,29 @@
           value="0"
         />
       </div>
+      
+      <!-- New Hat Controls -->
+      <div class="hat-container">
+        <div class="hat-selection">
+          <span>Select Hat:</span>
+          <div class="hat-options">
+            <img class="hat-option" src="hat_front_1.png" alt="Hat 1" data-hat="hat1" />
+            <img class="hat-option" src="hat_front_2.png" alt="Hat 2" data-hat="hat2" />
+            <img class="hat-option" src="hat_left.png" alt="Hat Left" data-hat="hatLeft" />
+            <img class="hat-option" src="hat_right.png" alt="Hat Right" data-hat="hatRight" />
+          </div>
+          <button id="add-hat-button">Add Hat</button>
+        </div>
+        <div class="control">
+          <span>Resize Hat:</span>
+          <input type="range" id="hat-resize-slider" min="0.5" max="2" step="0.1" value="1.25" />
+        </div>
+        <div class="control">
+          <span>Rotate Hat:</span>
+          <input type="range" id="hat-rotate-slider" min="-180" max="180" step="1" value="0" />
+        </div>
+      </div>
+
       <div class="control">
         <span>Choose Filter:</span>
         <div class="filter-options">
