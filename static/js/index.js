@@ -361,6 +361,7 @@ document.getElementById("download-button").addEventListener("click", function ()
   const scaleX = fullResCanvas.width / canvas.width;
   const scaleY = fullResCanvas.height / canvas.height;
 
+  // Draw lasers on the full resolution canvas
   lasers.forEach((laser) => {
     fullResCtx.save();
     fullResCtx.translate(
@@ -378,6 +379,25 @@ document.getElementById("download-button").addEventListener("click", function ()
     fullResCtx.restore();
   });
 
+  // Draw hats on the full resolution canvas
+  hats.forEach((hat) => {
+    fullResCtx.save();
+    fullResCtx.translate(
+      hat.x * scaleX + (hat.width * scaleX) / 2,
+      hat.y * scaleY + (hat.height * scaleY) / 2
+    );
+    fullResCtx.rotate(hat.rotation);
+    fullResCtx.drawImage(
+      hat.image,
+      -(hat.width * scaleX) / 2,
+      -(hat.height * scaleY) / 2,
+      hat.width * scaleX,
+      hat.height * scaleY
+    );
+    fullResCtx.restore();
+  });
+
+  // Create a blob and download the image
   fullResCanvas.toBlob(function (blob) {
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
