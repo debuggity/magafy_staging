@@ -352,6 +352,9 @@ document.getElementById("download-button").addEventListener("click", function ()
   // Apply the gradient map filter to the full resolution canvas
   applyFullResGradientMapFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
 
+  // Apply contrast and redness adjustments
+  applyFullResContrastAndRedness(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+
   const scaleX = fullResCanvas.width / canvas.width;
   const scaleY = fullResCanvas.height / canvas.height;
 
@@ -634,6 +637,24 @@ function applyLightFilter(context, width, height) {
 
   context.putImageData(imageData, 0, 0);
 }
+
+function applyFullResContrastAndRedness(context, width, height) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    // Apply contrast adjustment
+    data[i] = ((data[i] - 128) * contrastValue + 128);  // Red channel
+    data[i + 1] = ((data[i + 1] - 128) * contrastValue + 128);  // Green channel
+    data[i + 2] = ((data[i + 2] - 128) * contrastValue + 128);  // Blue channel
+
+    // Apply redness adjustment
+    data[i] = data[i] * rednessValue;  // Only adjust red channel
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
 
 function applyFullResGradientMapFilter(context, width, height) {
   if (currentFilter === 'dark') {
