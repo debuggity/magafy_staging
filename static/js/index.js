@@ -463,11 +463,34 @@ canvas.addEventListener("drop", function (e) {
   }
 });
 
+document.getElementById("contrast-slider").addEventListener("input", function (e) {
+  contrastValue = e.target.value;
+  drawCanvas();
+});
+
+document.getElementById("redness-slider").addEventListener("input", function (e) {
+  rednessValue = e.target.value;
+  drawCanvas();
+});
+
+// Reset adjustments
+document.getElementById("reset-adjustments-button").addEventListener("click", function () {
+  contrastValue = 1;
+  rednessValue = 1;
+  document.getElementById("contrast-slider").value = 1;
+  document.getElementById("redness-slider").value = 1;
+  drawCanvas();
+});
+
+
+let contrastValue = 1;  // Default contrast value
+let rednessValue = 1;   // Default redness value
 
 function drawCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas before redrawing
   ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
 
+  // Apply selected filter
   if (currentFilter === 'dark') {
     applyGradientMapFilter(ctx, canvas.width, canvas.height);
   } else if (currentFilter === 'classic') {
@@ -476,18 +499,15 @@ function drawCanvas() {
     applyLightFilter(ctx, canvas.width, canvas.height);
   }
 
+  // Apply contrast and redness adjustments
+  applyContrastAndRedness(ctx, canvas.width, canvas.height);
+
   // Draw lasers
   lasers.forEach((laser) => {
     ctx.save();
     ctx.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
     ctx.rotate(laser.rotation);
-    ctx.drawImage(
-      laser.image,
-      -laser.width / 2,
-      -laser.height / 2,
-      laser.width,
-      laser.height
-    );
+    ctx.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
     ctx.restore();
   });
 
@@ -496,16 +516,29 @@ function drawCanvas() {
     ctx.save();
     ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
     ctx.rotate(hat.rotation);
-    ctx.drawImage(
-      hat.image,
-      -hat.width / 2,
-      -hat.height / 2,
-      hat.width,
-      hat.height
-    );
+    ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
     ctx.restore();
   });
 }
+
+// Apply contrast and redness adjustments
+function applyContrastAndRedness(context, width, height) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    // Apply contrast adjustment
+    data[i] = ((data[i] - 128) * contrastValue + 128);  // Red channel
+    data[i + 1] = ((data[i + 1] - 128) * contrastValue + 128);  // Green channel
+    data[i + 2] = ((data[i + 2] - 128) * contrastValue + 128);  // Blue channel
+
+    // Apply redness adjustment
+    data[i] = data[i] * rednessValue;  // Only adjust red channel
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
 
 
 function applyGradientMapFilter(context, width, height) {

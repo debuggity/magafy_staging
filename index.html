@@ -75,6 +75,18 @@
       <hr class="separator">
 
       <div class="control">
+        <span>Adjust Contrast:</span>
+        <input type="range" id="contrast-slider" min="0.5" max="2" step="0.1" value="1" />
+      </div>
+      <div class="control">
+        <span>Adjust Redness:</span>
+        <input type="range" id="redness-slider" min="0" max="2" step="0.1" value="1" />
+      </div>
+      <div class="control">
+        <button id="reset-adjustments-button">Reset Adjustments</button>
+      </div>
+
+      <div class="control">
         <span>Choose Filter:</span>
         <div class="filter-options">
           <div class="filter-option" data-filter="dark">Classic Red</div>

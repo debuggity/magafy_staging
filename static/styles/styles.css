@@ -212,7 +212,24 @@ body {
   #add-hat-button:hover {
     background-color: #E3A61D; /* Match hover effect with your other buttons */
   }
+
+  #reset-adjustments-button {
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+  }
   
+  #reset-adjustments-button:hover {
+    background-color: #E3A61D;
+  }
+  
+  #reset-adjustments-button:active {
+    transform: scale(0.95);
+  }  
 
   .separator {
     border: 0;
