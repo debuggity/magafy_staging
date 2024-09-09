@@ -294,7 +294,7 @@ h1 {
   cursor: pointer;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   transition: background 0.3s, transform 0.3s;
-  transform: translateY(-50%); /* Ensure vertical centering */
+  transform: translateY(-20%); /* Ensure vertical centering */
 }
 
 /* Specific thumb color for contrast slider */
