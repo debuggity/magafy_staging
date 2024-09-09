@@ -268,7 +268,7 @@ h1 {
   height: 6px;
   border-radius: 5px;
   transition: background 0.3s;
-  margin: 0; /* Ensure no extra margin that might misalign */
+  background: #32406C; /* Base background color */
 }
 
 /* Contrast slider gradient */
@@ -281,34 +281,34 @@ h1 {
 }
 
 /* Slider thumb styles */
-/* Neutral thumb for contrast slider */
+/* General thumb style (neutral) */
 #contrast-slider::-webkit-slider-thumb,
-#contrast-slider::-moz-range-thumb,
-#contrast-slider::-ms-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #2A334E; /* Neutral blue-gray color */
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  transition: background 0.3s, transform 0.3s;
-  position: relative;
-  top: -7px; /* Adjust vertical alignment */
-}
-
-/* Red thumb for redness slider */
 #redness-slider::-webkit-slider-thumb,
+#contrast-slider::-moz-range-thumb,
 #redness-slider::-moz-range-thumb,
+#contrast-slider::-ms-thumb,
 #redness-slider::-ms-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #ff0000; /* Red color for redness adjustment */
   cursor: pointer;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   transition: background 0.3s, transform 0.3s;
-  position: relative;
-  top: -7px; /* Adjust vertical alignment */
+  transform: translateY(-50%); /* Ensure vertical centering */
+}
+
+/* Specific thumb color for contrast slider */
+#contrast-slider::-webkit-slider-thumb,
+#contrast-slider::-moz-range-thumb,
+#contrast-slider::-ms-thumb {
+  background: #2A334E; /* Neutral color for contrast */
+}
+
+/* Specific thumb color for redness slider */
+#redness-slider::-webkit-slider-thumb,
+#redness-slider::-moz-range-thumb,
+#redness-slider::-ms-thumb {
+  background: #ff0000; /* Red color for redness */
 }
 
 /* Hover effect for both slider thumbs */
@@ -318,7 +318,7 @@ h1 {
 #redness-slider::-webkit-slider-thumb:hover,
 #redness-slider::-moz-range-thumb:hover,
 #redness-slider::-ms-thumb:hover {
-  transform: scale(1.1); /* Enlarge on hover */
+  transform: scale(1.1) translateY(-50%); /* Enlarge and keep centered */
 }
 
 /* Hover color for contrast thumb */
@@ -334,6 +334,7 @@ h1 {
 #redness-slider::-ms-thumb:hover {
   background: #ff3333; /* Slightly lighter red on hover */
 }
+
 
 @media (max-width: 700px) {
   body {
