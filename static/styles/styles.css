@@ -267,6 +267,8 @@ h1 {
     flex-direction: column;
     justify-content: flex-start; /* Align everything to the top instead of center */
     padding: 10px;  /* Add some padding to prevent cut-off */
+    transform: scale(0.8);  /* Zoom out to 80% */
+    transform-origin: top;  /* Set the origin of the scale transformation */
   }
 
   #canvas-container {
@@ -288,4 +290,5 @@ h1 {
     max-width: 100%;  /* Adjust max width of controls to fit smaller screens */
   }
 }
+
 
