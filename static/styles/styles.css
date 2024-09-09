@@ -178,6 +178,30 @@ h1 {
   color: white;
 }
 
+.add-laser-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+#add-laser-button {
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+#add-laser-button:hover {
+  background-color: #E3A61D;
+}
+
+#add-laser-button:active {
+  transform: scale(0.95);
+}
+
 .hat-options {
   display: flex;
   gap: 10px;
