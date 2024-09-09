@@ -287,10 +287,5 @@ h1 {
     width: 100%;
     max-width: 100%;  /* Adjust max width of controls to fit smaller screens */
   }
-
-  .button-container {
-    flex-direction: column;  /* Stack buttons vertically on small screens */
-    gap: 15px;
-  }
 }
 
