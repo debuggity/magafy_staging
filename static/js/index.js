@@ -287,9 +287,12 @@ canvas.addEventListener("touchstart", function (e) {
   const scaleY = canvas.height / rect.height;
   const mouseX = (touch.clientX - rect.left) * scaleX;
   const mouseY = (touch.clientY - rect.top) * scaleY;
-  currentLaser = null;
-  let closestDistance = Infinity;
 
+  let closestDistance = Infinity;
+  currentLaser = null;
+  currentHat = null;
+
+  // Check lasers for closest
   lasers.forEach((laser) => {
     const centerX = laser.x + laser.width / 2;
     const centerY = laser.y + laser.height / 2;
@@ -304,21 +307,44 @@ canvas.addEventListener("touchstart", function (e) {
       mouseY < laser.y + laser.height &&
       distance < closestDistance
     ) {
-      laser.isDragging = true;
+      closestDistance = distance;
+      currentLaser = laser;
+      currentHat = null; // Ensure no hat is selected if a laser is closer
       offsetX = mouseX - laser.x;
       offsetY = mouseY - laser.y;
-      currentLaser = laser;
-      closestDistance = distance;
     }
   });
 
-  if (currentLaser) {
+  // Check hats for closest, but only if no closer laser is found
+  hats.forEach((hat) => {
+    const centerX = hat.x + hat.width / 2;
+    const centerY = hat.y + hat.height / 2;
+    const distance = Math.sqrt(
+      Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2)
+    );
+
+    if (
+      mouseX > hat.x &&
+      mouseX < hat.x + hat.width &&
+      mouseY > hat.y &&
+      mouseY < hat.y + hat.height &&
+      distance < closestDistance
+    ) {
+      closestDistance = distance;
+      currentHat = hat;
+      currentLaser = null; // Ensure no laser is selected if a hat is closer
+      offsetX = mouseX - hat.x;
+      offsetY = mouseY - hat.y;
+    }
+  });
+
+  if (currentLaser || currentHat) {
     isDragging = true;
   }
 });
 
 canvas.addEventListener("touchmove", function (e) {
-  if (isDragging && currentLaser) {
+  if (isDragging) {
     e.preventDefault();
     const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
@@ -326,9 +352,18 @@ canvas.addEventListener("touchmove", function (e) {
     const scaleY = canvas.height / rect.height;
     const mouseX = (touch.clientX - rect.left) * scaleX;
     const mouseY = (touch.clientY - rect.top) * scaleY;
-    currentLaser.x = mouseX - offsetX;
-    currentLaser.y = mouseY - offsetY;
-    drawCanvas();
+
+    if (currentLaser) {
+      currentLaser.x = mouseX - offsetX;
+      currentLaser.y = mouseY - offsetY;
+    }
+
+    if (currentHat) {
+      currentHat.x = mouseX - offsetX;
+      currentHat.y = mouseY - offsetY;
+    }
+
+    drawCanvas();  // Redraw canvas with updated positions
   }
 });
 

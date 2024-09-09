@@ -1,255 +1,272 @@
 body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #000;
+}
+#canvas-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+canvas {
+  border: 1px solid #000;
+}
+.button-container {
+  display: flex;
+  gap: 10px;
+}
+.controls-container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.control {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #000;
+}
+
+.control span {
+    color: white;
+    margin-right: 10px;
+}
+
+.control input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #32406C;
+    outline: none;
+    border-radius: 5px;
+    transition: background 0.3s;
+    touch-action: none;
+}
+
+.control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #2A334E;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s, transform 0.3s;
+}
+
+.control input[type="range"]::-webkit-slider-thumb:hover {
+    background: #3B4B7E;
+    transform: scale(1.1);
+}
+
+.control input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #2A334E;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s, transform 0.3s;
+}
+
+.control input[type="range"]::-moz-range-thumb:hover {
+    background: #3B4B7E;
+    transform: scale(1.1);
+}
+
+.control input[type="range"]::-ms-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #2A334E;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s, transform 0.3s;
+}
+
+.control input[type="range"]::-ms-thumb:hover {
+    background: #3B4B7E;
+    transform: scale(1.1);
+}
+
+.control input[type="range"]::-moz-range-track {
+    background: #32406C;
+    border-radius: 5px;
+}
+
+.control input[type="range"]::-ms-track {
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+}
+
+.control input[type="range"]::-ms-fill-lower {
+    background: #32406C;
+    border-radius: 5px;
+}
+
+.control input[type="range"]::-ms-fill-upper {
+    background: #32406C;
+    border-radius: 5px;
+}
+.filter-options {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-option {
+    padding: 5px 10px;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.filter-option.selected {
+    background-color: #f3040d;
+    transform: scale(1.1);
+}
+
+.filter-option:hover {
+    background-color: #E3A61D;
+}
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #333;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+button:hover {
+  background-color: #E3A61D;
+}
+button:active {
+  transform: scale(0.95);
+}
+input[type="file"] {
+  display: none;
+}
+label {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #333;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+label:hover {
+  background-color: #E3A61D;
+}
+label:active {
+  transform: scale(0.95);
+}
+h1 {
+  color: white;
+}
+
+.hat-options {
+  display: flex;
+  gap: 10px;
+}
+
+.hat-option {
+  width: 50px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.hat-option:hover, .hat-option.selected {
+  border: 2px solid #ff0000;
+}
+
+.add-hat-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+#add-hat-button {
+  padding: 10px 20px;
+  background-color: #333; /* Match the color of your other buttons */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+#add-hat-button:hover {
+  background-color: #E3A61D; /* Match hover effect with your other buttons */
+}
+
+#reset-adjustments-button {
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+#reset-adjustments-button:hover {
+  background-color: #E3A61D;
+}
+
+#reset-adjustments-button:active {
+  transform: scale(0.95);
+}  
+
+.separator {
+  border: 0;
+  height: 2px;
+  background: linear-gradient(to right, #ff0055, #4e4c4c);
+  margin: 20px 0;
+}  
+
+@media (max-width: 700px) {
+  body {
+    flex-direction: column;
+    justify-content: flex-start; /* Align everything to the top instead of center */
+    padding: 10px;  /* Add some padding to prevent cut-off */
   }
+
   #canvas-container {
     position: relative;
     display: inline-block;
     margin-bottom: 20px;
+    width: 100%; /* Ensures the container fits within the mobile screen */
+    padding-top: 20px; /* Add padding at the top for extra space */
   }
+
   canvas {
-    border: 1px solid #000;
+    width: 100%;  /* Allow canvas to shrink for smaller screens */
+    height: auto; /* Maintain aspect ratio */
+    max-width: 100%;  /* Max width to fit in mobile */
   }
-  .button-container {
-    display: flex;
-    gap: 10px;
-  }
+
   .controls-container {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
-      width: 100%;
-      max-width: 300px;
+    width: 100%;
+    max-width: 100%;  /* Adjust max width of controls to fit smaller screens */
   }
 
-  .control {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+  .button-container {
+    flex-direction: column;  /* Stack buttons vertically on small screens */
+    gap: 15px;
   }
+}
 
-  .control span {
-      color: white;
-      margin-right: 10px;
-  }
-
-  .control input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
-      background: #32406C;
-      outline: none;
-      border-radius: 5px;
-      transition: background 0.3s;
-      touch-action: none;
-  }
-
-  .control input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #2A334E;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-      transition: background 0.3s, transform 0.3s;
-  }
-
-  .control input[type="range"]::-webkit-slider-thumb:hover {
-      background: #3B4B7E;
-      transform: scale(1.1);
-  }
-
-  .control input[type="range"]::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #2A334E;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-      transition: background 0.3s, transform 0.3s;
-  }
-
-  .control input[type="range"]::-moz-range-thumb:hover {
-      background: #3B4B7E;
-      transform: scale(1.1);
-  }
-
-  .control input[type="range"]::-ms-thumb {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #2A334E;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-      transition: background 0.3s, transform 0.3s;
-  }
-
-  .control input[type="range"]::-ms-thumb:hover {
-      background: #3B4B7E;
-      transform: scale(1.1);
-  }
-
-  .control input[type="range"]::-moz-range-track {
-      background: #32406C;
-      border-radius: 5px;
-  }
-
-  .control input[type="range"]::-ms-track {
-      background: transparent;
-      border-color: transparent;
-      color: transparent;
-  }
-
-  .control input[type="range"]::-ms-fill-lower {
-      background: #32406C;
-      border-radius: 5px;
-  }
-
-  .control input[type="range"]::-ms-fill-upper {
-      background: #32406C;
-      border-radius: 5px;
-  }
-  .filter-options {
-      display: flex;
-      gap: 10px;
-  }
-
-  .filter-option {
-      padding: 5px 10px;
-      background-color: #333;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s, transform 0.3s;
-  }
-
-  .filter-option.selected {
-      background-color: #f3040d;
-      transform: scale(1.1);
-  }
-
-  .filter-option:hover {
-      background-color: #E3A61D;
-  }
-  button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #333;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-  }
-  button:hover {
-    background-color: #E3A61D;
-  }
-  button:active {
-    transform: scale(0.95);
-  }
-  input[type="file"] {
-    display: none;
-  }
-  label {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #333;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-  }
-  label:hover {
-    background-color: #E3A61D;
-  }
-  label:active {
-    transform: scale(0.95);
-  }
-  h1 {
-    color: white;
-  }
-
-  .hat-options {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .hat-option {
-    width: 50px;
-    cursor: pointer;
-    border: 2px solid transparent;
-  }
-  
-  .hat-option:hover, .hat-option.selected {
-    border: 2px solid #ff0000;
-  }
-
-  .add-hat-button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-  }
-  
-  #add-hat-button {
-    padding: 10px 20px;
-    background-color: #333; /* Match the color of your other buttons */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-  }
-  
-  #add-hat-button:hover {
-    background-color: #E3A61D; /* Match hover effect with your other buttons */
-  }
-
-  #reset-adjustments-button {
-    padding: 10px 20px;
-    background-color: #333;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-  }
-  
-  #reset-adjustments-button:hover {
-    background-color: #E3A61D;
-  }
-  
-  #reset-adjustments-button:active {
-    transform: scale(0.95);
-  }  
-
-  .separator {
-    border: 0;
-    height: 2px;
-    background: linear-gradient(to right, #ff0055, #4e4c4c);
-    margin: 20px 0;
-  }  
-  
-  @media (max-width: 700px) {
-    #canvas-container {
-      position: relative;
-      display: inline-block;
-      margin-bottom: 20px;
-      width: 100%; /* Ensures the container fits within the mobile screen */
-    }
-
-    canvas {
-      width: 100%;  /* Allow canvas to shrink for smaller screens */
-      height: auto; /* Maintain aspect ratio */
-      max-width: 100%;  /* Max width to fit in mobile */
-    }
-  }
-  
