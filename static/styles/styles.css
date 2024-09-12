@@ -1,144 +1,112 @@
 body {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  height: 100vh;
-  margin: 0;
   background-color: #000;
+  margin: 0;
 }
+
 #canvas-container {
   position: relative;
-  display: inline-block;
-  margin-bottom: 20px;
+  margin-top: 20px;
 }
+
 canvas {
   border: 1px solid #000;
 }
+
 .button-container {
   display: flex;
   gap: 10px;
+  margin-top: 20px;
 }
+
 .controls-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
-    width: 100%;
-    max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start; /* Align controls to the left */
+  width: 100%;
+  max-width: 300px;
 }
 
 .control {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .control span {
-    color: white;
-    margin-right: 10px;
+  color: white;
+  margin-bottom: 5px;
 }
 
 .control input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 6px;
-    background: #32406C;
-    outline: none;
-    border-radius: 5px;
-    transition: background 0.3s;
-    touch-action: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: #32406C;
+  outline: none;
+  border-radius: 5px;
+  transition: background 0.3s;
+  touch-action: none;
 }
 
 .control input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #2A334E;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    transition: background 0.3s, transform 0.3s;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2A334E;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  transition: background 0.3s, transform 0.3s;
 }
 
 .control input[type="range"]::-webkit-slider-thumb:hover {
-    background: #3B4B7E;
-    transform: scale(1.1);
+  background: #3B4B7E;
+  transform: scale(1.1);
 }
 
 .control input[type="range"]::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #2A334E;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    transition: background 0.3s, transform 0.3s;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2A334E;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  transition: background 0.3s, transform 0.3s;
 }
 
 .control input[type="range"]::-moz-range-thumb:hover {
-    background: #3B4B7E;
-    transform: scale(1.1);
+  background: #3B4B7E;
+  transform: scale(1.1);
 }
 
-.control input[type="range"]::-ms-thumb {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #2A334E;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    transition: background 0.3s, transform 0.3s;
-}
-
-.control input[type="range"]::-ms-thumb:hover {
-    background: #3B4B7E;
-    transform: scale(1.1);
-}
-
-.control input[type="range"]::-moz-range-track {
-    background: #32406C;
-    border-radius: 5px;
-}
-
-.control input[type="range"]::-ms-track {
-    background: transparent;
-    border-color: transparent;
-    color: transparent;
-}
-
-.control input[type="range"]::-ms-fill-lower {
-    background: #32406C;
-    border-radius: 5px;
-}
-
-.control input[type="range"]::-ms-fill-upper {
-    background: #32406C;
-    border-radius: 5px;
-}
 .filter-options {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .filter-option {
-    padding: 5px 10px;
-    background-color: #333;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
+  padding: 5px 10px;
+  background-color: #333;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
 }
 
 .filter-option.selected {
-    background-color: #f3040d;
-    transform: scale(1.1);
+  background-color: #f3040d;
+  transform: scale(1.1);
 }
 
 .filter-option:hover {
-    background-color: #E3A61D;
+  background-color: #E3A61D;
 }
+
 button {
   padding: 10px 20px;
   border: none;
@@ -149,15 +117,19 @@ button {
   cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
 }
+
 button:hover {
   background-color: #E3A61D;
 }
+
 button:active {
   transform: scale(0.95);
 }
+
 input[type="file"] {
   display: none;
 }
+
 label {
   padding: 10px 20px;
   border: none;
@@ -168,38 +140,25 @@ label {
   cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
 }
+
 label:hover {
   background-color: #E3A61D;
 }
+
 label:active {
   transform: scale(0.95);
 }
+
 h1 {
   color: white;
+  margin-top: 20px;
 }
 
-.add-laser-button-container {
+.add-laser-button-container,
+.add-hat-button-container {
   display: flex;
   justify-content: center;
   margin-top: 10px;
-}
-
-#add-laser-button {
-  padding: 10px 20px;
-  background-color: #333;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-#add-laser-button:hover {
-  background-color: #E3A61D;
-}
-
-#add-laser-button:active {
-  transform: scale(0.95);
 }
 
 .hat-options {
@@ -213,157 +172,246 @@ h1 {
   border: 2px solid transparent;
 }
 
-.hat-option:hover, .hat-option.selected {
+.hat-option:hover,
+.hat-option.selected {
   border: 2px solid #ff0000;
 }
 
-.add-hat-button-container {
+.hat-selection span {
+  color: white !important;
+}
+
+/* Container for the tab content */
+.tab-container {
+  width: 90%;
+  max-width: 900px;  /* Increase the width to give more space to the controls */
+  margin: 0 auto;   /* Center the entire tab container */
+  padding: 30px;
+  background-color: #161616;  /* Background color for containment effect */
+  border-radius: 10px;  /* Soft rounded corners for a modern look */
+  border: 2px solid #000000;  /* Slight border to define the container */
+}
+
+/* Tab links at the top */
+.tabs {
   display: flex;
-  justify-content: center;
-  margin-top: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;  /* Add more margin to separate tabs from content */
+  border-bottom: 2px solid #32406C;  /* Consistent border with container */
 }
 
-#add-hat-button {
-  padding: 10px 20px;
-  background-color: #333; /* Match the color of your other buttons */
-  color: white;
-  border: none;
-  border-radius: 5px;
+.tab-link {
+  flex: 1;
+  text-align: center;
+  padding: 20px;  /* Increase padding for a more prominent tab */
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-#add-hat-button:hover {
-  background-color: #E3A61D; /* Match hover effect with your other buttons */
-}
-
-#reset-adjustments-button {
-  padding: 10px 20px;
   background-color: #333;
   color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
+  transition: background-color 0.3s, transform 0.2s;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  font-size: 18px;  /* Increase font size for better readability */
 }
 
-#reset-adjustments-button:hover {
+.tab-link:hover {
   background-color: #E3A61D;
 }
 
-#reset-adjustments-button:active {
-  transform: scale(0.95);
-}  
+.tab-link.current {
+  background-color: #f3040d;
+  transform: scale(1.05);  /* Slight scale on active tab */
+}
 
-.separator {
-  border: 0;
-  height: 2px;
-  background: linear-gradient(to right, #ff0055, #4e4c4c);
-  margin: 20px 0;
-}  
+/* Content for each tab */
+.tab-content {
+  display: none;
+  justify-content: center;
+}
 
-/* Contrast and redness sliders track styles */
-#contrast-slider::-webkit-slider-runnable-track,
-#redness-slider::-webkit-slider-runnable-track {
-  height: 6px;
+.tab-content.current {
+  display: flex;
+  justify-content: center;
+  width: 100%;  /* Ensure content stretches to fill container */
+}
+
+.controls-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;  /* Increase gap between controls for better spacing */
+  width: 100%;
+  align-items: flex-start;  /* Left-align controls */
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;  /* Ensure controls take full width of container */
+}
+
+.control span {
+  color: white;
+  margin-bottom: 10px;  /* Add more spacing below labels */
+  font-size: 16px;  /* Slightly larger text for better readability */
+}
+
+.control input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;  /* Increase slider height */
+  background: #32406C;
+  outline: none;
   border-radius: 5px;
   transition: background 0.3s;
-  background: #32406C; /* Base background color */
+  touch-action: none;
 }
 
-/* Contrast slider gradient */
-#contrast-slider::-webkit-slider-runnable-track {
-  background: linear-gradient(to right, #000000, #ffffff); /* Gradient for contrast */
-}
-
-#redness-slider::-webkit-slider-runnable-track {
-  background: linear-gradient(to right, #ffffff, #ff0000); /* Gradient for redness */
-}
-
-/* Slider thumb styles */
-/* General thumb style (neutral) */
-#contrast-slider::-webkit-slider-thumb,
-#redness-slider::-webkit-slider-thumb,
-#contrast-slider::-moz-range-thumb,
-#redness-slider::-moz-range-thumb,
-#contrast-slider::-ms-thumb,
-#redness-slider::-ms-thumb {
-  width: 20px;
-  height: 20px;
+.control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;  /* Increase thumb size */
+  height: 24px;
   border-radius: 50%;
+  background: #2A334E;
   cursor: pointer;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   transition: background 0.3s, transform 0.3s;
-  transform: translateY(-50%); /* Ensure vertical centering */
 }
 
-/* Specific thumb color for contrast slider */
-#contrast-slider::-webkit-slider-thumb,
-#contrast-slider::-moz-range-thumb,
-#contrast-slider::-ms-thumb {
-  background: #2A334E; /* Neutral color for contrast */
+.control input[type="range"]::-webkit-slider-thumb:hover {
+  background: #3B4B7E;
+  transform: scale(1.1);
 }
 
-/* Specific thumb color for redness slider */
-#redness-slider::-webkit-slider-thumb,
-#redness-slider::-moz-range-thumb,
-#redness-slider::-ms-thumb {
-  background: #ff0000; /* Red color for redness */
+.control input[type="range"]::-moz-range-thumb {
+  width: 24px;  /* Increase thumb size */
+  height: 24px;
+  border-radius: 50%;
+  background: #2A334E;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  transition: background 0.3s, transform 0.3s;
 }
 
-/* Hover effect for both slider thumbs */
-#contrast-slider::-webkit-slider-thumb:hover,
-#contrast-slider::-moz-range-thumb:hover,
-#contrast-slider::-ms-thumb:hover,
-#redness-slider::-webkit-slider-thumb:hover,
-#redness-slider::-moz-range-thumb:hover,
-#redness-slider::-ms-thumb:hover {
-  transform: scale(1.1) translateY(-50%); /* Enlarge and keep centered */
+.control input[type="range"]::-moz-range-thumb:hover {
+  background: #3B4B7E;
+  transform: scale(1.1);
 }
 
-/* Hover color for contrast thumb */
-#contrast-slider::-webkit-slider-thumb:hover,
-#contrast-slider::-moz-range-thumb:hover,
-#contrast-slider::-ms-thumb:hover {
-  background: #3B4B7E; /* Light blue on hover */
+.filter-options {
+  display: flex;
+  gap: 20px;  /* Increase gap between filter options */
 }
 
-/* Hover color for redness thumb */
-#redness-slider::-webkit-slider-thumb:hover,
-#redness-slider::-moz-range-thumb:hover,
-#redness-slider::-ms-thumb:hover {
-  background: #ff3333; /* Slightly lighter red on hover */
+.filter-option {
+  padding: 10px 20px;  /* Increase padding for a more button-like feel */
+  background-color: #333;
+  color: white;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
+.filter-option.selected {
+  background-color: #f3040d;
+  transform: scale(1.1);
+}
 
+.filter-option:hover {
+  background-color: #E3A61D;
+}
 
+button {
+  padding: 15px 30px;  /* Larger buttons for a more proportional look */
+  border: none;
+  border-radius: 5px;
+  background-color: #333;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+button:hover {
+  background-color: #E3A61D;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+label {
+  padding: 15px 30px;  /* Larger labels to match button size */
+  border: none;
+  border-radius: 5px;
+  background-color: #333;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+label:hover {
+  background-color: #E3A61D;
+}
+
+label:active {
+  transform: scale(0.95);
+}
+
+h1 {
+  color: white;
+  margin-top: 20px;
+  font-size: 32px;  /* Larger title for better visibility */
+  text-align: center;
+}
+
+.add-laser-button-container,
+.add-hat-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;  /* Increase margin for better spacing */
+}
+
+.hat-options {
+  display: flex;
+  gap: 20px;  /* Increase gap between hat options */
+}
+
+.hat-option {
+  width: 60px;  /* Larger hat options */
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s, border-color 0.3s;
+}
+
+.hat-option:hover,
+.hat-option.selected {
+  border: 2px solid #ff0000;
+  transform: scale(1.1);
+}
+
+/* Adjustments for mobile */
 @media (max-width: 700px) {
-  body {
-    flex-direction: column;
-    justify-content: flex-start; /* Align everything to the top instead of center */
-    padding: 10px;  /* Add some padding to prevent cut-off */
-    transform: scale(0.8);  /* Zoom out to 80% */
-    transform-origin: top;  /* Set the origin of the scale transformation */
-  }
-
-  #canvas-container {
-    position: relative;
-    display: inline-block;
-    margin-bottom: 20px;
-    width: 100%; /* Ensures the container fits within the mobile screen */
-    padding-top: 20px; /* Add padding at the top for extra space */
-  }
-
-  canvas {
-    width: 100%;  /* Allow canvas to shrink for smaller screens */
-    height: auto; /* Maintain aspect ratio */
-    max-width: 100%;  /* Max width to fit in mobile */
+  .tab-container {
+    max-width: 85%;
+    padding: 20px;
   }
 
   .controls-container {
-    width: 100%;
-    max-width: 100%;  /* Adjust max width of controls to fit smaller screens */
+    max-width: 100%;
+  }
+
+  button, label {
+    padding: 10px 20px;  /* Adjust padding for smaller screens */
+  }
+
+  .hat-option {
+    width: 50px;  /* Slightly smaller hat options for mobile */
   }
 }
-
-

@@ -1,105 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dark Maga Maker</title>
-    <link rel="stylesheet" href="static/styles/styles.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dark PFP Maker</title>
+  <link rel="stylesheet" href="static/styles/styles.css" />
+</head>
 
-  <body>
-    <h1 id="h1-title">DARK PFP MAKER</h1>
-    <div id="canvas-container">
-      <canvas id="meme-canvas"></canvas>
+<body>
+  <h1 id="h1-title">DARK PFP MAKER</h1>
+  
+  <div id="canvas-container">
+    <canvas id="meme-canvas"></canvas>
+  </div>
+
+  <div class="button-container">
+    <label for="image-upload">Upload Image</label>
+    <input type="file" id="image-upload" accept="image/*" />
+    <button id="download-button">Download</button>
+  </div>
+  <br>
+  <!-- Tab navigation -->
+  <div class="tab-container">
+    <ul class="tabs">
+      <li class="tab-link current" data-tab="tab-1">Lasers</li>
+      <li class="tab-link" data-tab="tab-2">Hats</li>
+      <li class="tab-link" data-tab="tab-3">Filters & Adjustments</li>
+    </ul>
+    
+    <!-- Tab content -->
+    <div id="tab-1" class="tab-content current">
+      <!-- Lasers controls -->
+      <div class="controls-container">
+        <div class="control">
+          <span>Resize Lasers:</span>
+          <input
+            type="range"
+            id="resize-slider"
+            min="0.5"
+            max="2"
+            step="0.1"
+            value="1.25"
+          />
+        </div>
+        <div class="control">
+          <span>Rotate Lasers:</span>
+          <input
+            type="range"
+            id="rotate-slider"
+            min="-180"
+            max="180"
+            step="1"
+            value="0"
+          />
+        </div>
+        <div class="add-laser-button-container">
+          <button id="add-laser-button">Add Laser</button>
+        </div>
+      </div>
     </div>
-    <div class="button-container">
-      <label for="image-upload">Upload Image</label>
-      <input type="file" id="image-upload" accept="image/*" />
-      <button id="download-button">Download</button>
-    </div>
-
-    <div class="controls-container">
-      <div class="control">
-        <span>Resize Lasers:</span>
-        <input
-          type="range"
-          id="resize-slider"
-          min="0.5"
-          max="2"
-          step="0.1"
-          value="1.25"
-        />
-      </div>
-      <div class="control">
-        <span>Rotate Lasers:</span>
-        <input
-          type="range"
-          id="rotate-slider"
-          min="-180"
-          max="180"
-          step="1"
-          value="0"
-        />
-      </div>
-
-      <div class="add-laser-button-container">
-        <button id="add-laser-button">Add Laser</button>
-      </div>
-
-      <hr class="separator">
-
-      <!-- New Hat Controls -->
-      <div class="hat-container">
-        <div class="hat-selection">
-          <span>Select Hat:</span>
-          <div class="hat-options">
-            <img class="hat-option" src="hat_front_1.png" alt="Hat 1" data-hat="hat1" />
-            <img class="hat-option" src="hat_front_2.png" alt="Hat 2" data-hat="hat2" />
-            <img class="hat-option" src="hat_left.png" alt="Hat Left" data-hat="hatLeft" />
-            <img class="hat-option" src="hat_right.png" alt="Hat Right" data-hat="hatRight" />
+    
+    <div id="tab-2" class="tab-content">
+      <!-- Hats controls -->
+      <div class="controls-container">
+        <div class="hat-container">
+          <div class="hat-selection">
+            <span>Select Hat:</span>
+            <div class="hat-options">
+              <img class="hat-option" src="hat_front_1.png" alt="Hat 1" data-hat="hat1" />
+              <img class="hat-option" src="hat_front_2.png" alt="Hat 2" data-hat="hat2" />
+              <img class="hat-option" src="hat_left.png" alt="Hat Left" data-hat="hatLeft" />
+              <img class="hat-option" src="hat_right.png" alt="Hat Right" data-hat="hatRight" />
+            </div>
+          </div>
+          <br>
+          <div class="control">
+            <span>Resize Hat:</span>
+            <input type="range" id="hat-resize-slider" min="0.5" max="2" step="0.1" value="1.25" />
+          </div>
+          <div class="control">
+            <span>Rotate Hat:</span>
+            <input type="range" id="hat-rotate-slider" min="-180" max="180" step="1" value="0" />
+          </div>
+          <div class="add-hat-button-container">
+            <button id="add-hat-button">Add Hat</button>
           </div>
         </div>
-
-        <!-- Sliders for resizing and rotating hats -->
-        <div class="control">
-          <span>Resize Hat:</span>
-          <input type="range" id="hat-resize-slider" min="0.5" max="2" step="0.1" value="1.25" />
-        </div>
-        <div class="control">
-          <span>Rotate Hat:</span>
-          <input type="range" id="hat-rotate-slider" min="-180" max="180" step="1" value="0" />
-        </div>
-
-        <!-- Add Hat Button (moved under the sliders) -->
-        <div class="add-hat-button-container">
-          <button id="add-hat-button">Add Hat</button>
-        </div>
       </div>
-
-      <hr class="separator">
-
-      <div class="control">
-        <span>Choose Filter:</span>
-        <div class="filter-options">
-          <div class="filter-option" data-filter="dark">Classic Red</div>
-          <div class="filter-option selected" data-filter="classic">Dark</div>
-          <div class="filter-option" data-filter="light">Light</div>
-        </div>
-      </div>
-
-      <div class="control">
-        <span>Adjust Contrast:</span>
-        <input type="range" id="contrast-slider" min="0.5" max="2" step="0.1" value="1" />
-      </div>
-      <div class="control">
-        <span>Adjust Redness:</span>
-        <input type="range" id="redness-slider" min="0" max="2" step="0.1" value="1" />
-      </div>
-      <div class="control">
-        <button id="reset-adjustments-button">Reset Adjustments</button>
-      </div>
-      
     </div>
-    <script type="text/javascript" src="static/js/index.js"></script>
-  </body>
+    
+    <div id="tab-3" class="tab-content">
+      <!-- Filters and Adjustments controls -->
+      <div class="controls-container">
+        <div class="control">
+          <span>Choose Filter:</span>
+          <div class="filter-options">
+            <div class="filter-option" data-filter="dark">Classic Red</div>
+            <div class="filter-option selected" data-filter="classic">Dark</div>
+            <div class="filter-option" data-filter="light">Light</div>
+          </div>
+        </div>
+        <div class="control">
+          <span>Adjust Contrast:</span>
+          <input type="range" id="contrast-slider" min="0.5" max="2" step="0.1" value="1" />
+        </div>
+        <div class="control">
+          <span>Adjust Redness:</span>
+          <input type="range" id="redness-slider" min="0" max="2" step="0.1" value="1" />
+        </div>
+        <div class="control">
+          <button id="reset-adjustments-button">Reset Adjustments</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script type="text/javascript" src="static/js/index.js"></script>
+</body>
 </html>

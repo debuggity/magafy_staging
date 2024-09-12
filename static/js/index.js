@@ -702,3 +702,20 @@ function applyFullResGradientMapFilter(context, width, height) {
     applyLightFilter(context, width, height);
   }
 }
+
+// Tab functionality
+document.querySelectorAll('.tab-link').forEach(tab => {
+  tab.addEventListener('click', function() {
+    const tab_id = this.getAttribute('data-tab');
+
+    document.querySelectorAll('.tab-link').forEach(tab => {
+      tab.classList.remove('current');
+    });
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.remove('current');
+    });
+
+    this.classList.add('current');
+    document.getElementById(tab_id).classList.add('current');
+  });
+});
