@@ -535,6 +535,8 @@ function drawCanvas() {
     applyClassicRedFilter(ctx, canvas.width, canvas.height);
   } else if (currentFilter === 'light') {
     applyLightFilter(ctx, canvas.width, canvas.height);
+  } else if (currentFilter === 'none') {
+    // No filter applied, just draw the image
   }
 
   // Apply contrast and redness adjustments
@@ -718,4 +720,14 @@ document.querySelectorAll('.tab-link').forEach(tab => {
     this.classList.add('current');
     document.getElementById(tab_id).classList.add('current');
   });
+});
+
+document.getElementById("remove-all-lasers-button").addEventListener("click", function () {
+  lasers = [];
+  drawCanvas();
+});
+
+document.getElementById("remove-all-hats-button").addEventListener("click", function () {
+  hats = [];
+  drawCanvas();
 });

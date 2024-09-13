@@ -30,12 +30,6 @@ canvas {
   max-width: 300px;
 }
 
-.control {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
 .control span {
   color: white;
   margin-bottom: 5px;
@@ -126,55 +120,8 @@ button:active {
   transform: scale(0.95);
 }
 
-input[type="file"] {
-  display: none;
-}
-
-label {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background-color: #333;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-label:hover {
-  background-color: #E3A61D;
-}
-
 label:active {
   transform: scale(0.95);
-}
-
-h1 {
-  color: white;
-  margin-top: 20px;
-}
-
-.add-laser-button-container,
-.add-hat-button-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.hat-options {
-  display: flex;
-  gap: 10px;
-}
-
-.hat-option {
-  width: 50px;
-  cursor: pointer;
-  border: 2px solid transparent;
-}
-
-.hat-option:hover,
-.hat-option.selected {
-  border: 2px solid #ff0000;
 }
 
 .hat-selection span {
@@ -233,14 +180,6 @@ h1 {
   display: flex;
   justify-content: center;
   width: 100%;  /* Ensure content stretches to fill container */
-}
-
-.controls-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;  /* Increase gap between controls for better spacing */
-  width: 100%;
-  align-items: flex-start;  /* Left-align controls */
 }
 
 .control {
@@ -322,25 +261,6 @@ h1 {
   background-color: #E3A61D;
 }
 
-button {
-  padding: 15px 30px;  /* Larger buttons for a more proportional look */
-  border: none;
-  border-radius: 5px;
-  background-color: #333;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-button:hover {
-  background-color: #E3A61D;
-}
-
-button:active {
-  transform: scale(0.95);
-}
-
 input[type="file"] {
   display: none;
 }
@@ -360,22 +280,11 @@ label:hover {
   background-color: #E3A61D;
 }
 
-label:active {
-  transform: scale(0.95);
-}
-
 h1 {
   color: white;
   margin-top: 20px;
   font-size: 32px;  /* Larger title for better visibility */
   text-align: center;
-}
-
-.add-laser-button-container,
-.add-hat-button-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;  /* Increase margin for better spacing */
 }
 
 .hat-options {
@@ -395,6 +304,36 @@ h1 {
   border: 2px solid #ff0000;
   transform: scale(1.1);
 }
+
+#contrast-slider {
+  background: linear-gradient(to right, #000000, #FFFFFF);
+}
+
+#contrast-slider::-webkit-slider-thumb {
+  background-color: #3c3b49; /* White themed thumb */
+}
+
+#contrast-slider::-moz-range-thumb {
+  background-color: #ffffff;
+}
+
+#redness-slider {
+  background: linear-gradient(to right, #330000, #FF0000);
+}
+
+#redness-slider::-webkit-slider-thumb {
+  background-color: #ff0000; /* Red themed thumb */
+}
+
+#redness-slider::-moz-range-thumb {
+  background-color: #ff0000;
+}
+
+#contrast-slider:hover,
+#redness-slider:hover {
+  box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.7);
+}
+
 
 /* Adjustments for mobile */
 @media (max-width: 700px) {
