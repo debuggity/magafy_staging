@@ -57,7 +57,7 @@ async function addFlagWithBackgroundRemoval() {
       ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
 
       // Draw lasers, hats, and apply any selected filters on top of everything
-      drawCanvas(); // Ensure this function handles the rendering of lasers, hats, and filters
+      //drawCanvas(); // Ensure this function handles the rendering of lasers, hats, and filters
   };
 }
 
