@@ -45,17 +45,19 @@ async function addFlagWithBackgroundRemoval() {
   const maskImage = postprocessONNXOutput(output[Object.keys(output)[0]], canvasImage);
 
   maskImage.onload = function () {
-      // Clear the canvas and draw the flag with the specified opacity
+      // Clear the canvas before drawing
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw the flag image with the specified opacity behind the subject
       ctx.globalAlpha = flagOpacity;
       ctx.drawImage(flagImage, 0, 0, canvas.width, canvas.height);
 
-      // Draw the masked image on top of the flag
+      // Draw the masked image (foreground) on top of the flag
       ctx.globalAlpha = 1; // Reset alpha for the masked image
       ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
 
       // Draw lasers, hats, and apply any selected filters on top of everything
-      drawCanvas();
+      drawCanvas(); // Ensure this function handles the rendering of lasers, hats, and filters
   };
 }
 
