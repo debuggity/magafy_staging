@@ -45,21 +45,49 @@ async function addFlagWithBackgroundRemoval() {
   const maskImage = postprocessONNXOutput(output[Object.keys(output)[0]], canvasImage);
 
   maskImage.onload = function () {
-      // Clear the canvas before drawing
+      // Clear the canvas and start the rendering process
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw the flag image with the specified opacity behind the subject
+      // Draw the original image (base layer) without the mask.
+      ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
+
+      // Apply selected filter (if any)
+      if (currentFilter === 'dark') {
+          applyGradientMapFilter(ctx, canvas.width, canvas.height);
+      } else if (currentFilter === 'classic') {
+          applyClassicRedFilter(ctx, canvas.width, canvas.height);
+      } else if (currentFilter === 'light') {
+          applyLightFilter(ctx, canvas.width, canvas.height);
+      }
+      
+      // Draw the flag with the specified opacity behind the masked image
       ctx.globalAlpha = flagOpacity;
       ctx.drawImage(flagImage, 0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = 1; // Reset opacity for the next drawings
 
       // Draw the masked image (foreground) on top of the flag
-      ctx.globalAlpha = 1; // Reset alpha for the masked image
       ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
 
-      // Draw lasers, hats, and apply any selected filters on top of everything
-      //drawCanvas(); // Ensure this function handles the rendering of lasers, hats, and filters
+      // Draw lasers on top of the filtered image
+      lasers.forEach((laser) => {
+          ctx.save();
+          ctx.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
+          ctx.rotate(laser.rotation);
+          ctx.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
+          ctx.restore();
+      });
+
+      // Draw hats on top of the lasers
+      hats.forEach((hat) => {
+          ctx.save();
+          ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
+          ctx.rotate(hat.rotation);
+          ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
+          ctx.restore();
+      });
   };
 }
+
 
 // Event listeners for adding the flag
 document.getElementById("add-flag-button").addEventListener("click", addFlagWithBackgroundRemoval);
