@@ -34,7 +34,6 @@ async function loadModel() {
   u2netSession = await ort.InferenceSession.create('./u2netp.onnx');
 }
 
-// Function to add the flag with background removal
 async function addFlagWithBackgroundRemoval() {
   if (!canvasImage) return;
 
@@ -60,25 +59,25 @@ async function addFlagWithBackgroundRemoval() {
           applyLightFilter(ctx, canvas.width, canvas.height);
       }
 
-      // Calculate dimensions to maintain the flag's aspect ratio
+      // Calculate dimensions to maintain the flag's aspect ratio while covering the entire canvas
       const flagAspectRatio = flagImage.width / flagImage.height;
       let flagWidth, flagHeight;
 
       if (canvas.width / canvas.height > flagAspectRatio) {
-          // Canvas is wider than the flag, so fit the flag's height
-          flagHeight = canvas.height;
-          flagWidth = flagHeight * flagAspectRatio;
-      } else {
-          // Canvas is taller than the flag, so fit the flag's width
+          // Canvas is wider than the flag, so scale the flag by width and crop the top/bottom
           flagWidth = canvas.width;
           flagHeight = flagWidth / flagAspectRatio;
+      } else {
+          // Canvas is taller than the flag, so scale the flag by height and crop the sides
+          flagHeight = canvas.height;
+          flagWidth = flagHeight * flagAspectRatio;
       }
 
-      // Center the flag on the canvas
+      // Center the flag on the canvas (crop overflow equally)
       const flagX = (canvas.width - flagWidth) / 2;
       const flagY = (canvas.height - flagHeight) / 2;
 
-      // Draw the flag image with the specified opacity, maintaining aspect ratio
+      // Draw the flag image with the specified opacity, filling the canvas
       ctx.globalAlpha = flagOpacity;
       ctx.drawImage(flagImage, flagX, flagY, flagWidth, flagHeight);
       ctx.globalAlpha = 1; // Reset opacity for the next drawings
@@ -105,7 +104,6 @@ async function addFlagWithBackgroundRemoval() {
       });
   };
 }
-
 
 // Event listeners for adding the flag
 document.getElementById("add-flag-button").addEventListener("click", addFlagWithBackgroundRemoval);
