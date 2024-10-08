@@ -507,69 +507,98 @@ canvas.addEventListener("touchend", function () {
 });
 
 document.getElementById("download-button").addEventListener("click", function () {
+  // Create a temporary canvas for exporting the full resolution image
   const fullResCanvas = document.createElement("canvas");
   fullResCanvas.width = originalImageWidth;
   fullResCanvas.height = originalImageHeight;
-  const fullResCtx = fullResCanvas.getContext("2d", { willReadFrequently: true });
+  const fullResCtx = fullResCanvas.getContext("2d");
 
   // Draw the original image at full resolution
   fullResCtx.drawImage(canvasImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
 
-  // Apply the gradient map filter to the full resolution canvas
-  applyFullResGradientMapFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+  // Apply the selected filter (if any)
+  if (currentFilter === 'dark') {
+      applyGradientMapFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+  } else if (currentFilter === 'classic') {
+      applyClassicRedFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+  } else if (currentFilter === 'light') {
+      applyLightFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+  }
 
-  // Apply contrast and redness adjustments
-  applyFullResContrastAndRedness(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+  // Draw the flag if it is applied
+  if (flagApplied && savedMaskImage) {
+      const flagAspectRatio = flagImage.width / flagImage.height;
+      let flagWidth, flagHeight;
 
+      if (fullResCanvas.width / fullResCanvas.height > flagAspectRatio) {
+          flagWidth = fullResCanvas.width;
+          flagHeight = flagWidth / flagAspectRatio;
+      } else {
+          flagHeight = fullResCanvas.height;
+          flagWidth = flagHeight * flagAspectRatio;
+      }
+
+      // Center the flag on the canvas
+      const flagX = (fullResCanvas.width - flagWidth) / 2;
+      const flagY = (fullResCanvas.height - flagHeight) / 2;
+
+      fullResCtx.globalAlpha = flagOpacity;
+      fullResCtx.drawImage(flagImage, flagX, flagY, flagWidth, flagHeight);
+      fullResCtx.globalAlpha = 1; // Reset opacity for the next drawings
+
+      // Draw the masked image (foreground) on top of the flag
+      fullResCtx.drawImage(savedMaskImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
+  }
+
+  // Draw lasers at their respective positions
   const scaleX = fullResCanvas.width / canvas.width;
   const scaleY = fullResCanvas.height / canvas.height;
-
-  // Draw lasers on the full resolution canvas
   lasers.forEach((laser) => {
-    fullResCtx.save();
-    fullResCtx.translate(
-      laser.x * scaleX + (laser.width * scaleX) / 2,
-      laser.y * scaleY + (laser.height * scaleY) / 2
-    );
-    fullResCtx.rotate(laser.rotation);
-    fullResCtx.drawImage(
-      laser.image,
-      -(laser.width * scaleX) / 2,
-      -(laser.height * scaleY) / 2,
-      laser.width * scaleX,
-      laser.height * scaleY
-    );
-    fullResCtx.restore();
+      fullResCtx.save();
+      fullResCtx.translate(
+          (laser.x + laser.width / 2) * scaleX,
+          (laser.y + laser.height / 2) * scaleY
+      );
+      fullResCtx.rotate(laser.rotation);
+      fullResCtx.drawImage(
+          laser.image,
+          -laser.width * scaleX / 2,
+          -laser.height * scaleY / 2,
+          laser.width * scaleX,
+          laser.height * scaleY
+      );
+      fullResCtx.restore();
   });
 
-  // Draw hats on the full resolution canvas
+  // Draw hats at their respective positions
   hats.forEach((hat) => {
-    fullResCtx.save();
-    fullResCtx.translate(
-      hat.x * scaleX + (hat.width * scaleX) / 2,
-      hat.y * scaleY + (hat.height * scaleY) / 2
-    );
-    fullResCtx.rotate(hat.rotation);
-    fullResCtx.drawImage(
-      hat.image,
-      -(hat.width * scaleX) / 2,
-      -(hat.height * scaleY) / 2,
-      hat.width * scaleX,
-      hat.height * scaleY
-    );
-    fullResCtx.restore();
+      fullResCtx.save();
+      fullResCtx.translate(
+          (hat.x + hat.width / 2) * scaleX,
+          (hat.y + hat.height / 2) * scaleY
+      );
+      fullResCtx.rotate(hat.rotation);
+      fullResCtx.drawImage(
+          hat.image,
+          -hat.width * scaleX / 2,
+          -hat.height * scaleY / 2,
+          hat.width * scaleX,
+          hat.height * scaleY
+      );
+      fullResCtx.restore();
   });
 
-  // Create a blob and download the image
+  // Export the final image as a PNG
   fullResCanvas.toBlob(function (blob) {
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "dark_pfp_full_res.png";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "dark_pfp_with_flag.png";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
   }, 'image/png');
 });
+
 
 window.addEventListener("paste", function (e) {
   const items = e.clipboardData.items;
