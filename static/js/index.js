@@ -59,10 +59,28 @@ async function addFlagWithBackgroundRemoval() {
       } else if (currentFilter === 'light') {
           applyLightFilter(ctx, canvas.width, canvas.height);
       }
-      
-      // Draw the flag with the specified opacity behind the masked image
+
+      // Calculate dimensions to maintain the flag's aspect ratio
+      const flagAspectRatio = flagImage.width / flagImage.height;
+      let flagWidth, flagHeight;
+
+      if (canvas.width / canvas.height > flagAspectRatio) {
+          // Canvas is wider than the flag, so fit the flag's height
+          flagHeight = canvas.height;
+          flagWidth = flagHeight * flagAspectRatio;
+      } else {
+          // Canvas is taller than the flag, so fit the flag's width
+          flagWidth = canvas.width;
+          flagHeight = flagWidth / flagAspectRatio;
+      }
+
+      // Center the flag on the canvas
+      const flagX = (canvas.width - flagWidth) / 2;
+      const flagY = (canvas.height - flagHeight) / 2;
+
+      // Draw the flag image with the specified opacity, maintaining aspect ratio
       ctx.globalAlpha = flagOpacity;
-      ctx.drawImage(flagImage, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(flagImage, flagX, flagY, flagWidth, flagHeight);
       ctx.globalAlpha = 1; // Reset opacity for the next drawings
 
       // Draw the masked image (foreground) on top of the flag
