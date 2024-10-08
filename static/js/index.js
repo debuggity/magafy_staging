@@ -17,6 +17,24 @@ let currentHat = null;
 const MAX_WIDTH = 640;
 const MAX_HEIGHT = 480;
 
+let session = null;
+(async () => {
+  try {
+    session = await ort.InferenceSession.create('u2netp.onnx');
+    console.log('ONNX Model loaded successfully');
+  } catch (e) {
+    console.error('Failed to load the ONNX model:', e);
+  }
+})();
+
+// Add these variables along with existing ones
+let flagImage = new Image();
+flagImage.src = 'flag.png'; // Ensure the path is correct
+flagImage.crossOrigin = 'anonymous';
+let flags = [];
+let currentFlag = null;
+let flagOpacity = 1;
+
 let originalImageWidth, originalImageHeight;
 let currentFilter = 'classic';
 
@@ -30,11 +48,11 @@ window.addEventListener('DOMContentLoaded', () => {
   rotateSlider.value = '0';  // Middle value between 0 and 360
 });
 
-document.getElementById("image-upload").addEventListener("change", function (e) {
+document.getElementById("image-upload").addEventListener("change", async function (e) {
   const reader = new FileReader();
-  reader.onload = function (event) {
+  reader.onload = async function (event) {
     document.getElementById("h1-title").style.display = "none";
-    canvasImage.onload = function () {
+    canvasImage.onload = async function () {
       originalImageWidth = canvasImage.width;
       originalImageHeight = canvasImage.height;
 
@@ -46,6 +64,10 @@ document.getElementById("image-upload").addEventListener("change", function (e) 
       );
       canvas.width = canvasImage.width * scale;
       canvas.height = canvasImage.height * scale;
+      
+      // Remove background
+      await removeBackground(canvasImage);
+      
       drawCanvas();
       document.querySelector(".button-container").style.display = "flex";
     };
@@ -53,6 +75,7 @@ document.getElementById("image-upload").addEventListener("change", function (e) 
   };
   reader.readAsDataURL(e.target.files[0]);
 });
+
 
 document.getElementById("add-laser-button").addEventListener("click", function () {
   const aspectRatio = laserImageTemplate.width / laserImageTemplate.height;
@@ -375,7 +398,7 @@ canvas.addEventListener("touchend", function () {
   }
 });
 
-document.getElementById("download-button").addEventListener("click", function () {
+document.getElementById("download-button").addEventListener("click", async function () {
   const fullResCanvas = document.createElement("canvas");
   fullResCanvas.width = originalImageWidth;
   fullResCanvas.height = originalImageHeight;
@@ -392,6 +415,25 @@ document.getElementById("download-button").addEventListener("click", function ()
 
   const scaleX = fullResCanvas.width / canvas.width;
   const scaleY = fullResCanvas.height / canvas.height;
+
+  // Draw flags on the full resolution canvas
+  flags.forEach((flag) => {
+    fullResCtx.save();
+    fullResCtx.globalAlpha = flag.opacity; // Set opacity
+    fullResCtx.translate(
+      flag.x * scaleX + (flag.width * scaleX) / 2,
+      flag.y * scaleY + (flag.height * scaleY) / 2
+    );
+    fullResCtx.rotate(flag.rotation);
+    fullResCtx.drawImage(
+      flag.image,
+      -(flag.width * scaleX) / 2,
+      -(flag.height * scaleY) / 2,
+      flag.width * scaleX,
+      flag.height * scaleY
+    );
+    fullResCtx.restore();
+  });
 
   // Draw lasers on the full resolution canvas
   lasers.forEach((laser) => {
@@ -520,9 +562,57 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
   drawCanvas();
 });
 
-
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
+
+// Add this after existing event listeners for hats and lasers
+document.querySelectorAll('.flag-option').forEach(option => {
+  option.addEventListener('click', function () {
+    document.querySelectorAll('.flag-option').forEach(opt => opt.classList.remove('selected'));
+    this.classList.add('selected');
+
+    // Set the selected flag image
+    flagImage.src = this.src;
+  });
+});
+
+document.getElementById("flag-opacity-slider").addEventListener("input", function (e) {
+  flagOpacity = parseFloat(e.target.value);
+  drawCanvas();
+});
+
+document.getElementById("add-flag-button").addEventListener("click", function () {
+  if (!flagImage.src) return;
+
+  const aspectRatio = flagImage.width / flagImage.height;
+
+  let flagWidth = (canvas.width / 5) * 2;
+  let flagHeight = flagWidth / aspectRatio;
+
+  if (flagHeight > canvas.height) {
+    flagHeight = (canvas.height / 5) * 2;
+    flagWidth = flagHeight * aspectRatio;
+  }
+
+  const flag = {
+    image: flagImage,
+    width: flagWidth,
+    height: flagHeight,
+    x: canvas.width / 2 - flagWidth / 2,
+    y: canvas.height / 2 - flagHeight / 2,
+    rotation: 0,
+    opacity: flagOpacity
+  };
+  flags.push(flag);
+  drawCanvas();
+});
+
+document.getElementById("remove-all-flags-button").addEventListener("click", function () {
+  flags = [];
+  drawCanvas();
+});
+
+
 
 function drawCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas before redrawing
@@ -542,6 +632,16 @@ function drawCanvas() {
   // Apply contrast and redness adjustments
   applyContrastAndRedness(ctx, canvas.width, canvas.height);
 
+  // Draw flags behind the subject
+  flags.forEach((flag) => {
+    ctx.save();
+    ctx.globalAlpha = flag.opacity; // Set opacity
+    ctx.translate(flag.x + flag.width / 2, flag.y + flag.height / 2);
+    ctx.rotate(flag.rotation);
+    ctx.drawImage(flag.image, -flag.width / 2, -flag.height / 2, flag.width, flag.height);
+    ctx.restore();
+  });
+
   // Draw lasers
   lasers.forEach((laser) => {
     ctx.save();
@@ -559,6 +659,76 @@ function drawCanvas() {
     ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
     ctx.restore();
   });
+}
+
+async function removeBackground(image) {
+  if (!session) {
+    alert('Model is not loaded yet. Please wait.');
+    return;
+  }
+
+  // Preprocess the image to the required input size for U2NETP
+  const resizedCanvas = document.createElement('canvas');
+  const targetSize = 320; // U2NETP expects 320x320 images
+  resizedCanvas.width = targetSize;
+  resizedCanvas.height = targetSize;
+  const resizedCtx = resizedCanvas.getContext('2d');
+  resizedCtx.drawImage(image, 0, 0, targetSize, targetSize);
+  const imageData = resizedCtx.getImageData(0, 0, targetSize, targetSize);
+  const data = imageData.data;
+
+  // Normalize and prepare input tensor
+  const input = new Float32Array(targetSize * targetSize * 3);
+  for (let i = 0; i < targetSize * targetSize; i++) {
+    input[i * 3 + 0] = data[i * 4 + 0] / 255.0; // R
+    input[i * 3 + 1] = data[i * 4 + 1] / 255.0; // G
+    input[i * 3 + 2] = data[i * 4 + 2] / 255.0; // B
+  }
+
+  const tensor = new ort.Tensor('float32', input, [1, 3, targetSize, targetSize]);
+
+  // Run inference
+  const feeds = { 'x': tensor };
+  const results = await session.run(feeds);
+  const mask = results['out'][0].data; // Assuming 'out' is the output tensor
+
+  // Resize mask back to original image size
+  const maskCanvas = document.createElement('canvas');
+  maskCanvas.width = image.width;
+  maskCanvas.height = image.height;
+  const maskCtx = maskCanvas.getContext('2d');
+  const resizedMaskCanvas = document.createElement('canvas');
+  resizedMaskCanvas.width = targetSize;
+  resizedMaskCanvas.height = targetSize;
+  const resizedMaskCtx = resizedMaskCanvas.getContext('2d');
+
+  // Create grayscale mask image
+  const maskImageData = resizedMaskCtx.createImageData(targetSize, targetSize);
+  for (let i = 0; i < mask.length; i++) {
+    const value = mask[i] * 255;
+    maskImageData.data[i * 4 + 0] = value;
+    maskImageData.data[i * 4 + 1] = value;
+    maskImageData.data[i * 4 + 2] = value;
+    maskImageData.data[i * 4 + 3] = value;
+  }
+  resizedMaskCtx.putImageData(maskImageData, 0, 0);
+
+  // Draw the mask onto the maskCanvas
+  maskCtx.drawImage(resizedMaskCanvas, 0, 0, image.width, image.height);
+
+  // Get the mask data
+  const finalMaskData = maskCtx.getImageData(0, 0, image.width, image.height).data;
+
+  // Apply mask to the original image
+  const originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const originalData = originalImageData.data;
+
+  for (let i = 0; i < originalData.length; i += 4) {
+    const alpha = finalMaskData[i + 3] / 255;
+    originalData[i + 3] = originalData[i + 3] * alpha;
+  }
+
+  ctx.putImageData(originalImageData, 0, 0);
 }
 
 function applyContrastAndRedness(context, width, height) {
