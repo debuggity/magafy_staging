@@ -147,26 +147,44 @@ window.addEventListener('DOMContentLoaded', () => {
 document.getElementById("image-upload").addEventListener("change", function (e) {
   const reader = new FileReader();
   reader.onload = function (event) {
-    document.getElementById("h1-title").style.display = "none";
-    canvasImage.onload = function () {
-      originalImageWidth = canvasImage.width;
-      originalImageHeight = canvasImage.height;
+      // Hide any previous titles or placeholders
+      document.getElementById("h1-title").style.display = "none";
+      
+      // Reset the flag and mask state when a new image is uploaded
+      flagApplied = false;
+      savedMaskImage = null;
 
-      // Scale the image to fit within the specified limits
-      const scale = Math.min(
-        MAX_WIDTH / canvasImage.width,
-        MAX_HEIGHT / canvasImage.height,
-        1
-      );
-      canvas.width = canvasImage.width * scale;
-      canvas.height = canvasImage.height * scale;
-      drawCanvas();
-      document.querySelector(".button-container").style.display = "flex";
-    };
-    canvasImage.src = event.target.result;
+      canvasImage.onload = function () {
+          originalImageWidth = canvasImage.width;
+          originalImageHeight = canvasImage.height;
+
+          // Scale the image to fit within the specified limits
+          const scale = Math.min(
+              MAX_WIDTH / canvasImage.width,
+              MAX_HEIGHT / canvasImage.height,
+              1
+          );
+
+          // Set canvas dimensions based on the scaled image
+          canvas.width = canvasImage.width * scale;
+          canvas.height = canvasImage.height * scale;
+
+          // Clear the canvas before drawing the new image
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          drawCanvas(); // Redraw with the new image and reset state
+
+          // Display the button container for further actions
+          document.querySelector(".button-container").style.display = "flex";
+      };
+
+      // Set the new image source, which triggers the onload event
+      canvasImage.src = event.target.result;
   };
+
+  // Read the file as a data URL
   reader.readAsDataURL(e.target.files[0]);
 });
+
 
 document.getElementById("add-laser-button").addEventListener("click", function () {
   const aspectRatio = laserImageTemplate.width / laserImageTemplate.height;
