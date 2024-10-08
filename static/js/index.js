@@ -25,7 +25,7 @@ let flagImage = new Image();
 flagImage.src = "AmericanFlag.png"; // Ensure flag.png is in the root of the project
 flagImage.crossOrigin = "anonymous";
 
-let flagOpacity = 1; // Default opacity
+let flagOpacity = .5; // Default opacity
 
 let u2netSession;
 

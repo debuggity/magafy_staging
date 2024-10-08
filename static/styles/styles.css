@@ -342,6 +342,25 @@ h1 {
 
 /* Adjustments for mobile */
 @media (max-width: 700px) {
+
+  .tabs {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scrollbar-width: none; /* Hide scrollbar in Firefox */
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none; /* Hide scrollbar in Chrome, Safari, and Edge */
+  }
+
+  .tab-link {
+    flex: 0 0 auto; /* Prevent the tabs from shrinking */
+    padding: 10px; /* Adjust padding for smaller screens */
+    font-size: 14px; /* Adjust font size for better readability */
+  }
+
   .tab-container {
     max-width: 85%;
     padding: 20px;
