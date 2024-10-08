@@ -2,9 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-
-  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dark PFP Maker</title>
   <link rel="stylesheet" href="static/styles/styles.css" />
@@ -29,7 +26,6 @@
       <li class="tab-link current" data-tab="tab-1">Lasers</li>
       <li class="tab-link" data-tab="tab-2">Hats</li>
       <li class="tab-link" data-tab="tab-3">Filters & Adjustments</li>
-      <li class="tab-link" data-tab="tab-4">Flag</li>
     </ul>
     
     <!-- Tab content -->
@@ -124,28 +120,6 @@
         <div class="control">
           <button id="reset-adjustments-button">Reset Adjustments</button>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="tab-4" class="tab-content">
-    <!-- Flag controls -->
-    <div class="controls-container">
-      <div class="control">
-        <span>Select Flag:</span>
-        <div class="flag-options">
-          <img class="flag-option" src="flag.png" alt="Flag" data-flag="flag" />
-        </div>
-      </div>
-      <div class="control">
-        <span>Flag Opacity:</span>
-        <input type="range" id="flag-opacity-slider" min="0" max="1" step="0.05" value="0.5" />
-      </div>
-      <div class="add-flag-button-container">
-        <button id="add-flag-button">Add Flag</button>
-      </div>
-      <div class="remove-all-button-container">
-        <button id="remove-all-flags-button">Remove All Flags</button>
       </div>
     </div>
   </div>
