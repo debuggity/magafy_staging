@@ -345,6 +345,7 @@ h1 {
 
   .tabs {
     display: flex;
+    justify-content: center;
     overflow-x: auto;
     white-space: nowrap;
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
@@ -362,20 +363,20 @@ h1 {
   }
 
   .tab-container {
-    max-width: 100%;
+    max-width: 85%;
     padding: 20px;
   }
 
   #canvas-container {
     display: flex;
     justify-content: center;
-    width: 75%; /* Make sure it uses the full width of the mobile screen */
-    max-width: 75%; /* Prevents overflowing beyond the viewport */
+    width: 80%; /* Make sure it uses the full width of the mobile screen */
+    max-width: 80%; /* Prevents overflowing beyond the viewport */
     margin: 5 auto;  /* Center the canvas */
   }
 
   canvas {
-    max-width: 75%;  /* Ensure the canvas fits within the container */
+    max-width: 80%;  /* Ensure the canvas fits within the container */
     height: auto;     /* Maintain the aspect ratio */
   }
 
