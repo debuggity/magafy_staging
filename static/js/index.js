@@ -22,7 +22,7 @@ let currentFilter = 'classic';
 
 // Define variables for flag image and opacity
 let flagImage = new Image();
-flagImage.src = "flag.png"; // Ensure flag.png is in the root of the project
+flagImage.src = "AmericanFlag.png"; // Ensure flag.png is in the root of the project
 flagImage.crossOrigin = "anonymous";
 
 let flagOpacity = 1; // Default opacity
