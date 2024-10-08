@@ -12,3 +12,6 @@
 
 /hat_right.png
   Access-Control-Allow-Origin: *
+
+/flag.png
+  Access-Control-Allow-Origin: *

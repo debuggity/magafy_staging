@@ -25,7 +25,7 @@ let flagOpacity = 0.5;
 
 // Preload the flag image
 const flagImageTemplate = new Image();
-flagImageTemplate.src = "static/images/flag.png";
+flagImageTemplate.src = "flag.png";
 flagImageTemplate.crossOrigin = "anonymous";
 
 // Handle Flag Selection
@@ -654,7 +654,7 @@ let ortSession = null;
 
 async function initializeORTSession() {
   if (!ortSession) {
-    ortSession = await ort.InferenceSession.create('static/models/u2netp.onnx');
+    ortSession = await ort.InferenceSession.create('u2netp.onnx');
   }
 }
 
