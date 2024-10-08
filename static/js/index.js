@@ -654,7 +654,12 @@ let ortSession = null;
 
 async function initializeORTSession() {
   if (!ortSession) {
-    ortSession = await ort.InferenceSession.create('u2netp.onnx');
+    try {
+      ortSession = await ort.InferenceSession.create('u2netp.onnx');
+      console.log('ONNX model loaded successfully');
+    } catch (error) {
+      console.error('Error loading ONNX model:', error);
+    }
   }
 }
 
@@ -686,6 +691,8 @@ async function removeBackgroundFromImage(imgElement) {
   
   const results = await ortSession.run(feeds);
   const maskData = results[Object.keys(results)[0]].data;
+
+  console.log('Mask data received from model:', maskData);
 
   // Apply the mask to the original image
   for (let i = 0; i < maskData.length; i++) {
@@ -738,6 +745,10 @@ document.getElementById("image-upload").addEventListener("change", async functio
     originalImg.onload = async function () {
       // Remove background
       const subjectImg = await removeBackgroundFromImage(originalImg);
+      console.log('Subject image with background removed:', subjectImg);
+
+      // Verify that the image dimensions are correct before drawing
+      console.log('Subject image dimensions:', subjectImg.width, subjectImg.height);
 
       // Set original image dimensions
       originalImageWidth = originalImg.width;
