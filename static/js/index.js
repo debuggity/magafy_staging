@@ -34,6 +34,9 @@ async function loadModel() {
   u2netSession = await ort.InferenceSession.create('./u2netp.onnx');
 }
 
+// State variable to track if the flag is applied
+let flagApplied = false;
+
 async function addFlagWithBackgroundRemoval() {
   if (!canvasImage) return;
 
@@ -44,64 +47,14 @@ async function addFlagWithBackgroundRemoval() {
   const maskImage = postprocessONNXOutput(output[Object.keys(output)[0]], canvasImage);
 
   maskImage.onload = function () {
-      // Clear the canvas and start the rendering process
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Set flagApplied to true since the user has added the flag
+      flagApplied = true;
 
-      // Draw the original image (base layer) without the mask.
-      ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
+      // Save the mask image for later use in drawCanvas
+      savedMaskImage = maskImage;
 
-      // Apply selected filter (if any)
-      if (currentFilter === 'dark') {
-          applyGradientMapFilter(ctx, canvas.width, canvas.height);
-      } else if (currentFilter === 'classic') {
-          applyClassicRedFilter(ctx, canvas.width, canvas.height);
-      } else if (currentFilter === 'light') {
-          applyLightFilter(ctx, canvas.width, canvas.height);
-      }
-
-      // Calculate dimensions to maintain the flag's aspect ratio while covering the entire canvas
-      const flagAspectRatio = flagImage.width / flagImage.height;
-      let flagWidth, flagHeight;
-
-      if (canvas.width / canvas.height > flagAspectRatio) {
-          // Canvas is wider than the flag, so scale the flag by width and crop the top/bottom
-          flagWidth = canvas.width;
-          flagHeight = flagWidth / flagAspectRatio;
-      } else {
-          // Canvas is taller than the flag, so scale the flag by height and crop the sides
-          flagHeight = canvas.height;
-          flagWidth = flagHeight * flagAspectRatio;
-      }
-
-      // Center the flag on the canvas (crop overflow equally)
-      const flagX = (canvas.width - flagWidth) / 2;
-      const flagY = (canvas.height - flagHeight) / 2;
-
-      // Draw the flag image with the specified opacity, filling the canvas
-      ctx.globalAlpha = flagOpacity;
-      ctx.drawImage(flagImage, flagX, flagY, flagWidth, flagHeight);
-      ctx.globalAlpha = 1; // Reset opacity for the next drawings
-
-      // Draw the masked image (foreground) on top of the flag
-      ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
-
-      // Draw lasers on top of the filtered image
-      lasers.forEach((laser) => {
-          ctx.save();
-          ctx.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
-          ctx.rotate(laser.rotation);
-          ctx.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
-          ctx.restore();
-      });
-
-      // Draw hats on top of the lasers
-      hats.forEach((hat) => {
-          ctx.save();
-          ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
-          ctx.rotate(hat.rotation);
-          ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
-          ctx.restore();
-      });
+      // Redraw everything, including the flag and mask
+      drawCanvas();
   };
 }
 
@@ -683,40 +636,66 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
+// Ensure drawCanvas handles lasers, hats, filters, and the flag if applied
 function drawCanvas() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas before redrawing
+  // Clear the canvas before drawing
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw the base image (the original uploaded image).
   ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
 
-  // Apply selected filter
+  // Apply the selected filter (if any)
   if (currentFilter === 'dark') {
-    applyGradientMapFilter(ctx, canvas.width, canvas.height);
+      applyGradientMapFilter(ctx, canvas.width, canvas.height);
   } else if (currentFilter === 'classic') {
-    applyClassicRedFilter(ctx, canvas.width, canvas.height);
+      applyClassicRedFilter(ctx, canvas.width, canvas.height);
   } else if (currentFilter === 'light') {
-    applyLightFilter(ctx, canvas.width, canvas.height);
-  } else if (currentFilter === 'none') {
-    // No filter applied, just draw the image
+      applyLightFilter(ctx, canvas.width, canvas.height);
   }
 
-  // Apply contrast and redness adjustments
-  applyContrastAndRedness(ctx, canvas.width, canvas.height);
+  // Draw the flag and masked image if the flag is applied
+  if (flagApplied && savedMaskImage) {
+      // Calculate dimensions to maintain the flag's aspect ratio while covering the entire canvas
+      const flagAspectRatio = flagImage.width / flagImage.height;
+      let flagWidth, flagHeight;
 
-  // Draw lasers
+      if (canvas.width / canvas.height > flagAspectRatio) {
+          flagWidth = canvas.width;
+          flagHeight = flagWidth / flagAspectRatio;
+      } else {
+          flagHeight = canvas.height;
+          flagWidth = flagHeight * flagAspectRatio;
+      }
+
+      // Center the flag on the canvas (crop overflow equally)
+      const flagX = (canvas.width - flagWidth) / 2;
+      const flagY = (canvas.height - flagHeight) / 2;
+
+      // Draw the flag with the specified opacity, maintaining aspect ratio
+      ctx.globalAlpha = flagOpacity;
+      ctx.drawImage(flagImage, flagX, flagY, flagWidth, flagHeight);
+      ctx.globalAlpha = 1; // Reset opacity for the next drawings
+
+      // Draw the masked image (foreground) on top of the flag
+      ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
+  }
+
+  // Draw lasers on top of the filtered image
   lasers.forEach((laser) => {
-    ctx.save();
-    ctx.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
-    ctx.rotate(laser.rotation);
-    ctx.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
-    ctx.restore();
+      ctx.save();
+      ctx.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
+      ctx.rotate(laser.rotation);
+      ctx.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
+      ctx.restore();
   });
 
-  // Draw hats
+  // Draw hats on top of the lasers
   hats.forEach((hat) => {
-    ctx.save();
-    ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
-    ctx.rotate(hat.rotation);
-    ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
-    ctx.restore();
+      ctx.save();
+      ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
+      ctx.rotate(hat.rotation);
+      ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
+      ctx.restore();
   });
 }
 
