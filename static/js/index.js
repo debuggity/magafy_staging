@@ -20,6 +20,115 @@ const MAX_HEIGHT = 480;
 let originalImageWidth, originalImageHeight;
 let currentFilter = 'classic';
 
+// Define variables for flag image and opacity
+let flagImage = new Image();
+flagImage.src = "flag.png"; // Ensure flag.png is in the root of the project
+flagImage.crossOrigin = "anonymous";
+
+let flagOpacity = 1; // Default opacity
+
+let u2netSession;
+
+// Load the ONNX model
+async function loadModel() {
+  u2netSession = await ort.InferenceSession.create('./u2netp.onnx');
+}
+
+// Function to add the flag with background removal
+async function addFlagWithBackgroundRemoval() {
+  if (!canvasImage) return;
+
+  const inputTensor = preprocessImageForONNX(canvasImage);
+
+  // Perform inference with the ONNX model
+  const output = await u2netSession.run({ 'input.1': inputTensor });
+  const maskImage = postprocessONNXOutput(output[Object.keys(output)[0]], canvasImage);
+
+  maskImage.onload = function () {
+      // Clear the canvas and draw the flag at the specified opacity
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = flagOpacity;
+      ctx.drawImage(flagImage, 0, 0, canvas.width, canvas.height);
+
+      // Draw the masked image on top with full opacity
+      ctx.globalAlpha = 1;
+      ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
+  };
+}
+
+// Event listeners for adding the flag
+document.getElementById("add-flag-button").addEventListener("click", addFlagWithBackgroundRemoval);
+
+document.getElementById("flag-opacity-slider").addEventListener("input", function (e) {
+  flagOpacity = parseFloat(e.target.value);
+  drawCanvas(); // Redraw to reflect new opacity
+});
+
+// Event listener to remove the flag
+document.getElementById("remove-flag-button").addEventListener("click", function () {
+  flagImage = null;
+  drawCanvas(); // Redraw without the flag
+});
+
+// Load the ONNX model when the page loads
+window.addEventListener('DOMContentLoaded', loadModel);
+
+// Preprocessing function for the ONNX model input
+function preprocessImageForONNX(imageElement) {
+  const width = 320;
+  const height = 320;
+
+  // Create an offscreen canvas and draw the image onto it
+  const offscreenCanvas = document.createElement('canvas');
+  const offscreenCtx = offscreenCanvas.getContext('2d');
+  offscreenCanvas.width = width;
+  offscreenCanvas.height = height;
+  offscreenCtx.drawImage(imageElement, 0, 0, width, height);
+
+  // Get image data and convert to tensor
+  const imageData = offscreenCtx.getImageData(0, 0, width, height);
+  const tensorData = new Float32Array(1 * 3 * width * height);
+
+  for (let i = 0; i < imageData.data.length; i += 4) {
+      tensorData[i / 4] = imageData.data[i] / 255; // Red
+      tensorData[(i / 4) + (width * height)] = imageData.data[i + 1] / 255; // Green
+      tensorData[(i / 4) + (2 * width * height)] = imageData.data[i + 2] / 255; // Blue
+  }
+
+  return new ort.Tensor('float32', tensorData, [1, 3, width, height]);
+}
+
+// Postprocessing function for the ONNX model output
+function postprocessONNXOutput(output, imageElement) {
+  const width = 320;
+  const height = 320;
+
+  // Create an offscreen canvas to draw the output
+  const offscreenCanvas = document.createElement('canvas');
+  const offscreenCtx = offscreenCanvas.getContext('2d');
+  offscreenCanvas.width = width;
+  offscreenCanvas.height = height;
+  
+  // Get the output data (mask)
+  const maskData = output.data;
+  const imageData = offscreenCtx.getImageData(0, 0, width, height);
+
+  // Apply the mask to the alpha channel
+  for (let i = 0; i < maskData.length; i++) {
+      const pixelIndex = i * 4;
+      imageData.data[pixelIndex + 3] = maskData[i] > 0.5 ? 255 : 0; // Alpha
+  }
+
+  offscreenCtx.putImageData(imageData, 0, 0);
+
+  // Create a new image element with the background removed
+  const newImgElement = new Image();
+  newImgElement.src = offscreenCanvas.toDataURL();
+  return newImgElement;
+}
+
+
+
 window.addEventListener('DOMContentLoaded', () => {
   // Set resize slider to the middle
   const resizeSlider = document.getElementById('resize-slider');
@@ -101,7 +210,6 @@ document.getElementById("add-hat-button").addEventListener("click", function () 
   hats.push(hat);
   drawCanvas();
 });
-
 
 document.getElementById("resize-slider").addEventListener("input", function (e) {
   const scale = e.target.value;
