@@ -238,11 +238,6 @@ label:active {
   transform: scale(1.1);
 }
 
-.filter-options {
-  display: flex;
-  gap: 20px;  /* Increase gap between filter options */
-}
-
 .filter-option {
   padding: 10px 20px;  /* Increase padding for a more button-like feel */
   background-color: #333;
