@@ -45,14 +45,17 @@ async function addFlagWithBackgroundRemoval() {
   const maskImage = postprocessONNXOutput(output[Object.keys(output)[0]], canvasImage);
 
   maskImage.onload = function () {
-      // Clear the canvas and draw the flag at the specified opacity
+      // Clear the canvas and draw the flag with the specified opacity
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.globalAlpha = flagOpacity;
       ctx.drawImage(flagImage, 0, 0, canvas.width, canvas.height);
 
-      // Draw the masked image on top with full opacity
-      ctx.globalAlpha = 1;
+      // Draw the masked image on top of the flag
+      ctx.globalAlpha = 1; // Reset alpha for the masked image
       ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
+
+      // Draw lasers, hats, and apply any selected filters on top of everything
+      drawCanvas();
   };
 }
 
@@ -103,20 +106,22 @@ function postprocessONNXOutput(output, imageElement) {
   const width = 320;
   const height = 320;
 
-  // Create an offscreen canvas to draw the output
+  // Create an offscreen canvas to draw the masked output
   const offscreenCanvas = document.createElement('canvas');
   const offscreenCtx = offscreenCanvas.getContext('2d');
   offscreenCanvas.width = width;
   offscreenCanvas.height = height;
-  
-  // Get the output data (mask)
+  offscreenCtx.drawImage(imageElement, 0, 0, width, height);
+
+  // Get the output mask data and the image data
   const maskData = output.data;
   const imageData = offscreenCtx.getImageData(0, 0, width, height);
 
-  // Apply the mask to the alpha channel
+  // Apply the mask to the alpha channel of the image data
   for (let i = 0; i < maskData.length; i++) {
       const pixelIndex = i * 4;
-      imageData.data[pixelIndex + 3] = maskData[i] > 0.5 ? 255 : 0; // Alpha
+      const maskValue = maskData[i] * 255; // Convert the normalized mask back to 0-255 range
+      imageData.data[pixelIndex + 3] = maskValue; // Apply mask to alpha channel
   }
 
   offscreenCtx.putImageData(imageData, 0, 0);
