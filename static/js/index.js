@@ -685,6 +685,7 @@ let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
 // Ensure drawCanvas handles lasers, hats, filters, and the flag if applied
+// Ensure drawCanvas handles lasers, hats, filters, and the flag if applied
 function drawCanvas() {
   // Clear the canvas before drawing
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -700,6 +701,9 @@ function drawCanvas() {
   } else if (currentFilter === 'light') {
       applyLightFilter(ctx, canvas.width, canvas.height);
   }
+
+  // Apply contrast and redness adjustments
+  applyContrastAndRedness(ctx, canvas.width, canvas.height);
 
   // Draw the flag and masked image if the flag is applied
   if (flagApplied && savedMaskImage) {
@@ -746,6 +750,7 @@ function drawCanvas() {
       ctx.restore();
   });
 }
+
 
 function applyContrastAndRedness(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
