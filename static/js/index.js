@@ -17,23 +17,29 @@ let currentHat = null;
 const MAX_WIDTH = 640;
 const MAX_HEIGHT = 480;
 
-let session = null;
-(async () => {
-  try {
-    session = await ort.InferenceSession.create('u2netp.onnx');
-    console.log('ONNX Model loaded successfully');
-  } catch (e) {
-    console.error('Failed to load the ONNX model:', e);
-  }
-})();
-
-// Add these variables along with existing ones
-let flagImage = new Image();
-flagImage.src = 'flag.png'; // Ensure the path is correct
-flagImage.crossOrigin = 'anonymous';
+// Add at the top, after existing variable declarations
+let selectedFlagImage = null;
 let flags = [];
 let currentFlag = null;
-let flagOpacity = 1;
+let flagOpacity = 0.5;
+
+// Preload the flag image
+const flagImageTemplate = new Image();
+flagImageTemplate.src = "static/images/flag.png";
+flagImageTemplate.crossOrigin = "anonymous";
+
+// Handle Flag Selection
+document.querySelectorAll('.flag-option').forEach(option => {
+  option.addEventListener('click', function () {
+    document.querySelectorAll('.flag-option').forEach(opt => opt.classList.remove('selected'));
+    this.classList.add('selected');
+
+    selectedFlagImage = new Image();
+    selectedFlagImage.src = this.src;
+    selectedFlagImage.crossOrigin = 'anonymous';
+  });
+});
+
 
 let originalImageWidth, originalImageHeight;
 let currentFilter = 'classic';
@@ -47,35 +53,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const rotateSlider = document.getElementById('rotate-slider');
   rotateSlider.value = '0';  // Middle value between 0 and 360
 });
-
-document.getElementById("image-upload").addEventListener("change", async function (e) {
-  const reader = new FileReader();
-  reader.onload = async function (event) {
-    document.getElementById("h1-title").style.display = "none";
-    canvasImage.onload = async function () {
-      originalImageWidth = canvasImage.width;
-      originalImageHeight = canvasImage.height;
-
-      // Scale the image to fit within the specified limits
-      const scale = Math.min(
-        MAX_WIDTH / canvasImage.width,
-        MAX_HEIGHT / canvasImage.height,
-        1
-      );
-      canvas.width = canvasImage.width * scale;
-      canvas.height = canvasImage.height * scale;
-      
-      // Remove background
-      await removeBackground(canvasImage);
-      
-      drawCanvas();
-      document.querySelector(".button-container").style.display = "flex";
-    };
-    canvasImage.src = event.target.result;
-  };
-  reader.readAsDataURL(e.target.files[0]);
-});
-
 
 document.getElementById("add-laser-button").addEventListener("click", function () {
   const aspectRatio = laserImageTemplate.width / laserImageTemplate.height;
@@ -419,7 +396,7 @@ document.getElementById("download-button").addEventListener("click", async funct
   // Draw flags on the full resolution canvas
   flags.forEach((flag) => {
     fullResCtx.save();
-    fullResCtx.globalAlpha = flag.opacity; // Set opacity
+    fullResCtx.globalAlpha = flag.opacity;
     fullResCtx.translate(
       flag.x * scaleX + (flag.width * scaleX) / 2,
       flag.y * scaleY + (flag.height * scaleY) / 2
@@ -576,15 +553,11 @@ document.querySelectorAll('.flag-option').forEach(option => {
   });
 });
 
-document.getElementById("flag-opacity-slider").addEventListener("input", function (e) {
-  flagOpacity = parseFloat(e.target.value);
-  drawCanvas();
-});
-
+// Add Event Listener for Adding Flag
 document.getElementById("add-flag-button").addEventListener("click", function () {
-  if (!flagImage.src) return;
+  if (!selectedFlagImage) return;
 
-  const aspectRatio = flagImage.width / flagImage.height;
+  const aspectRatio = selectedFlagImage.width / selectedFlagImage.height;
 
   let flagWidth = (canvas.width / 5) * 2;
   let flagHeight = flagWidth / aspectRatio;
@@ -595,7 +568,7 @@ document.getElementById("add-flag-button").addEventListener("click", function ()
   }
 
   const flag = {
-    image: flagImage,
+    image: selectedFlagImage,
     width: flagWidth,
     height: flagHeight,
     x: canvas.width / 2 - flagWidth / 2,
@@ -607,16 +580,41 @@ document.getElementById("add-flag-button").addEventListener("click", function ()
   drawCanvas();
 });
 
+// Add Event Listener for Removing All Flags
 document.getElementById("remove-all-flags-button").addEventListener("click", function () {
   flags = [];
   drawCanvas();
 });
 
-
+// Add Event Listener for Flag Opacity Slider
+document.getElementById("flag-opacity-slider").addEventListener("input", function (e) {
+  flagOpacity = parseFloat(e.target.value);
+  flags.forEach(flag => {
+    flag.opacity = flagOpacity;
+  });
+  drawCanvas();
+});
 
 function drawCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas before redrawing
-  ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
+  
+  // Draw original image (assuming it's stored separately)
+  if (canvasImage) {
+    ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
+  }
+
+  // Draw flags behind the subject
+  flags.forEach(flag => {
+    ctx.save();
+    ctx.globalAlpha = flag.opacity;
+    ctx.translate(
+      flag.x + flag.width / 2,
+      flag.y + flag.height / 2
+    );
+    ctx.rotate(flag.rotation);
+    ctx.drawImage(flag.image, -flag.width / 2, -flag.height / 2, flag.width, flag.height);
+    ctx.restore();
+  });
 
   // Apply selected filter
   if (currentFilter === 'dark') {
@@ -631,16 +629,6 @@ function drawCanvas() {
 
   // Apply contrast and redness adjustments
   applyContrastAndRedness(ctx, canvas.width, canvas.height);
-
-  // Draw flags behind the subject
-  flags.forEach((flag) => {
-    ctx.save();
-    ctx.globalAlpha = flag.opacity; // Set opacity
-    ctx.translate(flag.x + flag.width / 2, flag.y + flag.height / 2);
-    ctx.rotate(flag.rotation);
-    ctx.drawImage(flag.image, -flag.width / 2, -flag.height / 2, flag.width, flag.height);
-    ctx.restore();
-  });
 
   // Draw lasers
   lasers.forEach((laser) => {
@@ -661,75 +649,136 @@ function drawCanvas() {
   });
 }
 
-async function removeBackground(image) {
-  if (!session) {
-    alert('Model is not loaded yet. Please wait.');
-    return;
+// Initialize ONNX Runtime Session
+let ortSession = null;
+
+async function initializeORTSession() {
+  if (!ortSession) {
+    ortSession = await ort.InferenceSession.create('static/models/u2netp.onnx');
   }
-
-  // Preprocess the image to the required input size for U2NETP
-  const resizedCanvas = document.createElement('canvas');
-  const targetSize = 320; // U2NETP expects 320x320 images
-  resizedCanvas.width = targetSize;
-  resizedCanvas.height = targetSize;
-  const resizedCtx = resizedCanvas.getContext('2d');
-  resizedCtx.drawImage(image, 0, 0, targetSize, targetSize);
-  const imageData = resizedCtx.getImageData(0, 0, targetSize, targetSize);
-  const data = imageData.data;
-
-  // Normalize and prepare input tensor
-  const input = new Float32Array(targetSize * targetSize * 3);
-  for (let i = 0; i < targetSize * targetSize; i++) {
-    input[i * 3 + 0] = data[i * 4 + 0] / 255.0; // R
-    input[i * 3 + 1] = data[i * 4 + 1] / 255.0; // G
-    input[i * 3 + 2] = data[i * 4 + 2] / 255.0; // B
-  }
-
-  const tensor = new ort.Tensor('float32', input, [1, 3, targetSize, targetSize]);
-
-  // Run inference
-  const feeds = { 'x': tensor };
-  const results = await session.run(feeds);
-  const mask = results['out'][0].data; // Assuming 'out' is the output tensor
-
-  // Resize mask back to original image size
-  const maskCanvas = document.createElement('canvas');
-  maskCanvas.width = image.width;
-  maskCanvas.height = image.height;
-  const maskCtx = maskCanvas.getContext('2d');
-  const resizedMaskCanvas = document.createElement('canvas');
-  resizedMaskCanvas.width = targetSize;
-  resizedMaskCanvas.height = targetSize;
-  const resizedMaskCtx = resizedMaskCanvas.getContext('2d');
-
-  // Create grayscale mask image
-  const maskImageData = resizedMaskCtx.createImageData(targetSize, targetSize);
-  for (let i = 0; i < mask.length; i++) {
-    const value = mask[i] * 255;
-    maskImageData.data[i * 4 + 0] = value;
-    maskImageData.data[i * 4 + 1] = value;
-    maskImageData.data[i * 4 + 2] = value;
-    maskImageData.data[i * 4 + 3] = value;
-  }
-  resizedMaskCtx.putImageData(maskImageData, 0, 0);
-
-  // Draw the mask onto the maskCanvas
-  maskCtx.drawImage(resizedMaskCanvas, 0, 0, image.width, image.height);
-
-  // Get the mask data
-  const finalMaskData = maskCtx.getImageData(0, 0, image.width, image.height).data;
-
-  // Apply mask to the original image
-  const originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const originalData = originalImageData.data;
-
-  for (let i = 0; i < originalData.length; i += 4) {
-    const alpha = finalMaskData[i + 3] / 255;
-    originalData[i + 3] = originalData[i + 3] * alpha;
-  }
-
-  ctx.putImageData(originalImageData, 0, 0);
 }
+
+async function removeBackgroundFromImage(imgElement) {
+  const width = 320;
+  const height = 320;
+
+  // Create an offscreen canvas and draw the image onto it
+  const offscreenCanvas = document.createElement('canvas');
+  const offscreenCtx = offscreenCanvas.getContext('2d');
+  offscreenCanvas.width = width;
+  offscreenCanvas.height = height;
+  offscreenCtx.drawImage(imgElement, 0, 0, width, height);
+
+  // Get image data and convert to tensor
+  const imageData = offscreenCtx.getImageData(0, 0, width, height);
+  const tensorData = new Float32Array(1 * 3 * width * height);
+  for (let i = 0; i < imageData.data.length; i += 4) {
+    tensorData[i / 4] = imageData.data[i] / 255; // Red
+    tensorData[(i / 4) + (width * height)] = imageData.data[i + 1] / 255; // Green
+    tensorData[(i / 4) + (2 * width * height)] = imageData.data[i + 2] / 255; // Blue
+  }
+
+  const input = new ort.Tensor('float32', tensorData, [1, 3, width, height]);
+  const feeds = { 'input.1': input };
+  
+  // Ensure the model is initialized
+  await initializeORTSession();
+  
+  const results = await ortSession.run(feeds);
+  const maskData = results[Object.keys(results)[0]].data;
+
+  // Apply the mask to the original image
+  for (let i = 0; i < maskData.length; i++) {
+    const pixelIndex = i * 4;
+    imageData.data[pixelIndex + 3] = maskData[i] > 0.5 ? 255 : 0; // Alpha
+  }
+
+  // Put the image data back onto the canvas
+  offscreenCtx.putImageData(imageData, 0, 0);
+
+  // Create a new image element with the background removed
+  return new Promise((resolve) => {
+    const newImgElement = new Image();
+    newImgElement.src = offscreenCanvas.toDataURL();
+    newImgElement.onload = () => {
+      // Calculate the actual aspect ratio and resize accordingly
+      const aspectRatio = imgElement.naturalWidth / imgElement.naturalHeight;
+      let canvasWidth, canvasHeight;
+
+      if (aspectRatio > 1) {
+        // Landscape orientation
+        canvasWidth = 320;
+        canvasHeight = 320 / aspectRatio;
+      } else {
+        // Portrait or square orientation
+        canvasHeight = 320;
+        canvasWidth = 320 * aspectRatio;
+      }
+
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = canvasWidth;
+      finalCanvas.height = canvasHeight;
+      const finalCtx = finalCanvas.getContext('2d');
+      finalCtx.drawImage(newImgElement, 0, 0, canvasWidth, canvasHeight);
+
+      const finalImgElement = new Image();
+      finalImgElement.src = finalCanvas.toDataURL();
+      finalImgElement.onload = () => resolve(finalImgElement);
+    };
+  });
+}
+
+// Update Image Upload Handler to Apply Background Removal
+document.getElementById("image-upload").addEventListener("change", async function (e) {
+  const reader = new FileReader();
+  reader.onload = async function (event) {
+    document.getElementById("h1-title").style.display = "none";
+    const originalImg = new Image();
+    originalImg.src = event.target.result;
+    originalImg.onload = async function () {
+      // Remove background
+      const subjectImg = await removeBackgroundFromImage(originalImg);
+
+      // Set original image dimensions
+      originalImageWidth = originalImg.width;
+      originalImageHeight = originalImg.height;
+
+      // Scale the subject image to fit within the specified limits
+      const scale = Math.min(
+        MAX_WIDTH / subjectImg.width,
+        MAX_HEIGHT / subjectImg.height,
+        1
+      );
+      canvas.width = subjectImg.width * scale;
+      canvas.height = subjectImg.height * scale;
+
+      // Draw original image
+      ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
+
+      // Draw flag behind the subject if any
+      flags.forEach(flag => {
+        ctx.save();
+        ctx.globalAlpha = flag.opacity;
+        ctx.translate(
+          flag.x + flag.width / 2,
+          flag.y + flag.height / 2
+        );
+        ctx.rotate(flag.rotation);
+        ctx.drawImage(flag.image, -flag.width / 2, -flag.height / 2, flag.width, flag.height);
+        ctx.restore();
+      });
+
+      // Draw subject (with background removed)
+      ctx.drawImage(subjectImg, 0, 0, canvas.width, canvas.height);
+
+      // Draw lasers and hats
+      drawCanvas();
+
+      document.querySelector(".button-container").style.display = "flex";
+    };
+  };
+  reader.readAsDataURL(e.target.files[0]);
+});
 
 function applyContrastAndRedness(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
