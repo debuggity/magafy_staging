@@ -68,8 +68,9 @@ document.getElementById("flag-opacity-slider").addEventListener("input", functio
 
 // Event listener to remove the flag
 document.getElementById("remove-flag-button").addEventListener("click", function () {
-  flagImage = null;
-  drawCanvas(); // Redraw without the flag
+  flagApplied = false; // Set the flag state to false
+  savedMaskImage = null; // Clear the saved mask image since the flag is removed
+  drawCanvas(); // Redraw without the flag and mask, but keep other elements
 });
 
 // Load the ONNX model when the page loads
