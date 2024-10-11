@@ -103,34 +103,48 @@ function preprocessImageForONNX(imageElement) {
 
 // Postprocessing function for the ONNX model output
 function postprocessONNXOutput(output, imageElement) {
-  const width = 320;
-  const height = 320;
+  const width = imageElement.width;
+  const height = imageElement.height;
 
   // Create an offscreen canvas to draw the masked output
   const offscreenCanvas = document.createElement('canvas');
   const offscreenCtx = offscreenCanvas.getContext('2d');
   offscreenCanvas.width = width;
   offscreenCanvas.height = height;
-  offscreenCtx.drawImage(imageElement, 0, 0, width, height);
 
-  // Get the output mask data and the image data
+  // Resize the mask data to match the original image size
   const maskData = output.data;
-  const imageData = offscreenCtx.getImageData(0, 0, width, height);
+  const scaledMaskCanvas = document.createElement('canvas');
+  scaledMaskCanvas.width = 320;
+  scaledMaskCanvas.height = 320;
+  const scaledMaskCtx = scaledMaskCanvas.getContext('2d');
 
-  // Apply the mask to the alpha channel of the image data
+  // Create ImageData object for the mask
+  const maskImageData = scaledMaskCtx.createImageData(320, 320);
+
+  // Fill the mask data into the ImageData object
   for (let i = 0; i < maskData.length; i++) {
-      const pixelIndex = i * 4;
-      const maskValue = maskData[i] * 255; // Convert the normalized mask back to 0-255 range
-      imageData.data[pixelIndex + 3] = maskValue; // Apply mask to alpha channel
+    const value = maskData[i] * 255;
+    maskImageData.data[i * 4 + 3] = value; // Set alpha channel
+    maskImageData.data[i * 4] = 0;
+    maskImageData.data[i * 4 + 1] = 0;
+    maskImageData.data[i * 4 + 2] = 0;
   }
+  scaledMaskCtx.putImageData(maskImageData, 0, 0);
 
-  offscreenCtx.putImageData(imageData, 0, 0);
+  // Draw the resized mask to the offscreen canvas at the original size
+  offscreenCtx.drawImage(scaledMaskCanvas, 0, 0, 320, 320, 0, 0, width, height);
+
+  // Draw the original image over the resized mask, preserving high resolution
+  offscreenCtx.globalCompositeOperation = 'source-in';
+  offscreenCtx.drawImage(imageElement, 0, 0, width, height);
 
   // Create a new image element with the background removed
   const newImgElement = new Image();
   newImgElement.src = offscreenCanvas.toDataURL();
   return newImgElement;
 }
+
 
 
 
