@@ -13,5 +13,8 @@
 /hat_right.png
   Access-Control-Allow-Origin: *
 
-/flag.png
+/AmericanFlag.png
+  Access-Control-Allow-Origin: *
+
+/lightning.png
   Access-Control-Allow-Origin: *
