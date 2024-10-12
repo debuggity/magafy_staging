@@ -15,6 +15,3 @@
 
 /flag.png
   Access-Control-Allow-Origin: *
-
-/lightning.png
-  Access-Control-Allow-Origin: *
