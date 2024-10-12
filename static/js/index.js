@@ -1,7 +1,7 @@
 const canvas = document.getElementById("meme-canvas");
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 const laserImageTemplate = new Image();
-laserImageTemplate.src = "https://dmagafy.netlify.app/laser_large.png";
+laserImageTemplate.src = "https://dmagafy.netlify-staging.app/laser_large.png";
 laserImageTemplate.crossOrigin = "anonymous";
 
 let canvasImage = new Image();
@@ -306,10 +306,10 @@ document.querySelectorAll('.hat-option').forEach(option => {
     
     // Set the URL of the hat image
     const hatUrl = {
-      'hat1': "https://dmagafy.netlify.app/hat_front_1.png",
-      'hat2': "https://dmagafy.netlify.app/hat_front_2.png",
-      'hatLeft': "https://dmagafy.netlify.app/hat_left.png",
-      'hatRight': "https://dmagafy.netlify.app/hat_right.png"
+      'hat1': "https://dmagafy-staging.netlify.app/hat_front_1.png",
+      'hat2': "https://dmagafy-staging.netlify.app/hat_front_2.png",
+      'hatLeft': "https://dmagafy-staging.netlify.app/hat_left.png",
+      'hatRight': "https://dmagafy-staging.netlify.app/hat_right.png"
     };
 
     const hatType = this.getAttribute('data-hat');
