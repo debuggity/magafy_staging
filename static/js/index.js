@@ -548,6 +548,9 @@ document.getElementById("download-button").addEventListener("click", function ()
   // Redraw the filtered image
   finalCtx.drawImage(fullResCanvas, 0, 0);
 
+  // Apply contrast and redness adjustments
+  applyContrastAndRedness(finalCtx, finalCanvas.width, finalCanvas.height);
+
   // Draw the flag if it is applied
   if (flagApplied && savedMaskImage) {
       const flagAspectRatio = flagImage.width / flagImage.height;
@@ -623,6 +626,7 @@ document.getElementById("download-button").addEventListener("click", function ()
       document.body.removeChild(link);
   }, 'image/png');
 });
+
 
 
 window.addEventListener("paste", function (e) {
