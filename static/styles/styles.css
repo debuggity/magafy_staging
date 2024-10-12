@@ -334,6 +334,24 @@ h1 {
   margin-bottom: 10px;
 }
 
+.lightning-options {
+  display: flex;
+  gap: 20px; /* Gap between the flag and lightning options */
+}
+
+.lightning-option {
+  width: 60px; /* Size of each background option */
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s, border-color 0.3s;
+}
+
+.lightning-option:hover,
+.lightning-option.selected {
+  border: 2px solid #ff0000;
+  transform: scale(1.1);
+}
+
 
 /* Adjustments for mobile */
 @media (max-width: 700px) {

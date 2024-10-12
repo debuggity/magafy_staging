@@ -25,6 +25,9 @@ let flagImage = new Image();
 flagImage.src = "AmericanFlag.png"; // Ensure flag.png is in the root of the project
 flagImage.crossOrigin = "anonymous";
 
+let selectedBackgroundImage = flagImage; // Default is the flag image.
+
+
 let flagOpacity = .5; // Default opacity
 
 let u2netSession;
@@ -68,10 +71,31 @@ document.getElementById("flag-opacity-slider").addEventListener("input", functio
 
 // Event listener to remove the flag
 document.getElementById("remove-flag-button").addEventListener("click", function () {
-  flagApplied = false; // Set the flag state to false
-  savedMaskImage = null; // Clear the saved mask image since the flag is removed
-  drawCanvas(); // Redraw without the flag and mask, but keep other elements
+  flagApplied = false; // Reset the background application state
+  savedMaskImage = null; // Clear the saved mask image
+  selectedBackgroundImage = null; // Clear the selected background
+  drawCanvas(); // Redraw the canvas without any background
 });
+
+document.querySelectorAll('.lightning-option').forEach(option => {
+  option.addEventListener('click', function () {
+    document.querySelectorAll('.lightning-option').forEach(opt => opt.classList.remove('selected'));
+    this.classList.add('selected');
+
+    // Switch between flag and lightning based on the selected option
+    const bgType = this.getAttribute('data-bg');
+    if (bgType === 'flag') {
+      selectedBackgroundImage = flagImage;
+    } else if (bgType === 'lightning') {
+      selectedBackgroundImage = new Image();
+      selectedBackgroundImage.src = "lightning.png";  // Load the lightning image
+      selectedBackgroundImage.crossOrigin = "anonymous"; // Handle cross-origin if needed
+    }
+    
+    drawCanvas(); // Redraw the canvas to apply the selected background
+  });
+});
+
 
 // Load the ONNX model when the page loads
 window.addEventListener('DOMContentLoaded', loadModel);
@@ -735,31 +759,31 @@ function drawCanvas() {
   applyContrastAndRedness(ctx, canvas.width, canvas.height);
 
   // Draw the flag and masked image if the flag is applied
-  if (flagApplied && savedMaskImage) {
-      // Calculate dimensions to maintain the flag's aspect ratio while covering the entire canvas
-      const flagAspectRatio = flagImage.width / flagImage.height;
-      let flagWidth, flagHeight;
-
-      if (canvas.width / canvas.height > flagAspectRatio) {
-          flagWidth = canvas.width;
-          flagHeight = flagWidth / flagAspectRatio;
-      } else {
-          flagHeight = canvas.height;
-          flagWidth = flagHeight * flagAspectRatio;
-      }
-
-      // Center the flag on the canvas (crop overflow equally)
-      const flagX = (canvas.width - flagWidth) / 2;
-      const flagY = (canvas.height - flagHeight) / 2;
-
-      // Draw the flag with the specified opacity, maintaining aspect ratio
-      ctx.globalAlpha = flagOpacity;
-      ctx.drawImage(flagImage, flagX, flagY, flagWidth, flagHeight);
-      ctx.globalAlpha = 1; // Reset opacity for the next drawings
-
-      // Draw the masked image (foreground) on top of the flag
-      ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
-  }
+  if (flagApplied && savedMaskImage && selectedBackgroundImage) {
+    // Calculate dimensions to maintain the background's aspect ratio while covering the entire canvas
+    const bgAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
+    let bgWidth, bgHeight;
+  
+    if (canvas.width / canvas.height > bgAspectRatio) {
+      bgWidth = canvas.width;
+      bgHeight = bgWidth / bgAspectRatio;
+    } else {
+      bgHeight = canvas.height;
+      bgWidth = bgHeight * bgAspectRatio;
+    }
+  
+    // Center the background on the canvas (crop overflow equally)
+    const bgX = (canvas.width - bgWidth) / 2;
+    const bgY = (canvas.height - bgHeight) / 2;
+  
+    // Draw the background with the specified opacity, maintaining aspect ratio
+    ctx.globalAlpha = flagOpacity; // Opacity for both flag and lightning
+    ctx.drawImage(selectedBackgroundImage, bgX, bgY, bgWidth, bgHeight);
+    ctx.globalAlpha = 1; // Reset opacity for the next drawings
+  
+    // Draw the masked image (foreground) on top of the background
+    ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
+  }  
 
   // Draw lasers on top of the filtered image
   lasers.forEach((laser) => {
