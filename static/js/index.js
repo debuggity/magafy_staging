@@ -527,17 +527,28 @@ document.getElementById("download-button").addEventListener("click", function ()
   fullResCanvas.height = originalImageHeight;
   const fullResCtx = fullResCanvas.getContext("2d");
 
-  // Draw the original image at full resolution
+  // Draw the original image at full resolution without any filters
   fullResCtx.drawImage(canvasImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
 
-  // Apply the selected filter (if any)
+  // Apply the selected filter (if any) to a new imageData object
+  const filteredImageData = fullResCtx.getImageData(0, 0, fullResCanvas.width, fullResCanvas.height);
+  const tempCtx = document.createElement('canvas').getContext('2d');
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = fullResCanvas.width;
+  tempCanvas.height = fullResCanvas.height;
+  tempCtx.putImageData(filteredImageData, 0, 0);
+  
+  // Apply filters to the temporary context instead
   if (currentFilter === 'dark') {
-      applyGradientMapFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+      applyGradientMapFilter(tempCtx, tempCanvas.width, tempCanvas.height);
   } else if (currentFilter === 'classic') {
-      applyClassicRedFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+      applyClassicRedFilter(tempCtx, tempCanvas.width, tempCanvas.height);
   } else if (currentFilter === 'light') {
-      applyLightFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+      applyLightFilter(tempCtx, tempCanvas.width, tempCanvas.height);
   }
+  
+  // Put filtered data back into fullResCtx for subsequent drawing
+  fullResCtx.putImageData(tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height), 0, 0);
 
   // Draw the flag if it is applied
   if (flagApplied && savedMaskImage) {
@@ -612,7 +623,6 @@ document.getElementById("download-button").addEventListener("click", function ()
       document.body.removeChild(link);
   }, 'image/png');
 });
-
 
 window.addEventListener("paste", function (e) {
   const items = e.clipboardData.items;
