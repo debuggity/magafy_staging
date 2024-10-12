@@ -530,7 +530,7 @@ document.getElementById("download-button").addEventListener("click", function ()
   // Draw the original image at full resolution
   fullResCtx.drawImage(canvasImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
 
-  // Apply filters directly to the full resolution image
+  // Apply the selected filter directly to the fullResCanvas
   if (currentFilter === 'dark') {
       applyGradientMapFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
   } else if (currentFilter === 'classic') {
@@ -539,71 +539,82 @@ document.getElementById("download-button").addEventListener("click", function ()
       applyLightFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
   }
 
+  // Create a new canvas for the final output
+  const finalCanvas = document.createElement("canvas");
+  finalCanvas.width = originalImageWidth;
+  finalCanvas.height = originalImageHeight;
+  const finalCtx = finalCanvas.getContext("2d");
+
+  // Redraw the filtered image
+  finalCtx.drawImage(fullResCanvas, 0, 0);
+
   // Draw the flag if it is applied
   if (flagApplied && savedMaskImage) {
       const flagAspectRatio = flagImage.width / flagImage.height;
       let flagWidth, flagHeight;
 
-      if (fullResCanvas.width / fullResCanvas.height > flagAspectRatio) {
-          flagWidth = fullResCanvas.width;
+      if (finalCanvas.width / finalCanvas.height > flagAspectRatio) {
+          flagWidth = finalCanvas.width;
           flagHeight = flagWidth / flagAspectRatio;
       } else {
-          flagHeight = fullResCanvas.height;
+          flagHeight = finalCanvas.height;
           flagWidth = flagHeight * flagAspectRatio;
       }
 
       // Center the flag on the canvas
-      const flagX = (fullResCanvas.width - flagWidth) / 2;
-      const flagY = (fullResCanvas.height - flagHeight) / 2;
+      const flagX = (finalCanvas.width - flagWidth) / 2;
+      const flagY = (finalCanvas.height - flagHeight) / 2;
 
-      fullResCtx.globalAlpha = flagOpacity;
-      fullResCtx.drawImage(flagImage, flagX, flagY, flagWidth, flagHeight);
-      fullResCtx.globalAlpha = 1; // Reset opacity for the next drawings
+      finalCtx.globalAlpha = flagOpacity; // Set the flag opacity
+      finalCtx.drawImage(flagImage, flagX, flagY, flagWidth, flagHeight);
+      finalCtx.globalAlpha = 1; // Reset opacity for the next drawings
+  }
 
-      // Draw the masked image (foreground) on top of the flag
-      fullResCtx.drawImage(savedMaskImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
+  // Draw the masked image on top of the flag
+  if (flagApplied && savedMaskImage) {
+      finalCtx.drawImage(savedMaskImage, 0, 0, finalCanvas.width, finalCanvas.height);
   }
 
   // Draw lasers at their respective positions
-  const scaleX = fullResCanvas.width / canvas.width;
-  const scaleY = fullResCanvas.height / canvas.height;
+  const scaleX = finalCanvas.width / canvas.width;
+  const scaleY = finalCanvas.height / canvas.height;
   lasers.forEach((laser) => {
-      fullResCtx.save();
-      fullResCtx.translate(
+      finalCtx.save();
+      finalCtx.translate(
           (laser.x + laser.width / 2) * scaleX,
           (laser.y + laser.height / 2) * scaleY
       );
-      fullResCtx.rotate(laser.rotation);
-      fullResCtx.drawImage(
+      finalCtx.rotate(laser.rotation);
+      finalCtx.drawImage(
           laser.image,
           -laser.width * scaleX / 2,
           -laser.height * scaleY / 2,
           laser.width * scaleX,
           laser.height * scaleY
       );
-      fullResCtx.restore();
+      finalCtx.restore();
   });
 
   // Draw hats at their respective positions
   hats.forEach((hat) => {
-      fullResCtx.save();
-      fullResCtx.translate(
+      finalCtx.save();
+      finalCtx.translate(
           (hat.x + hat.width / 2) * scaleX,
           (hat.y + hat.height / 2) * scaleY
       );
-      fullResCtx.rotate(hat.rotation);
-      fullResCtx.drawImage(
+      finalCtx.rotate(hat.rotation);
+      finalCtx.drawImage(
           hat.image,
           -hat.width * scaleX / 2,
           -hat.height * scaleY / 2,
           hat.width * scaleX,
           hat.height * scaleY
       );
-      fullResCtx.restore();
+      finalCtx.restore();
   });
 
   // Export the final image as a PNG
-  fullResCanvas.toBlob(function (blob) {
+  finalCanvas.toBlob(function (blob) {
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = "dark_pfp_with_flag.png";
