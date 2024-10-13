@@ -334,29 +334,54 @@ h1 {
   margin-bottom: 10px;
 }
 
-/* Background options label styling */
-.background-options label {
-  font-family: 'Arial', sans-serif;  /* Set the correct font */
-  font-size: 16px;                   /* Consistent size with other text */
-  color: white;                      /* Ensure white text color */
-  display: inline-block;             /* Make sure label doesn’t wrap awkwardly */
-  margin-right: 15px;                /* Space between labels */
-}
-
-/* Style the radio buttons */
-.background-options input[type="radio"] {
-  margin-right: 8px;    /* Space between radio button and text */
-  transform: scale(1.2); /* Make the radio button slightly bigger */
-}
-
-/* Ensure container has proper spacing */
 .background-options {
   display: flex;
-  justify-content: center;           /* Center the background options */
-  margin-bottom: 10px;               /* Add space below the options */
-  flex-wrap: wrap;                   /* Ensure they wrap on smaller screens */
+  justify-content: center;    /* Center the buttons horizontally */
+  gap: 20px;                  /* Space between each button */
+  margin-bottom: 10px;         /* Space below the options container */
 }
 
+/* Background options label */
+.background-options label {
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  color: white;
+  display: flex;
+  align-items: center;        /* Align the radio button and text vertically */
+  cursor: pointer;
+  gap: 10px;                  /* Space between the radio button and label text */
+}
+
+/* Hide the default radio button */
+.background-options input[type="radio"] {
+  appearance: none;            /* Remove the default radio button style */
+  width: 20px;                 /* Fixed width */
+  height: 20px;                /* Fixed height */
+  border: 2px solid #E3A61D;   /* Custom border color */
+  border-radius: 50%;          /* Make it circular */
+  background-color: #333;      /* Dark background to match the style */
+  position: relative;          /* For positioning the custom dot */
+  transition: all 0.3s ease;   /* Smooth transition for effects */
+  flex-shrink: 0;              /* Prevent shrinking inside flexbox */
+}
+
+/* Hover effect for the radio button */
+.background-options input[type="radio"]:hover {
+  background-color: #555;      /* Lighter background on hover */
+}
+
+/* Custom dot inside the radio button when checked */
+.background-options input[type="radio"]:checked::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;                 /* Size of the inner dot */
+  height: 12px;
+  border-radius: 50%;
+  background-color: #f3040d;   /* Red dot when selected */
+}
 .controls-container span {
   font-family: 'Arial', sans-serif;  /* Correct font */
   font-size: 16px;                   /* Font size to match the rest */
