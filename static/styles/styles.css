@@ -334,11 +334,39 @@ h1 {
   margin-bottom: 10px;
 }
 
+/* Background options label styling */
+.background-options label {
+  font-family: 'Arial', sans-serif;  /* Set the correct font */
+  font-size: 16px;                   /* Consistent size with other text */
+  color: white;                      /* Ensure white text color */
+  display: inline-block;             /* Make sure label doesn’t wrap awkwardly */
+  margin-right: 15px;                /* Space between labels */
+}
 
+/* Style the radio buttons */
+.background-options input[type="radio"] {
+  margin-right: 8px;    /* Space between radio button and text */
+  transform: scale(1.2); /* Make the radio button slightly bigger */
+}
 
+/* Ensure container has proper spacing */
+.background-options {
+  display: flex;
+  justify-content: center;           /* Center the background options */
+  margin-bottom: 10px;               /* Add space below the options */
+  flex-wrap: wrap;                   /* Ensure they wrap on smaller screens */
+}
 
 /* Adjustments for mobile */
 @media (max-width: 700px) {
+
+  .background-options {
+    justify-content: flex-start;     /* Align to the left on small screens */
+  }
+
+  .background-options label {
+    font-size: 14px;                 /* Smaller text size for smaller screens */
+  }
 
   .tabs {
     display: flex;
