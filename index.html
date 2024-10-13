@@ -129,16 +129,28 @@
 
     <div id="tab-4" class="tab-content">
       <div class="controls-container">
-        <button id="add-flag-button">Add Flag</button>
-        <div class="control">
-          <span>Adjust Flag Opacity:</span>
-          <input type="range" id="flag-opacity-slider" min="0" max="1" step="0.1" value=".5" />
+        <span>Select Background:</span>
+        <div class="background-options">
+          <label>
+            <input type="radio" name="background" value="americanFlag" checked />
+            American Flag
+          </label>
+          <label>
+            <input type="radio" name="background" value="lightning" />
+            Lightning
+          </label>
         </div>
+        <div class="control">
+          <span>Adjust Background Opacity:</span>
+          <input type="range" id="flag-opacity-slider" min="0" max="1" step="0.1" value="0.5" />
+        </div>
+        <button id="add-background-button">Add Background</button>
         <div class="remove-flag-button-container">
-          <button id="remove-flag-button">Remove Flag</button>
+          <button id="remove-flag-button">Remove Background</button>
         </div>
       </div>
     </div>
+    
   </div>
 
   <script type="text/javascript" src="static/js/index.js"></script>

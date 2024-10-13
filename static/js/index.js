@@ -20,10 +20,15 @@ const MAX_HEIGHT = 480;
 let originalImageWidth, originalImageHeight;
 let currentFilter = 'classic';
 
-// Define variables for flag image and opacity
-let flagImage = new Image();
-flagImage.src = "lightning.png"; // Ensure flag.png is in the root of the project
-flagImage.crossOrigin = "anonymous";
+let americanFlagImage = new Image();
+americanFlagImage.src = "AmericanFlag.png";
+americanFlagImage.crossOrigin = "anonymous";
+
+let lightningImage = new Image();
+lightningImage.src = "lightning.png";
+lightningImage.crossOrigin = "anonymous";
+
+let selectedBackgroundImage = americanFlagImage;  // Default to American Flag
 
 let flagOpacity = .5; // Default opacity
 
@@ -59,7 +64,16 @@ async function addFlagWithBackgroundRemoval() {
 }
 
 // Event listeners for adding the flag
-document.getElementById("add-flag-button").addEventListener("click", addFlagWithBackgroundRemoval);
+document.getElementById("add-background-button").addEventListener("click", function () {
+  const selectedOption = document.querySelector('input[name="background"]:checked').value;
+  if (selectedOption === "americanFlag") {
+    selectedBackgroundImage = americanFlagImage;
+  } else if (selectedOption === "lightning") {
+    selectedBackgroundImage = lightningImage;
+  }
+
+  addFlagWithBackgroundRemoval();  // Re-use the existing function to apply the selected background
+});
 
 document.getElementById("flag-opacity-slider").addEventListener("input", function (e) {
   flagOpacity = parseFloat(e.target.value);
@@ -551,29 +565,29 @@ document.getElementById("download-button").addEventListener("click", function ()
   // Apply contrast and redness adjustments
   applyContrastAndRedness(finalCtx, finalCanvas.width, finalCanvas.height);
 
-  // Draw the flag if it is applied
+  // Draw the background if it is applied
   if (flagApplied && savedMaskImage) {
-      const flagAspectRatio = flagImage.width / flagImage.height;
-      let flagWidth, flagHeight;
+      const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
+      let backgroundWidth, backgroundHeight;
 
-      if (finalCanvas.width / finalCanvas.height > flagAspectRatio) {
-          flagWidth = finalCanvas.width;
-          flagHeight = flagWidth / flagAspectRatio;
+      if (finalCanvas.width / finalCanvas.height > backgroundAspectRatio) {
+          backgroundWidth = finalCanvas.width;
+          backgroundHeight = backgroundWidth / backgroundAspectRatio;
       } else {
-          flagHeight = finalCanvas.height;
-          flagWidth = flagHeight * flagAspectRatio;
+          backgroundHeight = finalCanvas.height;
+          backgroundWidth = backgroundHeight * backgroundAspectRatio;
       }
 
-      // Center the flag on the canvas
-      const flagX = (finalCanvas.width - flagWidth) / 2;
-      const flagY = (finalCanvas.height - flagHeight) / 2;
+      // Center the background on the canvas
+      const backgroundX = (finalCanvas.width - backgroundWidth) / 2;
+      const backgroundY = (finalCanvas.height - backgroundHeight) / 2;
 
-      finalCtx.globalAlpha = flagOpacity; // Set the flag opacity
-      finalCtx.drawImage(flagImage, flagX, flagY, flagWidth, flagHeight);
+      finalCtx.globalAlpha = flagOpacity; // Set the background opacity
+      finalCtx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
       finalCtx.globalAlpha = 1; // Reset opacity for the next drawings
   }
 
-  // Draw the masked image on top of the flag
+  // Draw the masked image on top of the background (if applied)
   if (flagApplied && savedMaskImage) {
       finalCtx.drawImage(savedMaskImage, 0, 0, finalCanvas.width, finalCanvas.height);
   }
@@ -620,12 +634,13 @@ document.getElementById("download-button").addEventListener("click", function ()
   finalCanvas.toBlob(function (blob) {
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = "dark_pfp_with_flag.png";
+      link.download = "dark_pfp_with_background.png";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
   }, 'image/png');
 });
+
 
 
 
@@ -736,30 +751,30 @@ function drawCanvas() {
 
   // Draw the flag and masked image if the flag is applied
   if (flagApplied && savedMaskImage) {
-      // Calculate dimensions to maintain the flag's aspect ratio while covering the entire canvas
-      const flagAspectRatio = flagImage.width / flagImage.height;
-      let flagWidth, flagHeight;
-
-      if (canvas.width / canvas.height > flagAspectRatio) {
-          flagWidth = canvas.width;
-          flagHeight = flagWidth / flagAspectRatio;
-      } else {
-          flagHeight = canvas.height;
-          flagWidth = flagHeight * flagAspectRatio;
-      }
-
-      // Center the flag on the canvas (crop overflow equally)
-      const flagX = (canvas.width - flagWidth) / 2;
-      const flagY = (canvas.height - flagHeight) / 2;
-
-      // Draw the flag with the specified opacity, maintaining aspect ratio
-      ctx.globalAlpha = flagOpacity;
-      ctx.drawImage(flagImage, flagX, flagY, flagWidth, flagHeight);
-      ctx.globalAlpha = 1; // Reset opacity for the next drawings
-
-      // Draw the masked image (foreground) on top of the flag
-      ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
-  }
+    // Calculate dimensions to maintain the background's aspect ratio while covering the entire canvas
+    const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
+    let backgroundWidth, backgroundHeight;
+  
+    if (canvas.width / canvas.height > backgroundAspectRatio) {
+      backgroundWidth = canvas.width;
+      backgroundHeight = backgroundWidth / backgroundAspectRatio;
+    } else {
+      backgroundHeight = canvas.height;
+      backgroundWidth = backgroundHeight * backgroundAspectRatio;
+    }
+  
+    // Center the background image on the canvas (crop overflow equally)
+    const backgroundX = (canvas.width - backgroundWidth) / 2;
+    const backgroundY = (canvas.height - backgroundHeight) / 2;
+  
+    // Draw the background with the specified opacity, maintaining aspect ratio
+    ctx.globalAlpha = flagOpacity;
+    ctx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
+    ctx.globalAlpha = 1;  // Reset opacity for the next drawings
+  
+    // Draw the masked image (foreground) on top of the background
+    ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
+  }  
 
   // Draw lasers on top of the filtered image
   lasers.forEach((laser) => {
