@@ -357,6 +357,14 @@ h1 {
   flex-wrap: wrap;                   /* Ensure they wrap on smaller screens */
 }
 
+.controls-container span {
+  font-family: 'Arial', sans-serif;  /* Correct font */
+  font-size: 16px;                   /* Font size to match the rest */
+  color: white;                      /* Ensure the text is white */
+  display: inline-block;             /* Make sure the span doesn't wrap awkwardly */
+  margin-bottom: 5px;                /* Add some space below for alignment */
+}
+
 /* Adjustments for mobile */
 @media (max-width: 700px) {
 
