@@ -770,9 +770,9 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const blurRadius = laser.width * 0.05;  // Adjust this value for different levels of blur
+  const featherRadius = laser.width * 0.1;  // Adjust the feather radius for a smooth transition
 
-  // Draw the outer laser fully
+  // Draw the outer laser first (full image, no modification)
   context.save();
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
@@ -785,13 +785,13 @@ function drawLaserCenter(laser, context) {
   );
   context.restore();
 
-  // Create a new canvas to apply the blur effect to the inner laser
+  // Create a new temporary canvas for the inner eye with feathering
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d');
 
-  // Draw the laser image onto the temp canvas
+  // Draw the inner laser on the temporary canvas
   tempCtx.drawImage(
     laser.image,
     0,
@@ -800,18 +800,20 @@ function drawLaserCenter(laser, context) {
     laser.height
   );
 
-  // Apply a blur filter to the inner laser
-  tempCtx.filter = `blur(${blurRadius}px)`;
-  tempCtx.globalAlpha = 0.8;  // Optional: adjust opacity for blending
-  tempCtx.drawImage(
-    laser.image,
-    0,
-    0,
-    laser.width,
-    laser.height
+  // Create a feathered cutout (soft edge) using a radial gradient
+  const gradient = tempCtx.createRadialGradient(
+    laser.width / 2, laser.height / 2, featherRadius,  // Feather from the center
+    laser.width / 2, laser.height / 2, laser.width / 2 // Fade out to the edges
   );
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');  // Full opacity in the center
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');  // Transparent towards the outer edge
 
-  // Draw the blurred inner laser back onto the main canvas
+  // Apply the feathered gradient as a mask
+  tempCtx.globalCompositeOperation = 'destination-in';
+  tempCtx.fillStyle = gradient;
+  tempCtx.fillRect(0, 0, laser.width, laser.height);
+
+  // Now, draw the inner laser (feathered) on top of the outer laser
   context.save();
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
