@@ -751,7 +751,7 @@ function drawLaser(laser) {
   ctx.globalCompositeOperation = 'destination-out';
   
   // Ensure the fill style is fully opaque to correctly erase the center
-  ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0)';
   
   ctx.beginPath();
   ctx.arc(0, 0, radius, 0, Math.PI * 2);
