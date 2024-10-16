@@ -814,7 +814,7 @@ function drawCanvas() {
 
   // First, draw all lasers normally
   lasers.forEach((laser) => {
-    drawLaser(laser);  // Draw the entire laser image
+    //drawLaser(laser);  // Draw the entire laser image
   });
 
   // Then, redraw the central part of each laser to ensure it blocks any overlap
