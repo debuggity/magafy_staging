@@ -729,7 +729,6 @@ let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
 
-// Function to draw the entire laser image
 function drawLaser(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
@@ -739,17 +738,23 @@ function drawLaser(laser) {
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Draw the laser image, but skip the center part (manually adjusting the drawing area)
-  // Here, we are manually calculating which parts to skip
-  const centerDiameter = radius * 2;
-
-  // Draw the full laser but "manually" cut out the center region
+  // Draw the entire laser image
   ctx.drawImage(
     laser.image,
-    -laser.width / 2, -laser.height / 2, // Full image starting point
-    laser.width, laser.height            // Full width and height
+    -laser.width / 2,
+    -laser.height / 2,
+    laser.width,
+    laser.height
   );
 
+  // Set composite mode to 'destination-out' to clear the center
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.fill();  // Erase the center part
+
+  // Reset composite mode to default
+  ctx.globalCompositeOperation = 'source-over';
   ctx.restore();
 }
 
@@ -762,20 +767,25 @@ function drawLaserCenter(laser) {
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Draw only the center part of the laser
-  const centerDiameter = radius * 2;
+  // Define the clipping region for the center
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.clip();
 
-  // Now draw the center part directly without overlap
+  // Ensure we're using the default composite operation
+  ctx.globalCompositeOperation = 'source-over';
+  
+  // Draw the laser image again within the clipped center
   ctx.drawImage(
     laser.image,
-    -laser.width / 2, -laser.height / 2, // Centered around the x/y of the laser
-    laser.width, laser.height            // Full width and height
+    -laser.width / 2,
+    -laser.height / 2,
+    laser.width,
+    laser.height
   );
 
   ctx.restore();
 }
-
-
 
 
 // Ensure drawCanvas handles lasers, hats, filters, and the flag if applied
