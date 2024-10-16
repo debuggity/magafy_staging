@@ -770,7 +770,7 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.05;
+  const radius = laser.width * 0.05; // Adjust this value if necessary for size
 
   context.save();
   context.translate(centerX, centerY);
@@ -781,6 +781,7 @@ function drawLaserCenter(laser, context) {
   tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
 
+  // Draw the laser image first
   tempCtx.drawImage(
     laser.image,
     0,
@@ -789,17 +790,19 @@ function drawLaserCenter(laser, context) {
     laser.height
   );
 
-  tempCtx.globalCompositeOperation = 'destination-in';
-  tempCtx.beginPath();
-  tempCtx.arc(
-    laser.width / 2,
-    laser.height / 2,
-    radius, // Slightly larger center circle
-    0,
-    Math.PI * 2
+  // Apply a radial gradient to smoothly blend the inner part
+  const gradient = tempCtx.createRadialGradient(
+    laser.width / 2, laser.height / 2, radius / 2,   // Inner circle
+    laser.width / 2, laser.height / 2, radius * 3     // Outer circle
   );
-  tempCtx.fill();
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');  // Fully opaque at the center
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');  // Fully transparent at the edge
 
+  tempCtx.globalCompositeOperation = 'destination-in';  // Keep only the parts that overlap with the gradient
+  tempCtx.fillStyle = gradient;
+  tempCtx.fillRect(0, 0, laser.width, laser.height);
+
+  // Draw the result back onto the main canvas
   context.drawImage(
     tempCanvas,
     -laser.width / 2,
@@ -807,6 +810,7 @@ function drawLaserCenter(laser, context) {
   );
   context.restore();
 }
+
 
 function drawCanvas() {
   // Clear the canvas before drawing
