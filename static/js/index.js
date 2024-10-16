@@ -730,7 +730,7 @@ let rednessValue = 1;   // Default redness value
 function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.065; // Use same radius for cutout and center
+  const radius = laser.width * 0.055; // Use same radius for cutout and center
 
   context.save();
   context.translate(centerX, centerY);
