@@ -743,21 +743,18 @@ function drawLaserWithCenter(laser) {
   const centerY = laser.y + laser.height / 2;
 
   // Define the central region you want to stay unblocked
-  const centerWidth = laser.width * 0.3;  // Adjust the percentage as needed
-  const centerHeight = laser.height * 0.3;  // Adjust the percentage as needed
+  const centerWidth = laser.width * 0.2;  // 20% of the laser width
+  const centerHeight = laser.height;      // 100% of the laser height
 
   ctx.save();
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Clear the area of the center part (optional, depending on effect)
-  // ctx.clearRect(-centerWidth / 2, -centerHeight / 2, centerWidth, centerHeight);
-
   // Redraw the center part of the laser to ensure it's on top
   ctx.drawImage(
     laser.image,
-    laser.width * 0.35,  // This should be the relative position of the center in the image
-    laser.height * 0.35,  // Adjust based on the laser's actual image dimensions
+    laser.width * 0.4,  // Adjusted to start drawing 40% in from the left
+    0,                  // Start from the top of the image (0% vertically)
     centerWidth,
     centerHeight,
     -centerWidth / 2,
