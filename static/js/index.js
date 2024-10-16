@@ -727,14 +727,16 @@ let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
 
-function drawLaser(laser) {
+function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
   const radius = laser.width * 0.05;
+  // Add a small amount to the cutout radius to prevent gaps
+  const cutoutRadius = radius + 0.5;
 
-  ctx.save();
-  ctx.translate(centerX, centerY);
-  ctx.rotate(laser.rotation);
+  context.save();
+  context.translate(centerX, centerY);
+  context.rotate(laser.rotation);
 
   // Create a temporary canvas for the laser image
   const tempCanvas = document.createElement('canvas');
@@ -751,42 +753,44 @@ function drawLaser(laser) {
     laser.height
   );
 
-  // Clear the center circle from the temporary canvas
+  // Clear the center circle from the temporary canvas with slightly larger radius
   tempCtx.globalCompositeOperation = 'destination-out';
   tempCtx.beginPath();
   tempCtx.arc(
     laser.width / 2,
     laser.height / 2,
-    radius,
+    cutoutRadius,
     0,
     Math.PI * 2
   );
   tempCtx.fill();
 
   // Draw the modified laser image (with hole) onto the main canvas
-  ctx.drawImage(
+  context.drawImage(
     tempCanvas,
     -laser.width / 2,
     -laser.height / 2
   );
 
-  ctx.restore();
+  context.restore();
 }
 
-function drawLaserCenter(laser) {
+function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
   const radius = laser.width * 0.05;
+  // Add a small amount to the center radius to ensure overlap
+  const centerRadius = radius + 0.5;
 
-  ctx.save();
-  ctx.translate(centerX, centerY);
-  ctx.rotate(laser.rotation);
+  context.save();
+  context.translate(centerX, centerY);
+  context.rotate(laser.rotation);
 
   // Create a temporary canvas for the center
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
-  const tempCtx = tempCanvas.getContext('2d');
+  const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
 
   // Draw the full laser image
   tempCtx.drawImage(
@@ -797,26 +801,26 @@ function drawLaserCenter(laser) {
     laser.height
   );
 
-  // Create a clipping path for the center circle
+  // Create a clipping path for the center circle with slightly larger radius
   tempCtx.globalCompositeOperation = 'destination-in';
   tempCtx.beginPath();
   tempCtx.arc(
     laser.width / 2,
     laser.height / 2,
-    radius,
+    centerRadius,
     0,
     Math.PI * 2
   );
   tempCtx.fill();
 
   // Draw the center onto the main canvas
-  ctx.drawImage(
+  context.drawImage(
     tempCanvas,
     -laser.width / 2,
     -laser.height / 2
   );
 
-  ctx.restore();
+  context.restore();
 }
 
 function drawCanvas() {
@@ -863,11 +867,11 @@ function drawCanvas() {
 
   // Draw lasers in two passes
   lasers.forEach(laser => {
-    drawLaser(laser);  // First pass: draw laser with hole
+    drawLaser(laser, ctx);  // First pass: draw laser with hole
   });
   
   lasers.forEach(laser => {
-    drawLaserCenter(laser);  // Second pass: draw centers
+    drawLaserCenter(laser, ctx);  // Second pass: draw centers
   });
 
   // Draw hats on top of everything
@@ -879,7 +883,6 @@ function drawCanvas() {
     ctx.restore();
   });
 }
-
 
 function applyContrastAndRedness(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
