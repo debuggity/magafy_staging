@@ -732,83 +732,109 @@ let rednessValue = 1;   // Default redness value
 function drawLaser(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.05;  // Adjust this for the size of the center
+  const radius = laser.width * 0.05;
 
   ctx.save();
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Draw the entire laser image
-  ctx.drawImage(
+  // Create a temporary canvas for the laser image
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = laser.width;
+  tempCanvas.height = laser.height;
+  const tempCtx = tempCanvas.getContext('2d');
+
+  // Draw the laser image onto the temporary canvas
+  tempCtx.drawImage(
     laser.image,
-    -laser.width / 2,
-    -laser.height / 2,
+    0,
+    0,
     laser.width,
     laser.height
   );
 
-  // Set composite mode to 'destination-out' to clear the center
-  ctx.globalCompositeOperation = 'destination-out';
-  
-  // Ensure the fill style is fully opaque to correctly erase the center
-  ctx.fillStyle = 'rgba(0, 0, 0, 0)';
-  
-  ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, Math.PI * 2);
-  ctx.fill();  // Erase the center part
+  // Clear the center circle from the temporary canvas
+  tempCtx.globalCompositeOperation = 'destination-out';
+  tempCtx.beginPath();
+  tempCtx.arc(
+    laser.width / 2,
+    laser.height / 2,
+    radius,
+    0,
+    Math.PI * 2
+  );
+  tempCtx.fill();
 
-  // Reset composite mode to default
-  ctx.globalCompositeOperation = 'source-over';
+  // Draw the modified laser image (with hole) onto the main canvas
+  ctx.drawImage(
+    tempCanvas,
+    -laser.width / 2,
+    -laser.height / 2
+  );
+
   ctx.restore();
 }
-
 
 function drawLaserCenter(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.05; // Adjust this for the size of the center
+  const radius = laser.width * 0.05;
 
   ctx.save();
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Define the clipping region for the center
-  ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, Math.PI * 2);
-  ctx.clip();
+  // Create a temporary canvas for the center
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = laser.width;
+  tempCanvas.height = laser.height;
+  const tempCtx = tempCanvas.getContext('2d');
 
-  // Ensure we're using the default composite operation
-  ctx.globalCompositeOperation = 'source-over';
-
-  // Draw the laser image again within the clipped center
-  ctx.drawImage(
+  // Draw the full laser image
+  tempCtx.drawImage(
     laser.image,
-    -laser.width / 2,
-    -laser.height / 2,
+    0,
+    0,
     laser.width,
     laser.height
+  );
+
+  // Create a clipping path for the center circle
+  tempCtx.globalCompositeOperation = 'destination-in';
+  tempCtx.beginPath();
+  tempCtx.arc(
+    laser.width / 2,
+    laser.height / 2,
+    radius,
+    0,
+    Math.PI * 2
+  );
+  tempCtx.fill();
+
+  // Draw the center onto the main canvas
+  ctx.drawImage(
+    tempCanvas,
+    -laser.width / 2,
+    -laser.height / 2
   );
 
   ctx.restore();
 }
 
-
-
-// Ensure drawCanvas handles lasers, hats, filters, and the flag if applied
 function drawCanvas() {
   // Clear the canvas before drawing
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw the base image (the original uploaded image).
+  // Draw the base image (the original uploaded image)
   ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
 
   // Apply the selected filter (if any)
   if (currentFilter === 'dark') {
-      applyGradientMapFilter(ctx, canvas.width, canvas.height);
+    applyGradientMapFilter(ctx, canvas.width, canvas.height);
   } else if (currentFilter === 'classic') {
-      applyClassicRedFilter(ctx, canvas.width, canvas.height);
+    applyClassicRedFilter(ctx, canvas.width, canvas.height);
   } else if (currentFilter === 'light') {
-      applyLightFilter(ctx, canvas.width, canvas.height);
+    applyLightFilter(ctx, canvas.width, canvas.height);
   }
 
   // Apply contrast and redness adjustments
@@ -816,10 +842,9 @@ function drawCanvas() {
 
   // Draw the flag and masked image if the flag is applied
   if (flagApplied && savedMaskImage) {
-    // Calculate dimensions to maintain the background's aspect ratio while covering the entire canvas
     const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
     let backgroundWidth, backgroundHeight;
-  
+
     if (canvas.width / canvas.height > backgroundAspectRatio) {
       backgroundWidth = canvas.width;
       backgroundHeight = backgroundWidth / backgroundAspectRatio;
@@ -827,37 +852,33 @@ function drawCanvas() {
       backgroundHeight = canvas.height;
       backgroundWidth = backgroundHeight * backgroundAspectRatio;
     }
-  
-    // Center the background image on the canvas (crop overflow equally)
+
     const backgroundX = (canvas.width - backgroundWidth) / 2;
     const backgroundY = (canvas.height - backgroundHeight) / 2;
-  
-    // Draw the background with the specified opacity, maintaining aspect ratio
+
     ctx.globalAlpha = flagOpacity;
     ctx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
-    ctx.globalAlpha = 1;  // Reset opacity for the next drawings
-  
-    // Draw the masked image (foreground) on top of the background
+    ctx.globalAlpha = 1;
+
     ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
-  }  
+  }
 
-  // First, draw all lasers normally
-  lasers.forEach((laser) => {
-    drawLaser(laser);  // Draw the entire laser image
+  // Draw lasers in two passes
+  lasers.forEach(laser => {
+    drawLaser(laser);  // First pass: draw laser with hole
+  });
+  
+  lasers.forEach(laser => {
+    drawLaserCenter(laser);  // Second pass: draw centers
   });
 
-  // Then, redraw the central part of each laser to ensure it blocks any overlap
-  lasers.forEach((laser) => {
-    drawLaserCenter(laser);  // Draw only the center part to be on top
-  });
-
-  // Draw hats on top of the lasers
-  hats.forEach((hat) => {
-      ctx.save();
-      ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
-      ctx.rotate(hat.rotation);
-      ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
-      ctx.restore();
+  // Draw hats on top of everything
+  hats.forEach(hat => {
+    ctx.save();
+    ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
+    ctx.rotate(hat.rotation);
+    ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
+    ctx.restore();
   });
 }
 
