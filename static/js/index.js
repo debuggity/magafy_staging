@@ -770,13 +770,12 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.08; // Adjust this for size, but keep slightly larger for a smooth transition
+  const blurRadius = laser.width * 0.05;  // Adjust this value for different levels of blur
 
+  // Draw the outer laser fully
   context.save();
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
-
-  // Draw the outer laser eye first (full image with no masking)
   context.drawImage(
     laser.image,
     -laser.width / 2,
@@ -784,14 +783,15 @@ function drawLaserCenter(laser, context) {
     laser.width,
     laser.height
   );
+  context.restore();
 
-  // Now draw the inner laser with a soft edge gradient on top
+  // Create a new canvas to apply the blur effect to the inner laser
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
-  const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+  const tempCtx = tempCanvas.getContext('2d');
 
-  // Draw the same laser image on the temp canvas
+  // Draw the laser image onto the temp canvas
   tempCtx.drawImage(
     laser.image,
     0,
@@ -800,28 +800,30 @@ function drawLaserCenter(laser, context) {
     laser.height
   );
 
-  // Create a radial gradient to smoothly transition the inner laser
-  const gradient = tempCtx.createRadialGradient(
-    laser.width / 2, laser.height / 2, radius,       // Start closer to the center
-    laser.width / 2, laser.height / 2, laser.width / 2 // Transition out to the edges
+  // Apply a blur filter to the inner laser
+  tempCtx.filter = `blur(${blurRadius}px)`;
+  tempCtx.globalAlpha = 0.8;  // Optional: adjust opacity for blending
+  tempCtx.drawImage(
+    laser.image,
+    0,
+    0,
+    laser.width,
+    laser.height
   );
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');  // Full opacity in the center
-  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');  // Transparent towards the edges
 
-  tempCtx.globalCompositeOperation = 'destination-in';  // Mask the inner part with the gradient
-  tempCtx.fillStyle = gradient;
-  tempCtx.fillRect(0, 0, laser.width, laser.height);
-
-  // Draw the inner laser with the gradient mask on top of the outer laser
+  // Draw the blurred inner laser back onto the main canvas
+  context.save();
+  context.translate(centerX, centerY);
+  context.rotate(laser.rotation);
   context.drawImage(
     tempCanvas,
     -laser.width / 2,
-    -laser.height / 2
+    -laser.height / 2,
+    laser.width,
+    laser.height
   );
-
   context.restore();
 }
-
 
 
 function drawCanvas() {
