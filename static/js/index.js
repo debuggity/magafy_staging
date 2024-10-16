@@ -728,7 +728,46 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
-// Ensure drawCanvas handles lasers, hats, filters, and the flag if applied
+
+// Function to draw a laser with its center part always on top
+function drawLaserWithCenter(laser) {
+  // Draw the entire laser image
+  ctx.save();
+  ctx.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
+  ctx.rotate(laser.rotation);
+  ctx.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
+  ctx.restore();
+
+  // Now, draw the center part again to ensure it stays on top
+  const centerX = laser.x + laser.width / 2;
+  const centerY = laser.y + laser.height / 2;
+
+  // Define the central region you want to stay unblocked
+  const centerWidth = laser.width * 0.3;  // Adjust the percentage as needed
+  const centerHeight = laser.height * 0.3;  // Adjust the percentage as needed
+
+  ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.rotate(laser.rotation);
+
+  // Clear the area of the center part (optional, depending on effect)
+  // ctx.clearRect(-centerWidth / 2, -centerHeight / 2, centerWidth, centerHeight);
+
+  // Redraw the center part of the laser to ensure it's on top
+  ctx.drawImage(
+    laser.image,
+    laser.width * 0.35,  // This should be the relative position of the center in the image
+    laser.height * 0.35,  // Adjust based on the laser's actual image dimensions
+    centerWidth,
+    centerHeight,
+    -centerWidth / 2,
+    -centerHeight / 2,
+    centerWidth,
+    centerHeight
+  );
+  ctx.restore();
+}
+
 // Ensure drawCanvas handles lasers, hats, filters, and the flag if applied
 function drawCanvas() {
   // Clear the canvas before drawing
@@ -778,11 +817,7 @@ function drawCanvas() {
 
   // Draw lasers on top of the filtered image
   lasers.forEach((laser) => {
-      ctx.save();
-      ctx.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
-      ctx.rotate(laser.rotation);
-      ctx.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
-      ctx.restore();
+    drawLaserWithCenter(laser);  // Use the new function to draw lasers with the center part on top
   });
 
   // Draw hats on top of the lasers
