@@ -731,28 +731,46 @@ let rednessValue = 1;   // Default redness value
 
 // Function to draw the entire laser image
 function drawLaser(laser) {
+  const centerX = laser.x + laser.width / 2;
+  const centerY = laser.y + laser.height / 2;
+  const radius = laser.width * 0.05;  // Define the center radius (adjust as needed)
+
   ctx.save();
-  ctx.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
+  ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
-  ctx.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
+
+  // Clip the outer part of the laser (excluding the center)
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.globalCompositeOperation = 'destination-out';  // Exclude the center from drawing
+
+  // Draw the outer part of the laser
+  ctx.drawImage(
+    laser.image,
+    -laser.width / 2,
+    -laser.height / 2,
+    laser.width,
+    laser.height
+  );
+
   ctx.restore();
 }
 
 function drawLaserCenter(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.05; // Radius for clipping the center (adjust as needed)
+  const radius = laser.width * 0.05; // Adjust the radius as needed for the center
 
   ctx.save();
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Create a circular clipping region for the laser center
+  // Draw only the center part of the laser
   ctx.beginPath();
   ctx.arc(0, 0, radius, 0, Math.PI * 2);
   ctx.clip();
 
-  // Redraw the laser with only the center part visible inside the clipping region
   ctx.drawImage(
     laser.image,
     -laser.width / 2,
