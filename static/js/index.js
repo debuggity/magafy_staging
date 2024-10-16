@@ -730,7 +730,7 @@ function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
   const radius = laser.width * 0.05;
-  const blurWidth = 4; // Width of blur effect in pixels
+  const blurWidth = 2; // Width of blur effect in pixels
 
   context.save();
   context.translate(centerX, centerY);
@@ -784,7 +784,7 @@ function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
   const radius = laser.width * 0.05;
-  const blurWidth = 4; // Width of blur effect in pixels
+  const blurWidth = 2; // Width of blur effect in pixels
 
   context.save();
   context.translate(centerX, centerY);
