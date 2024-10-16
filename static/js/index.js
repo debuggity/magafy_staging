@@ -749,6 +749,10 @@ function drawLaser(laser) {
 
   // Set composite mode to 'destination-out' to clear the center
   ctx.globalCompositeOperation = 'destination-out';
+  
+  // Ensure the fill style is fully opaque to correctly erase the center
+  ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+  
   ctx.beginPath();
   ctx.arc(0, 0, radius, 0, Math.PI * 2);
   ctx.fill();  // Erase the center part
@@ -757,6 +761,7 @@ function drawLaser(laser) {
   ctx.globalCompositeOperation = 'source-over';
   ctx.restore();
 }
+
 
 function drawLaserCenter(laser) {
   const centerX = laser.x + laser.width / 2;
@@ -774,7 +779,7 @@ function drawLaserCenter(laser) {
 
   // Ensure we're using the default composite operation
   ctx.globalCompositeOperation = 'source-over';
-  
+
   // Draw the laser image again within the clipped center
   ctx.drawImage(
     laser.image,
@@ -786,6 +791,7 @@ function drawLaserCenter(laser) {
 
   ctx.restore();
 }
+
 
 
 // Ensure drawCanvas handles lasers, hats, filters, and the flag if applied
