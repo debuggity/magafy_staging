@@ -771,7 +771,7 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.0509; // Same exact radius for the center
+  const radius = laser.width * 0.0508; // Same exact radius for the center
 
   context.save();
   context.translate(centerX, centerY);
@@ -851,6 +851,8 @@ function drawCanvas() {
     ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
   }
 
+  ctx.imageSmoothingEnabled = false;
+
   // Draw lasers in two passes
   lasers.forEach(laser => {
     drawLaser(laser, ctx);  // First pass: draw laser with hole
@@ -859,6 +861,8 @@ function drawCanvas() {
   lasers.forEach(laser => {
     drawLaserCenter(laser, ctx);  // Second pass: draw centers
   });
+
+  ctx.imageSmoothingEnabled = true;  // Re-enable it for other operations if needed
 
   // Draw hats on top of everything
   hats.forEach(hat => {
