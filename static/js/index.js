@@ -733,19 +733,13 @@ let rednessValue = 1;   // Default redness value
 function drawLaser(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.05;  // Define the center radius (adjust as needed)
+  const radius = laser.width * 0.05;  // Adjust this for the size of the center
 
   ctx.save();
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Clip the outer part of the laser (excluding the center)
-  ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, Math.PI * 2);
-  ctx.clip();
-  ctx.globalCompositeOperation = 'destination-out';  // Exclude the center from drawing
-
-  // Draw the outer part of the laser
+  // Draw the entire laser
   ctx.drawImage(
     laser.image,
     -laser.width / 2,
@@ -753,6 +747,12 @@ function drawLaser(laser) {
     laser.width,
     laser.height
   );
+
+  // Mask out the center (clear the center area)
+  ctx.globalCompositeOperation = 'destination-out';  // This will erase the center
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.fill();  // Fill the path, erasing the center part
 
   ctx.restore();
 }
@@ -760,17 +760,18 @@ function drawLaser(laser) {
 function drawLaserCenter(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.05; // Adjust the radius as needed for the center
+  const radius = laser.width * 0.05; // Adjust this for the size of the center
 
   ctx.save();
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Draw only the center part of the laser
+  // Draw the center part
   ctx.beginPath();
   ctx.arc(0, 0, radius, 0, Math.PI * 2);
-  ctx.clip();
+  ctx.clip();  // Clip the drawing to the center area
 
+  // Redraw only the center part
   ctx.drawImage(
     laser.image,
     -laser.width / 2,
@@ -781,6 +782,7 @@ function drawLaserCenter(laser) {
 
   ctx.restore();
 }
+
 
 
 // Ensure drawCanvas handles lasers, hats, filters, and the flag if applied
