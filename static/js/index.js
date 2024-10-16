@@ -729,20 +729,20 @@ let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
 
-// Function to draw a laser with its center part always on top
-function drawLaserWithCenter(laser) {
-  // Draw the entire laser image
+// Function to draw the entire laser image
+function drawLaser(laser) {
   ctx.save();
   ctx.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
   ctx.rotate(laser.rotation);
   ctx.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
   ctx.restore();
+}
 
-  // Now, draw the center part again to ensure it stays on top
+// Function to redraw only the center part of a laser, ensuring it blocks all other lasers
+function drawLaserCenter(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
 
-  // Define the central region you want to stay unblocked
   const centerWidth = laser.width * 0.2;  // 20% of the laser width
   const centerHeight = laser.height;      // 100% of the laser height
 
@@ -750,10 +750,10 @@ function drawLaserWithCenter(laser) {
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Redraw the center part of the laser to ensure it's on top
+  // Redraw only the center part of the laser to ensure it blocks everything else
   ctx.drawImage(
     laser.image,
-    laser.width * 0.4,  // Adjusted to start drawing 40% in from the left
+    laser.width * 0.4,  // Start drawing 40% in from the left (so the center part is at the middle)
     0,                  // Start from the top of the image (0% vertically)
     centerWidth,
     centerHeight,
@@ -812,9 +812,14 @@ function drawCanvas() {
     ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
   }  
 
-  // Draw lasers on top of the filtered image
+  // First, draw all lasers normally
   lasers.forEach((laser) => {
-    drawLaserWithCenter(laser);  // Use the new function to draw lasers with the center part on top
+    drawLaser(laser);  // Draw the entire laser image
+  });
+
+  // Then, redraw the central part of each laser to ensure it blocks any overlap
+  lasers.forEach((laser) => {
+    drawLaserCenter(laser);  // Draw only the center part to be on top
   });
 
   // Draw hats on top of the lasers
