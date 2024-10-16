@@ -731,8 +731,8 @@ function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
   const radius = laser.width * 0.05;
-  // Increase overlap by using a slightly smaller cutout radius
-  const cutoutRadius = radius - 0.5;
+  // Use exact radius for the cutout
+  const cutoutRadius = radius;
 
   context.save();
   context.translate(centerX, centerY);
@@ -779,8 +779,8 @@ function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
   const radius = laser.width * 0.05;
-  // Make the center slightly larger to ensure overlap
-  const centerRadius = radius + 0.5;
+  // Use exact same radius as the cutout
+  const centerRadius = radius;
 
   context.save();
   context.translate(centerX, centerY);
