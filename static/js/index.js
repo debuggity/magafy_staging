@@ -770,18 +770,28 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.05; // Adjust this value if necessary for size
+  const radius = laser.width * 0.08; // Adjust this for size, but keep slightly larger for a smooth transition
 
   context.save();
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
 
+  // Draw the outer laser eye first (full image with no masking)
+  context.drawImage(
+    laser.image,
+    -laser.width / 2,
+    -laser.height / 2,
+    laser.width,
+    laser.height
+  );
+
+  // Now draw the inner laser with a soft edge gradient on top
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
 
-  // Draw the laser image first
+  // Draw the same laser image on the temp canvas
   tempCtx.drawImage(
     laser.image,
     0,
@@ -790,26 +800,28 @@ function drawLaserCenter(laser, context) {
     laser.height
   );
 
-  // Apply a radial gradient to smoothly blend the inner part
+  // Create a radial gradient to smoothly transition the inner laser
   const gradient = tempCtx.createRadialGradient(
-    laser.width / 2, laser.height / 2, radius / 2,   // Inner circle
-    laser.width / 2, laser.height / 2, radius * 3     // Outer circle
+    laser.width / 2, laser.height / 2, radius,       // Start closer to the center
+    laser.width / 2, laser.height / 2, laser.width / 2 // Transition out to the edges
   );
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');  // Fully opaque at the center
-  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');  // Fully transparent at the edge
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');  // Full opacity in the center
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');  // Transparent towards the edges
 
-  tempCtx.globalCompositeOperation = 'destination-in';  // Keep only the parts that overlap with the gradient
+  tempCtx.globalCompositeOperation = 'destination-in';  // Mask the inner part with the gradient
   tempCtx.fillStyle = gradient;
   tempCtx.fillRect(0, 0, laser.width, laser.height);
 
-  // Draw the result back onto the main canvas
+  // Draw the inner laser with the gradient mask on top of the outer laser
   context.drawImage(
     tempCanvas,
     -laser.width / 2,
     -laser.height / 2
   );
+
   context.restore();
 }
+
 
 
 function drawCanvas() {
