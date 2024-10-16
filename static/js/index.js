@@ -729,36 +729,35 @@ let rednessValue = 1;   // Default redness value
 function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = Math.round(laser.width * 0.05); // Round to nearest pixel
+  const radius = laser.width * 0.05;
+  const overlap = -.1; // Add a small overlap to prevent gaps
 
   context.save();
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
 
   const tempCanvas = document.createElement('canvas');
-  // Ensure canvas dimensions are integers
-  tempCanvas.width = Math.ceil(laser.width);
-  tempCanvas.height = Math.ceil(laser.height);
-  const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+  tempCanvas.width = laser.width;
+  tempCanvas.height = laser.height;
+  const tempCtx = tempCanvas.getContext('2d');
 
-  // Disable anti-aliasing for the mask
-  tempCtx.imageSmoothingEnabled = false;
-  
   tempCtx.drawImage(
     laser.image,
     0,
     0,
-    tempCanvas.width,
-    tempCanvas.height
+    laser.width,
+    laser.height
   );
 
   tempCtx.globalCompositeOperation = 'destination-out';
-  
-  // Draw a pixel-aligned circle
   tempCtx.beginPath();
-  const centerPosX = Math.round(tempCanvas.width / 2);
-  const centerPosY = Math.round(tempCanvas.height / 2);
-  drawPixelPerfectCircle(tempCtx, centerPosX, centerPosY, radius);
+  tempCtx.arc(
+    laser.width / 2,
+    laser.height / 2,
+    radius + overlap, // Slightly larger cutout
+    0,
+    Math.PI * 2
+  );
   tempCtx.fill();
 
   context.drawImage(
@@ -772,36 +771,35 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = Math.round(laser.width * 0.05); // Use same rounded radius
+  const radius = laser.width * 0.05;
+  const overlap = 0.5; // Same overlap value as above
 
   context.save();
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
 
   const tempCanvas = document.createElement('canvas');
-  // Ensure canvas dimensions are integers
-  tempCanvas.width = Math.ceil(laser.width);
-  tempCanvas.height = Math.ceil(laser.height);
+  tempCanvas.width = laser.width;
+  tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
-
-  // Disable anti-aliasing for the mask
-  tempCtx.imageSmoothingEnabled = false;
 
   tempCtx.drawImage(
     laser.image,
     0,
     0,
-    tempCanvas.width,
-    tempCanvas.height
+    laser.width,
+    laser.height
   );
 
   tempCtx.globalCompositeOperation = 'destination-in';
-  
-  // Draw the same pixel-perfect circle
   tempCtx.beginPath();
-  const centerPosX = Math.round(tempCanvas.width / 2);
-  const centerPosY = Math.round(tempCanvas.height / 2);
-  drawPixelPerfectCircle(tempCtx, centerPosX, centerPosY, radius);
+  tempCtx.arc(
+    laser.width / 2,
+    laser.height / 2,
+    radius + overlap, // Slightly larger center circle
+    0,
+    Math.PI * 2
+  );
   tempCtx.fill();
 
   context.drawImage(
@@ -810,42 +808,6 @@ function drawLaserCenter(laser, context) {
     -laser.height / 2
   );
   context.restore();
-}
-
-// Helper function to draw a pixel-perfect circle
-function drawPixelPerfectCircle(ctx, x0, y0, radius) {
-  let x = radius;
-  let y = 0;
-  let radiusError = 1 - x;
-
-  while (x >= y) {
-    // Draw 8 octants
-    drawPixel(ctx, x + x0, y + y0);
-    drawPixel(ctx, y + x0, x + y0);
-    drawPixel(ctx, -x + x0, y + y0);
-    drawPixel(ctx, -y + x0, x + y0);
-    drawPixel(ctx, -x + x0, -y + y0);
-    drawPixel(ctx, -y + x0, -x + y0);
-    drawPixel(ctx, x + x0, -y + y0);
-    drawPixel(ctx, y + x0, -x + y0);
-
-    y++;
-    
-    if (radiusError < 0) {
-      radiusError += 2 * y + 1;
-    } else {
-      x--;
-      radiusError += 2 * (y - x + 1);
-    }
-  }
-
-  // Fill the circle
-  ctx.fill();
-}
-
-// Helper function to draw a single pixel
-function drawPixel(ctx, x, y) {
-  ctx.rect(Math.round(x), Math.round(y), 1, 1);
 }
 
 function drawCanvas() {
