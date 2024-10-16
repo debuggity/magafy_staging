@@ -730,7 +730,7 @@ function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
   const radius = laser.width * 0.05;
-  const overlap = -.01; // Add a small overlap to prevent gaps
+  const overlap = -.001; // Add a small overlap to prevent gaps
 
   context.save();
   context.translate(centerX, centerY);
