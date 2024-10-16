@@ -726,11 +726,11 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
-
 function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.059; // Use same radius for cutout and center
+  const radius = laser.width * 0.05;
+  const overlap = 0.5; // Add a small overlap to prevent gaps
 
   context.save();
   context.translate(centerX, centerY);
@@ -754,7 +754,7 @@ function drawLaser(laser, context) {
   tempCtx.arc(
     laser.width / 2,
     laser.height / 2,
-    radius, // Use the exact same radius here
+    radius + overlap, // Slightly larger cutout
     0,
     Math.PI * 2
   );
@@ -771,7 +771,8 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.06; // Same exact radius for the center
+  const radius = laser.width * 0.05;
+  const overlap = 0.5; // Same overlap value as above
 
   context.save();
   context.translate(centerX, centerY);
@@ -795,7 +796,7 @@ function drawLaserCenter(laser, context) {
   tempCtx.arc(
     laser.width / 2,
     laser.height / 2,
-    radius, // Same radius as the outer part
+    radius + overlap, // Slightly larger center circle
     0,
     Math.PI * 2
   );
