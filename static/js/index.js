@@ -546,98 +546,96 @@ document.getElementById("download-button").addEventListener("click", function ()
 
   // Apply the selected filter directly to the fullResCanvas
   if (currentFilter === 'dark') {
-      applyGradientMapFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+    applyGradientMapFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
   } else if (currentFilter === 'classic') {
-      applyClassicRedFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+    applyClassicRedFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
   } else if (currentFilter === 'light') {
-      applyLightFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
+    applyLightFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
   }
 
-  // Create a new canvas for the final output
-  const finalCanvas = document.createElement("canvas");
-  finalCanvas.width = originalImageWidth;
-  finalCanvas.height = originalImageHeight;
-  const finalCtx = finalCanvas.getContext("2d");
-
-  // Redraw the filtered image
-  finalCtx.drawImage(fullResCanvas, 0, 0);
-
   // Apply contrast and redness adjustments
-  applyContrastAndRedness(finalCtx, finalCanvas.width, finalCanvas.height);
+  applyContrastAndRedness(fullResCtx, fullResCanvas.width, fullResCanvas.height);
 
   // Draw the background if it is applied
   if (flagApplied && savedMaskImage) {
-      const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
-      let backgroundWidth, backgroundHeight;
+    const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
+    let backgroundWidth, backgroundHeight;
 
-      if (finalCanvas.width / finalCanvas.height > backgroundAspectRatio) {
-          backgroundWidth = finalCanvas.width;
-          backgroundHeight = backgroundWidth / backgroundAspectRatio;
-      } else {
-          backgroundHeight = finalCanvas.height;
-          backgroundWidth = backgroundHeight * backgroundAspectRatio;
-      }
+    if (fullResCanvas.width / fullResCanvas.height > backgroundAspectRatio) {
+      backgroundWidth = fullResCanvas.width;
+      backgroundHeight = backgroundWidth / backgroundAspectRatio;
+    } else {
+      backgroundHeight = fullResCanvas.height;
+      backgroundWidth = backgroundHeight * backgroundAspectRatio;
+    }
 
-      // Center the background on the canvas
-      const backgroundX = (finalCanvas.width - backgroundWidth) / 2;
-      const backgroundY = (finalCanvas.height - backgroundHeight) / 2;
+    // Center the background on the canvas
+    const backgroundX = (fullResCanvas.width - backgroundWidth) / 2;
+    const backgroundY = (fullResCanvas.height - backgroundHeight) / 2;
 
-      finalCtx.globalAlpha = flagOpacity; // Set the background opacity
-      finalCtx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
-      finalCtx.globalAlpha = 1; // Reset opacity for the next drawings
+    fullResCtx.globalAlpha = flagOpacity;
+    fullResCtx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
+    fullResCtx.globalAlpha = 1;
   }
 
   // Draw the masked image on top of the background (if applied)
   if (flagApplied && savedMaskImage) {
-      finalCtx.drawImage(savedMaskImage, 0, 0, finalCanvas.width, finalCanvas.height);
+    fullResCtx.drawImage(savedMaskImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
   }
 
-  // Draw lasers at their respective positions
-  const scaleX = finalCanvas.width / canvas.width;
-  const scaleY = finalCanvas.height / canvas.height;
+  // Calculate scale factors for full resolution
+  const scaleX = fullResCanvas.width / canvas.width;
+  const scaleY = fullResCanvas.height / canvas.height;
+
+  // Draw lasers at full resolution in two passes
   lasers.forEach((laser) => {
-      finalCtx.save();
-      finalCtx.translate(
-          (laser.x + laser.width / 2) * scaleX,
-          (laser.y + laser.height / 2) * scaleY
-      );
-      finalCtx.rotate(laser.rotation);
-      finalCtx.drawImage(
-          laser.image,
-          -laser.width * scaleX / 2,
-          -laser.height * scaleY / 2,
-          laser.width * scaleX,
-          laser.height * scaleY
-      );
-      finalCtx.restore();
+    const scaledLaser = {
+      ...laser,
+      x: laser.x * scaleX,
+      y: laser.y * scaleY,
+      width: laser.width * scaleX,
+      height: laser.height * scaleY
+    };
+    drawLaser(scaledLaser, fullResCtx);
   });
 
-  // Draw hats at their respective positions
+  lasers.forEach((laser) => {
+    const scaledLaser = {
+      ...laser,
+      x: laser.x * scaleX,
+      y: laser.y * scaleY,
+      width: laser.width * scaleX,
+      height: laser.height * scaleY
+    };
+    drawLaserCenter(scaledLaser, fullResCtx);
+  });
+
+  // Draw hats at full resolution
   hats.forEach((hat) => {
-      finalCtx.save();
-      finalCtx.translate(
-          (hat.x + hat.width / 2) * scaleX,
-          (hat.y + hat.height / 2) * scaleY
-      );
-      finalCtx.rotate(hat.rotation);
-      finalCtx.drawImage(
-          hat.image,
-          -hat.width * scaleX / 2,
-          -hat.height * scaleY / 2,
-          hat.width * scaleX,
-          hat.height * scaleY
-      );
-      finalCtx.restore();
+    fullResCtx.save();
+    fullResCtx.translate(
+      (hat.x + hat.width / 2) * scaleX,
+      (hat.y + hat.height / 2) * scaleY
+    );
+    fullResCtx.rotate(hat.rotation);
+    fullResCtx.drawImage(
+      hat.image,
+      -hat.width * scaleX / 2,
+      -hat.height * scaleY / 2,
+      hat.width * scaleX,
+      hat.height * scaleY
+    );
+    fullResCtx.restore();
   });
 
   // Export the final image as a PNG
-  finalCanvas.toBlob(function (blob) {
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "dark_pfp_with_background.png";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  fullResCanvas.toBlob(function (blob) {
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "dark_pfp_with_background.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }, 'image/png');
 });
 
