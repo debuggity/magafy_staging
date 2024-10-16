@@ -730,7 +730,7 @@ let rednessValue = 1;   // Default redness value
 function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.027; // Use same radius for cutout and center
+  const radius = laser.width * 0.04; // Radius for cutout
 
   context.save();
   context.translate(centerX, centerY);
@@ -741,37 +741,31 @@ function drawLaser(laser, context) {
   tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d');
 
-  tempCtx.drawImage(
-    laser.image,
-    0,
-    0,
-    laser.width,
-    laser.height
-  );
+  // Draw the laser image
+  tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
 
+  // Use a radial gradient to softly mask the outer part
+  const gradient = tempCtx.createRadialGradient(
+    laser.width / 2, laser.height / 2, radius / 1.5, 
+    laser.width / 2, laser.height / 2, radius
+  );
+  gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
+
+  // Blend with the source image using 'destination-out' to create a smooth transition
   tempCtx.globalCompositeOperation = 'destination-out';
-  tempCtx.beginPath();
-  tempCtx.arc(
-    laser.width / 2,
-    laser.height / 2,
-    radius, // Use the exact same radius here
-    0,
-    Math.PI * 2
-  );
-  tempCtx.fill();
+  tempCtx.fillStyle = gradient;
+  tempCtx.fillRect(0, 0, laser.width, laser.height);
 
-  context.drawImage(
-    tempCanvas,
-    -laser.width / 2,
-    -laser.height / 2
-  );
+  context.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
   context.restore();
 }
+
 
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.02795; // Same exact radius for the center
+  const radius = laser.width * 0.0495; // Same exact radius for the center
 
   context.save();
   context.translate(centerX, centerY);
@@ -790,16 +784,20 @@ function drawLaserCenter(laser, context) {
     laser.height
   );
 
-  tempCtx.globalCompositeOperation = 'destination-in';
-  tempCtx.beginPath();
-  tempCtx.arc(
-    laser.width / 2,
-    laser.height / 2,
-    radius, // Same radius as the outer part
-    0,
-    Math.PI * 2
+  // Apply radial gradient to the center of the laser to blend it smoothly
+  const gradient = tempCtx.createRadialGradient(
+    laser.width / 2, laser.height / 2, 0,
+    laser.width / 2, laser.height / 2, radius
   );
-  tempCtx.fill();
+  
+  // Set gradient color from opaque in the center to transparent at the edge
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+  // Use global composite operation to blend the laser center
+  tempCtx.globalCompositeOperation = 'source-atop';
+  tempCtx.fillStyle = gradient;
+  tempCtx.fillRect(0, 0, laser.width, laser.height);
 
   context.drawImage(
     tempCanvas,
@@ -808,6 +806,7 @@ function drawLaserCenter(laser, context) {
   );
   context.restore();
 }
+
 
 function drawCanvas() {
   // Clear the canvas before drawing
