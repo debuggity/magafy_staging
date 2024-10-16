@@ -738,32 +738,32 @@ function drawLaser(laser) {
   ctx.restore();
 }
 
-// Function to redraw only the center part of a laser, ensuring it blocks all other lasers
 function drawLaserCenter(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-
-  const centerWidth = laser.width * 0.2;  // 20% of the laser width
-  const centerHeight = laser.height;      // 100% of the laser height
+  const radius = laser.width * 0.2; // Radius for clipping the center (adjust as needed)
 
   ctx.save();
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Redraw only the center part of the laser to ensure it blocks everything else
+  // Create a circular clipping region for the laser center
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.clip();
+
+  // Redraw the laser with only the center part visible inside the clipping region
   ctx.drawImage(
     laser.image,
-    laser.width * 0.4,  // Start drawing 40% in from the left (so the center part is at the middle)
-    0,                  // Start from the top of the image (0% vertically)
-    centerWidth,
-    centerHeight,
-    -centerWidth / 2,
-    -centerHeight / 2,
-    centerWidth,
-    centerHeight
+    -laser.width / 2,
+    -laser.height / 2,
+    laser.width,
+    laser.height
   );
+
   ctx.restore();
 }
+
 
 // Ensure drawCanvas handles lasers, hats, filters, and the flag if applied
 function drawCanvas() {
@@ -814,7 +814,7 @@ function drawCanvas() {
 
   // First, draw all lasers normally
   lasers.forEach((laser) => {
-    //drawLaser(laser);  // Draw the entire laser image
+    drawLaser(laser);  // Draw the entire laser image
   });
 
   // Then, redraw the central part of each laser to ensure it blocks any overlap
