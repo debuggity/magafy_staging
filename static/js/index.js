@@ -731,8 +731,8 @@ function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
   const radius = laser.width * 0.05;
-  // Add a small amount to the cutout radius to prevent gaps
-  const cutoutRadius = radius + 0.5;
+  // Increase overlap by using a slightly smaller cutout radius
+  const cutoutRadius = radius - 0.5;
 
   context.save();
   context.translate(centerX, centerY);
@@ -753,7 +753,7 @@ function drawLaser(laser, context) {
     laser.height
   );
 
-  // Clear the center circle from the temporary canvas with slightly larger radius
+  // Clear the center circle from the temporary canvas
   tempCtx.globalCompositeOperation = 'destination-out';
   tempCtx.beginPath();
   tempCtx.arc(
@@ -779,7 +779,7 @@ function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
   const radius = laser.width * 0.05;
-  // Add a small amount to the center radius to ensure overlap
+  // Make the center slightly larger to ensure overlap
   const centerRadius = radius + 0.5;
 
   context.save();
@@ -801,7 +801,7 @@ function drawLaserCenter(laser, context) {
     laser.height
   );
 
-  // Create a clipping path for the center circle with slightly larger radius
+  // Create a clipping path for the center circle
   tempCtx.globalCompositeOperation = 'destination-in';
   tempCtx.beginPath();
   tempCtx.arc(
