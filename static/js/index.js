@@ -770,28 +770,17 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const featherRadius = laser.width * 0.1;  // Adjust the feather radius for a smooth transition
+  const radius = laser.width * 0.05;
 
-  // Draw the outer laser first (full image, no modification)
   context.save();
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
-  context.drawImage(
-    laser.image,
-    -laser.width / 2,
-    -laser.height / 2,
-    laser.width,
-    laser.height
-  );
-  context.restore();
 
-  // Create a new temporary canvas for the inner eye with feathering
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
-  const tempCtx = tempCanvas.getContext('2d');
+  const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
 
-  // Draw the inner laser on the temporary canvas
   tempCtx.drawImage(
     laser.image,
     0,
@@ -800,33 +789,24 @@ function drawLaserCenter(laser, context) {
     laser.height
   );
 
-  // Create a feathered cutout (soft edge) using a radial gradient
-  const gradient = tempCtx.createRadialGradient(
-    laser.width / 2, laser.height / 2, featherRadius,  // Feather from the center
-    laser.width / 2, laser.height / 2, laser.width / 2 // Fade out to the edges
-  );
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');  // Full opacity in the center
-  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');  // Transparent towards the outer edge
-
-  // Apply the feathered gradient as a mask
   tempCtx.globalCompositeOperation = 'destination-in';
-  tempCtx.fillStyle = gradient;
-  tempCtx.fillRect(0, 0, laser.width, laser.height);
+  tempCtx.beginPath();
+  tempCtx.arc(
+    laser.width / 2,
+    laser.height / 2,
+    radius, // Slightly larger center circle
+    0,
+    Math.PI * 2
+  );
+  tempCtx.fill();
 
-  // Now, draw the inner laser (feathered) on top of the outer laser
-  context.save();
-  context.translate(centerX, centerY);
-  context.rotate(laser.rotation);
   context.drawImage(
     tempCanvas,
     -laser.width / 2,
-    -laser.height / 2,
-    laser.width,
-    laser.height
+    -laser.height / 2
   );
   context.restore();
 }
-
 
 function drawCanvas() {
   // Clear the canvas before drawing
