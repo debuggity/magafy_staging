@@ -741,7 +741,7 @@ function drawLaser(laser) {
 function drawLaserCenter(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.2; // Radius for clipping the center (adjust as needed)
+  const radius = laser.width * 0.05; // Radius for clipping the center (adjust as needed)
 
   ctx.save();
   ctx.translate(centerX, centerY);
