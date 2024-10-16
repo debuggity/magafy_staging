@@ -771,7 +771,7 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.05087; // Same exact radius for the center
+  const radius = laser.width * 0.0509; // Same exact radius for the center
 
   context.save();
   context.translate(centerX, centerY);
