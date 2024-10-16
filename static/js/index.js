@@ -739,7 +739,12 @@ function drawLaser(laser) {
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Draw the entire laser
+  // Draw the laser but avoid drawing the center by using clipping
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);  // Create a circular path for the center
+  ctx.clip();  // This will clip out the center part
+
+  // Draw the outer part of the laser (the full laser image)
   ctx.drawImage(
     laser.image,
     -laser.width / 2,
@@ -748,14 +753,9 @@ function drawLaser(laser) {
     laser.height
   );
 
-  // Mask out the center (clear the center area)
-  ctx.globalCompositeOperation = 'destination-out';  // This will erase the center
-  ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, Math.PI * 2);
-  ctx.fill();  // Fill the path, erasing the center part
-
   ctx.restore();
 }
+
 
 function drawLaserCenter(laser) {
   const centerX = laser.x + laser.width / 2;
@@ -766,12 +766,12 @@ function drawLaserCenter(laser) {
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Draw the center part
+  // Draw the center part of the laser
   ctx.beginPath();
   ctx.arc(0, 0, radius, 0, Math.PI * 2);
-  ctx.clip();  // Clip the drawing to the center area
+  ctx.clip();  // Clip the drawing to the center part only
 
-  // Redraw only the center part
+  // Now draw the center part
   ctx.drawImage(
     laser.image,
     -laser.width / 2,
@@ -782,6 +782,7 @@ function drawLaserCenter(laser) {
 
   ctx.restore();
 }
+
 
 
 
