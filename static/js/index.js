@@ -731,12 +731,13 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
-// Updated drawLaser function with explicit image smoothing control
+// Updated drawLaser function with wide ellipse and softer gradient
 function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.028;
-  const blurWidth = 3;
+  const radiusX = laser.width * 0.05;  // Wide ellipse along the X-axis
+  const radiusY = laser.height * 0.02;  // Smaller height for a wide ellipse
+  const blurWidth = 10; // Increase blur for softer gradient
 
   context.save();
   context.translate(centerX, centerY);
@@ -749,59 +750,47 @@ function drawLaser(laser, context) {
   
   // Disable smoothing on temp canvas
   tempCtx.imageSmoothingEnabled = false;
-  tempCtx.msImageSmoothingEnabled = false;
-  tempCtx.webkitImageSmoothingEnabled = false;
 
   // Draw the main laser image
-  tempCtx.drawImage(
-    laser.image,
-    0,
-    0,
-    laser.width,
-    laser.height
-  );
+  tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
 
-  // Create and apply gradient mask
+  // Create and apply gradient mask for an ellipse
   const gradientMask = tempCtx.createRadialGradient(
-    laser.width / 2, laser.height / 2, radius - blurWidth,
-    laser.width / 2, laser.height / 2, radius + blurWidth
+    laser.width / 2, laser.height / 2, radiusX - blurWidth,
+    laser.width / 2, laser.height / 2, radiusX + blurWidth
   );
-  gradientMask.addColorStop(0, 'rgba(0, 0, 0, 1)');
-  gradientMask.addColorStop(0.25, 'rgba(0, 0, 0, 0.5)');
-  gradientMask.addColorStop(0.5, 'rgba(0, 0, 0, 0)');
+  gradientMask.addColorStop(0, 'rgba(0, 0, 0, 1)');  // More opaque center
+  gradientMask.addColorStop(0.5, 'rgba(0, 0, 0, 0.7)');  // Slightly less transparent
+  gradientMask.addColorStop(1, 'rgba(0, 0, 0, 0)');  // Fully transparent edge
 
   tempCtx.globalCompositeOperation = 'destination-out';
   tempCtx.fillStyle = gradientMask;
   tempCtx.beginPath();
-  tempCtx.arc(
+  
+  // Draw wide ellipse mask
+  tempCtx.ellipse(
     laser.width / 2,
     laser.height / 2,
-    radius + blurWidth,
+    radiusX + blurWidth,
+    radiusY + blurWidth,
+    0,
     0,
     Math.PI * 2
   );
   tempCtx.fill();
 
-  // Disable smoothing on main context before drawing
   context.imageSmoothingEnabled = false;
-  context.msImageSmoothingEnabled = false;
-  context.webkitImageSmoothingEnabled = false;
-
-  context.drawImage(
-    tempCanvas,
-    -laser.width / 2,
-    -laser.height / 2
-  );
-  
+  context.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
   context.restore();
 }
 
-// Updated drawLaserCenter function with explicit image smoothing control
+// Updated drawLaserCenter function with wide ellipse and softer gradient
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.033;
-  const blurWidth = 3;
+  const radiusX = laser.width * 0.07;  // Larger ellipse for the center
+  const radiusY = laser.height * 0.03;  // More elliptical
+  const blurWidth = 8; // Adjust blur for softer edges
 
   context.save();
   context.translate(centerX, centerY);
@@ -812,54 +801,41 @@ function drawLaserCenter(laser, context) {
   tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d');
   
-  // Disable smoothing on temp canvas
   tempCtx.imageSmoothingEnabled = false;
-  tempCtx.msImageSmoothingEnabled = false;
-  tempCtx.webkitImageSmoothingEnabled = false;
 
   // Draw the main laser image
-  tempCtx.drawImage(
-    laser.image,
-    0,
-    0,
-    laser.width,
-    laser.height
-  );
+  tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
 
-  // Create and apply gradient mask
+  // Create and apply gradient mask for a wide ellipse
   const gradientMask = tempCtx.createRadialGradient(
-    laser.width / 2, laser.height / 2, radius - blurWidth,
-    laser.width / 2, laser.height / 2, radius + blurWidth
+    laser.width / 2, laser.height / 2, radiusX - blurWidth,
+    laser.width / 2, laser.height / 2, radiusX + blurWidth
   );
   gradientMask.addColorStop(0, 'rgba(0, 0, 0, 1)');
-  gradientMask.addColorStop(0.25, 'rgba(0, 0, 0, 0.5)');
-  gradientMask.addColorStop(0.5, 'rgba(0, 0, 0, 0)');
+  gradientMask.addColorStop(0.5, 'rgba(0, 0, 0, 0.6)');
+  gradientMask.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
   tempCtx.globalCompositeOperation = 'destination-in';
   tempCtx.fillStyle = gradientMask;
   tempCtx.beginPath();
-  tempCtx.arc(
+  
+  // Draw wide ellipse mask
+  tempCtx.ellipse(
     laser.width / 2,
     laser.height / 2,
-    radius + blurWidth,
+    radiusX + blurWidth,
+    radiusY + blurWidth,
+    0,
     0,
     Math.PI * 2
   );
   tempCtx.fill();
 
-  // Disable smoothing on main context before drawing
   context.imageSmoothingEnabled = false;
-  context.msImageSmoothingEnabled = false;
-  context.webkitImageSmoothingEnabled = false;
-
-  context.drawImage(
-    tempCanvas,
-    -laser.width / 2,
-    -laser.height / 2
-  );
-  
+  context.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
   context.restore();
 }
+
 
 function drawCanvas() {
   // Clear the canvas before drawing
