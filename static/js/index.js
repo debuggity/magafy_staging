@@ -729,7 +729,7 @@ let rednessValue = 1;   // Default redness value
 function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.03;
+  const radius = laser.width * 0.028;
   const blurWidth = 3; // Width of blur effect in pixels
 
   context.save();
@@ -756,8 +756,8 @@ function drawLaser(laser, context) {
     laser.width / 2, laser.height / 2, radius + blurWidth
   );
   gradientMask.addColorStop(0, 'rgba(0, 0, 0, 1)');
-  gradientMask.addColorStop(0.5, 'rgba(0, 0, 0, 0.5)');
-  gradientMask.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  gradientMask.addColorStop(0.25, 'rgba(0, 0, 0, 0.5)');
+  gradientMask.addColorStop(0.5, 'rgba(0, 0, 0, 0)');
 
   // Apply the gradient mask
   tempCtx.globalCompositeOperation = 'destination-out';
@@ -783,7 +783,7 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.038;
+  const radius = laser.width * 0.03;
   const blurWidth = 3; // Width of blur effect in pixels
 
   context.save();
@@ -810,8 +810,8 @@ function drawLaserCenter(laser, context) {
     laser.width / 2, laser.height / 2, radius + blurWidth
   );
   gradientMask.addColorStop(0, 'rgba(0, 0, 0, 1)');
-  gradientMask.addColorStop(0.5, 'rgba(0, 0, 0, 0.5)');
-  gradientMask.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  gradientMask.addColorStop(0.25, 'rgba(0, 0, 0, 0.5)');
+  gradientMask.addColorStop(0.5, 'rgba(0, 0, 0, 0)');
 
   // Apply the gradient mask
   tempCtx.globalCompositeOperation = 'destination-in';
