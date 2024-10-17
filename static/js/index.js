@@ -587,6 +587,9 @@ document.getElementById("download-button").addEventListener("click", function ()
   const scaleX = fullResCanvas.width / canvas.width;
   const scaleY = fullResCanvas.height / canvas.height;
 
+  
+  ctx.imageSmoothingEnabled = false;  
+
   // Draw lasers at full resolution in two passes
   lasers.forEach((laser) => {
     const scaledLaser = {
@@ -610,6 +613,8 @@ document.getElementById("download-button").addEventListener("click", function ()
     drawLaserCenter(scaledLaser, fullResCtx);
   });
 
+  ctx.imageSmoothingEnabled = true; 
+  
   // Draw hats at full resolution
   hats.forEach((hat) => {
     fullResCtx.save();
