@@ -535,12 +535,11 @@ canvas.addEventListener("touchend", function () {
 });
 
 document.getElementById("download-button").addEventListener("click", function () {
-  // Create a temporary canvas for exporting the full resolution image
   const fullResCanvas = document.createElement("canvas");
   fullResCanvas.width = originalImageWidth;
   fullResCanvas.height = originalImageHeight;
   const fullResCtx = fullResCanvas.getContext("2d");
-
+  
   // Draw the original image at full resolution
   fullResCtx.drawImage(canvasImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
 
@@ -569,7 +568,6 @@ document.getElementById("download-button").addEventListener("click", function ()
       backgroundWidth = backgroundHeight * backgroundAspectRatio;
     }
 
-    // Center the background on the canvas
     const backgroundX = (fullResCanvas.width - backgroundWidth) / 2;
     const backgroundY = (fullResCanvas.height - backgroundHeight) / 2;
 
@@ -587,8 +585,8 @@ document.getElementById("download-button").addEventListener("click", function ()
   const scaleX = fullResCanvas.width / canvas.width;
   const scaleY = fullResCanvas.height / canvas.height;
 
-  
-  ctx.imageSmoothingEnabled = false;  
+  // Important: Disable image smoothing before drawing lasers
+  fullResCtx.imageSmoothingEnabled = false;
 
   // Draw lasers at full resolution in two passes
   lasers.forEach((laser) => {
@@ -613,8 +611,9 @@ document.getElementById("download-button").addEventListener("click", function ()
     drawLaserCenter(scaledLaser, fullResCtx);
   });
 
-  ctx.imageSmoothingEnabled = true; 
-  
+  // Re-enable image smoothing for the rest of the drawing
+  fullResCtx.imageSmoothingEnabled = true;
+
   // Draw hats at full resolution
   hats.forEach((hat) => {
     fullResCtx.save();
