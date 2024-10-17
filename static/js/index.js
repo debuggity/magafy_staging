@@ -534,16 +534,22 @@ canvas.addEventListener("touchend", function () {
   }
 });
 
+// Updated download button handler
 document.getElementById("download-button").addEventListener("click", function () {
   const fullResCanvas = document.createElement("canvas");
   fullResCanvas.width = originalImageWidth;
   fullResCanvas.height = originalImageHeight;
-  const fullResCtx = fullResCanvas.getContext("2d");
+  const fullResCtx = fullResCanvas.getContext("2d", { willReadFrequently: true });
+
+  // Disable image smoothing globally for the full resolution context
+  fullResCtx.imageSmoothingEnabled = false;
+  fullResCtx.msImageSmoothingEnabled = false;
+  fullResCtx.webkitImageSmoothingEnabled = false;
   
-  // Draw the original image at full resolution
+  // Draw the original image
   fullResCtx.drawImage(canvasImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
 
-  // Apply the selected filter directly to the fullResCanvas
+  // Apply filters and adjustments
   if (currentFilter === 'dark') {
     applyGradientMapFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
   } else if (currentFilter === 'classic') {
@@ -551,11 +557,10 @@ document.getElementById("download-button").addEventListener("click", function ()
   } else if (currentFilter === 'light') {
     applyLightFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
   }
-
-  // Apply contrast and redness adjustments
+  
   applyContrastAndRedness(fullResCtx, fullResCanvas.width, fullResCanvas.height);
 
-  // Draw the background if it is applied
+  // Draw background if applied
   if (flagApplied && savedMaskImage) {
     const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
     let backgroundWidth, backgroundHeight;
@@ -574,21 +579,15 @@ document.getElementById("download-button").addEventListener("click", function ()
     fullResCtx.globalAlpha = flagOpacity;
     fullResCtx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
     fullResCtx.globalAlpha = 1;
-  }
 
-  // Draw the masked image on top of the background (if applied)
-  if (flagApplied && savedMaskImage) {
     fullResCtx.drawImage(savedMaskImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
   }
 
-  // Calculate scale factors for full resolution
+  // Calculate scale factors
   const scaleX = fullResCanvas.width / canvas.width;
   const scaleY = fullResCanvas.height / canvas.height;
 
-  // Important: Disable image smoothing before drawing lasers
-  fullResCtx.imageSmoothingEnabled = false;
-
-  // Draw lasers at full resolution in two passes
+  // Draw lasers with updated scale
   lasers.forEach((laser) => {
     const scaledLaser = {
       ...laser,
@@ -611,10 +610,12 @@ document.getElementById("download-button").addEventListener("click", function ()
     drawLaserCenter(scaledLaser, fullResCtx);
   });
 
-  // Re-enable image smoothing for the rest of the drawing
+  // Re-enable smoothing for hat drawing
   fullResCtx.imageSmoothingEnabled = true;
+  fullResCtx.msImageSmoothingEnabled = true;
+  fullResCtx.webkitImageSmoothingEnabled = true;
 
-  // Draw hats at full resolution
+  // Draw hats
   hats.forEach((hat) => {
     fullResCtx.save();
     fullResCtx.translate(
@@ -632,7 +633,7 @@ document.getElementById("download-button").addEventListener("click", function ()
     fullResCtx.restore();
   });
 
-  // Export the final image as a PNG
+  // Export as PNG
   fullResCanvas.toBlob(function (blob) {
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -730,11 +731,12 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
+// Updated drawLaser function with explicit image smoothing control
 function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
   const radius = laser.width * 0.028;
-  const blurWidth = 3; // Width of blur effect in pixels
+  const blurWidth = 3;
 
   context.save();
   context.translate(centerX, centerY);
@@ -744,6 +746,11 @@ function drawLaser(laser, context) {
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d');
+  
+  // Disable smoothing on temp canvas
+  tempCtx.imageSmoothingEnabled = false;
+  tempCtx.msImageSmoothingEnabled = false;
+  tempCtx.webkitImageSmoothingEnabled = false;
 
   // Draw the main laser image
   tempCtx.drawImage(
@@ -754,7 +761,7 @@ function drawLaser(laser, context) {
     laser.height
   );
 
-  // Create a gradient mask for the blur effect
+  // Create and apply gradient mask
   const gradientMask = tempCtx.createRadialGradient(
     laser.width / 2, laser.height / 2, radius - blurWidth,
     laser.width / 2, laser.height / 2, radius + blurWidth
@@ -763,7 +770,6 @@ function drawLaser(laser, context) {
   gradientMask.addColorStop(0.25, 'rgba(0, 0, 0, 0.5)');
   gradientMask.addColorStop(0.5, 'rgba(0, 0, 0, 0)');
 
-  // Apply the gradient mask
   tempCtx.globalCompositeOperation = 'destination-out';
   tempCtx.fillStyle = gradientMask;
   tempCtx.beginPath();
@@ -776,19 +782,26 @@ function drawLaser(laser, context) {
   );
   tempCtx.fill();
 
+  // Disable smoothing on main context before drawing
+  context.imageSmoothingEnabled = false;
+  context.msImageSmoothingEnabled = false;
+  context.webkitImageSmoothingEnabled = false;
+
   context.drawImage(
     tempCanvas,
     -laser.width / 2,
     -laser.height / 2
   );
+  
   context.restore();
 }
 
+// Updated drawLaserCenter function with explicit image smoothing control
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
   const radius = laser.width * 0.033;
-  const blurWidth = 3; // Width of blur effect in pixels
+  const blurWidth = 3;
 
   context.save();
   context.translate(centerX, centerY);
@@ -797,7 +810,12 @@ function drawLaserCenter(laser, context) {
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
-  const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+  const tempCtx = tempCanvas.getContext('2d');
+  
+  // Disable smoothing on temp canvas
+  tempCtx.imageSmoothingEnabled = false;
+  tempCtx.msImageSmoothingEnabled = false;
+  tempCtx.webkitImageSmoothingEnabled = false;
 
   // Draw the main laser image
   tempCtx.drawImage(
@@ -808,7 +826,7 @@ function drawLaserCenter(laser, context) {
     laser.height
   );
 
-  // Create a gradient mask for the blur effect
+  // Create and apply gradient mask
   const gradientMask = tempCtx.createRadialGradient(
     laser.width / 2, laser.height / 2, radius - blurWidth,
     laser.width / 2, laser.height / 2, radius + blurWidth
@@ -817,7 +835,6 @@ function drawLaserCenter(laser, context) {
   gradientMask.addColorStop(0.25, 'rgba(0, 0, 0, 0.5)');
   gradientMask.addColorStop(0.5, 'rgba(0, 0, 0, 0)');
 
-  // Apply the gradient mask
   tempCtx.globalCompositeOperation = 'destination-in';
   tempCtx.fillStyle = gradientMask;
   tempCtx.beginPath();
@@ -830,11 +847,17 @@ function drawLaserCenter(laser, context) {
   );
   tempCtx.fill();
 
+  // Disable smoothing on main context before drawing
+  context.imageSmoothingEnabled = false;
+  context.msImageSmoothingEnabled = false;
+  context.webkitImageSmoothingEnabled = false;
+
   context.drawImage(
     tempCanvas,
     -laser.width / 2,
     -laser.height / 2
   );
+  
   context.restore();
 }
 
