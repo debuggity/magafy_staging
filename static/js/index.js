@@ -729,7 +729,7 @@ let rednessValue = 1;   // Default redness value
 function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.05;
+  const radius = laser.width * 0.03;
   const blurWidth = 3; // Width of blur effect in pixels
 
   context.save();
@@ -783,7 +783,7 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.058;
+  const radius = laser.width * 0.038;
   const blurWidth = 3; // Width of blur effect in pixels
 
   context.save();
