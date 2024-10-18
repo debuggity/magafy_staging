@@ -731,167 +731,129 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
-// Preprocess function to separate glow and core images
-function preprocessLaserImages(laser) {
-  // Create temporary canvases
-  const glowCanvas = document.createElement('canvas');
-  glowCanvas.width = laser.width;
-  glowCanvas.height = laser.height;
-  const glowCtx = glowCanvas.getContext('2d');
+// Create an offscreen canvas for laser glows
+const glowCanvas = document.createElement('canvas');
+const glowCtx = glowCanvas.getContext('2d', { willReadFrequently: true });
 
-  const coreCanvas = document.createElement('canvas');
-  coreCanvas.width = laser.width;
-  coreCanvas.height = laser.height;
-  const coreCtx = coreCanvas.getContext('2d');
-
-  // Draw the original laser image onto both canvases
-  glowCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
-  coreCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
-
-  // Clear the center to isolate the glow
-  glowCtx.globalCompositeOperation = 'destination-out';
-  glowCtx.beginPath();
-  glowCtx.arc(
-    laser.width / 2,
-    laser.height / 2,
-    laser.width * 0.05, // Adjust radius as needed
-    0,
-    Math.PI * 2
-  );
-  glowCtx.fill();
-
-  // Clear the glow to isolate the core
-  coreCtx.globalCompositeOperation = 'destination-out';
-  coreCtx.drawImage(glowCanvas, 0, 0);
-  coreCtx.beginPath();
-  coreCtx.arc(
-    laser.width / 2,
-    laser.height / 2,
-    laser.width * 0.05, // Adjust radius as needed
-    0,
-    Math.PI * 2
-  );
-  coreCtx.fill();
-
-  // Assign the separated images back to the laser object
-  laser.glowImage = glowCanvas;
-  laser.coreImage = coreCanvas;
-}
-
-// Call this function once for each laser after loading
-lasers.forEach(laser => {
-  preprocessLaserImages(laser);
-});
-
-// Function to draw the glow part of the laser
-function drawLaserGlow(laser) {
-  const centerX = laser.x + laser.width / 2;
-  const centerY = laser.y + laser.height / 2;
-
-  ctx.save();
-  ctx.translate(centerX, centerY);
-  ctx.rotate(laser.rotation);
-
-  // Draw the glow image
-  ctx.drawImage(
-    laser.glowImage,
-    -laser.width / 2,
-    -laser.height / 2,
-    laser.width,
-    laser.height
-  );
-
-  ctx.restore();
-}
-
-// Function to draw the core part of the laser
-function drawLaserCore(laser) {
-  const centerX = laser.x + laser.width / 2;
-  const centerY = laser.y + laser.height / 2;
-
-  ctx.save();
-  ctx.translate(centerX, centerY);
-  ctx.rotate(laser.rotation);
-
-  // Draw the core image
-  ctx.drawImage(
-    laser.coreImage,
-    -laser.width / 2,
-    -laser.height / 2,
-    laser.width,
-    laser.height
-  );
-
-  ctx.restore();
-}
-
+// Modify the drawCanvas function
 function drawCanvas() {
-  // Clear the canvas before drawing
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Clear the main canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw the base image (the original uploaded image)
-  ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
+    // Draw the base image (original uploaded image)
+    ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
 
-  // Apply the selected filter (if any)
-  if (currentFilter === 'dark') {
-    applyGradientMapFilter(ctx, canvas.width, canvas.height);
-  } else if (currentFilter === 'classic') {
-    applyClassicRedFilter(ctx, canvas.width, canvas.height);
-  } else if (currentFilter === 'light') {
-    applyLightFilter(ctx, canvas.width, canvas.height);
-  }
-
-  // Apply contrast and redness adjustments
-  applyContrastAndRedness(ctx, canvas.width, canvas.height);
-
-  // Draw the flag and masked image if the flag is applied
-  if (flagApplied && savedMaskImage) {
-    const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
-    let backgroundWidth, backgroundHeight;
-
-    if (canvas.width / canvas.height > backgroundAspectRatio) {
-      backgroundWidth = canvas.width;
-      backgroundHeight = backgroundWidth / backgroundAspectRatio;
-    } else {
-      backgroundHeight = canvas.height;
-      backgroundWidth = backgroundHeight * backgroundAspectRatio;
+    // Apply the selected filter (if any)
+    if (currentFilter === 'dark') {
+        applyGradientMapFilter(ctx, canvas.width, canvas.height);
+    } else if (currentFilter === 'classic') {
+        applyClassicRedFilter(ctx, canvas.width, canvas.height);
+    } else if (currentFilter === 'light') {
+        applyLightFilter(ctx, canvas.width, canvas.height);
     }
 
-    const backgroundX = (canvas.width - backgroundWidth) / 2;
-    const backgroundY = (canvas.height - backgroundHeight) / 2;
+    // Apply contrast and redness adjustments
+    applyContrastAndRedness(ctx, canvas.width, canvas.height);
 
-    ctx.globalAlpha = flagOpacity;
-    ctx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
-    ctx.globalAlpha = 1;
+    // Draw the flag and masked image if the flag is applied
+    if (flagApplied && savedMaskImage) {
+        const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
+        let backgroundWidth, backgroundHeight;
 
-    ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
-  }
+        if (canvas.width / canvas.height > backgroundAspectRatio) {
+            backgroundWidth = canvas.width;
+            backgroundHeight = backgroundWidth / backgroundAspectRatio;
+        } else {
+            backgroundHeight = canvas.height;
+            backgroundWidth = backgroundHeight * backgroundAspectRatio;
+        }
 
-  ctx.imageSmoothingEnabled = false;
+        const backgroundX = (canvas.width - backgroundWidth) / 2;
+        const backgroundY = (canvas.height - backgroundHeight) / 2;
 
-  // Draw glows in additive blending mode
-  ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
-  lasers.forEach(laser => {
-    drawLaserGlow(laser); // Draw only the glow part
-  });
-  ctx.restore();
+        ctx.globalAlpha = flagOpacity;
+        ctx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
+        ctx.globalAlpha = 1;
 
-  // Draw cores normally on top
-  lasers.forEach(laser => {
-    drawLaserCore(laser); // Draw only the core part
-  });
+        ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
+    }
 
-  ctx.imageSmoothingEnabled = true; // Re-enable it for other operations if needed
+    // Prepare the glow canvas
+    glowCanvas.width = canvas.width;
+    glowCanvas.height = canvas.height;
+    glowCtx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
+    glowCtx.globalCompositeOperation = 'lighter'; // Additive blending for glows
 
-  // Draw hats on top of everything
-  hats.forEach(hat => {
-    ctx.save();
-    ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
-    ctx.rotate(hat.rotation);
-    ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
-    ctx.restore();
-  });
+    // Draw all laser glows on the glow canvas
+    lasers.forEach(laser => {
+        drawLaserGlow(laser, glowCtx);
+    });
+
+    // Draw the glow canvas onto the main canvas
+    ctx.drawImage(glowCanvas, 0, 0);
+
+    // Reset composite operation for core drawing
+    ctx.globalCompositeOperation = 'source-over';
+
+    // Draw all laser centers on the main canvas
+    lasers.forEach(laser => {
+        drawLaserCenter(laser, ctx);
+    });
+
+    // Re-enable image smoothing if needed
+    ctx.imageSmoothingEnabled = true;
+
+    // Draw hats on top of everything
+    hats.forEach(hat => {
+        ctx.save();
+        ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
+        ctx.rotate(hat.rotation);
+        ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
+        ctx.restore();
+    });
+}
+
+// Function to draw laser glow on the glow canvas
+function drawLaserGlow(laser, context) {
+    const centerX = laser.x + laser.width / 2;
+    const centerY = laser.y + laser.height / 2;
+
+    context.save();
+    context.translate(centerX, centerY);
+    context.rotate(laser.rotation);
+
+    // Draw the laser image as is on the glow canvas
+    context.drawImage(
+        laser.image,
+        -laser.width / 2,
+        -laser.height / 2,
+        laser.width,
+        laser.height
+    );
+
+    context.restore();
+}
+
+// Function to draw laser center on the main canvas
+function drawLaserCenter(laser, context) {
+    const centerX = laser.x + laser.width / 2;
+    const centerY = laser.y + laser.height / 2;
+
+    context.save();
+    context.translate(centerX, centerY);
+    context.rotate(laser.rotation);
+
+    // Draw only the center part of the laser
+    const radius = laser.width * 0.05;
+    context.globalCompositeOperation = 'destination-out';
+    context.beginPath();
+    context.arc(0, 0, radius, 0, Math.PI * 2);
+    context.fill();
+
+    // Reset composite operation
+    context.globalCompositeOperation = 'source-over';
+
+    context.restore();
 }
 
 function applyContrastAndRedness(context, width, height) {
