@@ -730,127 +730,262 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
 
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
+// Function to create a Gaussian blurred alpha mask
+function createGaussianBlurredMask(image, radius) {
+  // Create a canvas to draw the mask
+  const maskCanvas = document.createElement('canvas');
+  maskCanvas.width = image.width;
+  maskCanvas.height = image.height;
+  const maskCtx = maskCanvas.getContext('2d');
 
-// Create an offscreen canvas for laser glows
-const glowCanvas = document.createElement('canvas');
-const glowCtx = glowCanvas.getContext('2d', { willReadFrequently: true });
+  // Draw the image and extract alpha channel
+  maskCtx.drawImage(image, 0, 0);
+  const imageData = maskCtx.getImageData(0, 0, image.width, image.height);
+  const alphaData = new Uint8ClampedArray(imageData.data.length);
 
-// Modify the drawCanvas function
-function drawCanvas() {
-    // Clear the main canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Copy only the alpha channel
+  for (let i = 3; i < imageData.data.length; i += 4) {
+    alphaData[i] = imageData.data[i];
+  }
 
-    // Draw the base image (original uploaded image)
-    ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
+  // Apply a stack blur on the alpha data
+  stackBlur(alphaData, image.width, image.height, radius);
 
-    // Apply the selected filter (if any)
-    if (currentFilter === 'dark') {
-        applyGradientMapFilter(ctx, canvas.width, canvas.height);
-    } else if (currentFilter === 'classic') {
-        applyClassicRedFilter(ctx, canvas.width, canvas.height);
-    } else if (currentFilter === 'light') {
-        applyLightFilter(ctx, canvas.width, canvas.height);
-    }
+  // Update the alpha channel in the image data
+  for (let i = 3; i < imageData.data.length; i += 4) {
+    imageData.data[i] = alphaData[i];
+  }
 
-    // Apply contrast and redness adjustments
-    applyContrastAndRedness(ctx, canvas.width, canvas.height);
+  // Put the updated image data back on the canvas
+  maskCtx.putImageData(imageData, 0, 0);
+  return maskCanvas;
+}
 
-    // Draw the flag and masked image if the flag is applied
-    if (flagApplied && savedMaskImage) {
-        const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
-        let backgroundWidth, backgroundHeight;
+// Simple stack blur algorithm implementation (Gaussian approximation)
+function stackBlur(data, width, height, radius) {
+  if (radius < 1) return;
 
-        if (canvas.width / canvas.height > backgroundAspectRatio) {
-            backgroundWidth = canvas.width;
-            backgroundHeight = backgroundWidth / backgroundAspectRatio;
-        } else {
-            backgroundHeight = canvas.height;
-            backgroundWidth = backgroundHeight * backgroundAspectRatio;
+  const wm = width - 1;
+  const hm = height - 1;
+  const wh = width * height;
+  const r1 = radius + 1;
+
+  const red = new Uint8Array(wh);
+  const green = new Uint8Array(wh);
+  const blue = new Uint8Array(wh);
+  const alpha = new Uint8Array(wh);
+  let sumAlpha, sumRed, sumGreen, sumBlue;
+
+  // Separate color channels and initialize arrays
+  for (let i = 0; i < wh; i++) {
+    red[i] = data[i * 4];
+    green[i] = data[i * 4 + 1];
+    blue[i] = data[i * 4 + 2];
+    alpha[i] = data[i * 4 + 3];
+  }
+
+  const vmin = new Uint16Array(Math.max(width, height));
+
+  // Process each channel separately
+  for (let channel of [red, green, blue, alpha]) {
+    for (let y = 0; y < height; y++) {
+      sumRed = sumGreen = sumBlue = 0;
+      sumAlpha = 0;
+
+      // Initialize the sliding window
+      for (let i = -radius; i <= radius; i++) {
+        const pixel = channel[y * width + Math.min(wm, Math.max(i, 0))];
+        sumRed += pixel;
+        sumAlpha += pixel;
+      }
+
+      // Apply blur horizontally
+      for (let x = 0; x < width; x++) {
+        const index = y * width + x;
+        channel[index] = sumRed / r1;
+
+        if (x >= radius) {
+          const pixel = channel[index - radius];
+          sumRed -= pixel;
+          sumAlpha -= pixel;
         }
 
-        const backgroundX = (canvas.width - backgroundWidth) / 2;
-        const backgroundY = (canvas.height - backgroundHeight) / 2;
-
-        ctx.globalAlpha = flagOpacity;
-        ctx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
-        ctx.globalAlpha = 1;
-
-        ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
+        if (x + radius + 1 < width) {
+          const pixel = channel[index + radius + 1];
+          sumRed += pixel;
+          sumAlpha += pixel;
+        }
+      }
     }
 
-    // Prepare the glow canvas
-    glowCanvas.width = canvas.width;
-    glowCanvas.height = canvas.height;
-    glowCtx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
-    glowCtx.globalCompositeOperation = 'lighter'; // Additive blending for glows
+    // Apply blur vertically
+    for (let x = 0; x < width; x++) {
+      sumRed = sumGreen = sumBlue = 0;
+      sumAlpha = 0;
 
-    // Draw all laser glows on the glow canvas
-    lasers.forEach(laser => {
-        drawLaserGlow(laser, glowCtx);
-    });
+      // Initialize the sliding window
+      for (let i = -radius; i <= radius; i++) {
+        const pixel = channel[Math.min(hm, Math.max(i, 0)) * width + x];
+        sumRed += pixel;
+        sumAlpha += pixel;
+      }
 
-    // Draw the glow canvas onto the main canvas
-    ctx.drawImage(glowCanvas, 0, 0);
+      // Apply blur vertically
+      for (let y = 0; y < height; y++) {
+        const index = y * width + x;
+        channel[index] = sumRed / r1;
 
-    // Reset composite operation for core drawing
-    ctx.globalCompositeOperation = 'source-over';
+        if (y >= radius) {
+          const pixel = channel[(y - radius) * width + x];
+          sumRed -= pixel;
+          sumAlpha -= pixel;
+        }
 
-    // Draw all laser cores on the main canvas
-    lasers.forEach(laser => {
-        drawLaserCore(laser, ctx);
-    });
+        if (y + radius + 1 < height) {
+          const pixel = channel[(y + radius + 1) * width + x];
+          sumRed += pixel;
+          sumAlpha += pixel;
+        }
+      }
+    }
+  }
 
-    // Re-enable image smoothing if needed
-    ctx.imageSmoothingEnabled = true;
-
-    // Draw hats on top of everything
-    hats.forEach(hat => {
-        ctx.save();
-        ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
-        ctx.rotate(hat.rotation);
-        ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
-        ctx.restore();
-    });
+  // Reconstruct the original image data
+  for (let i = 0; i < wh; i++) {
+    data[i * 4] = red[i];
+    data[i * 4 + 1] = green[i];
+    data[i * 4 + 2] = blue[i];
+    data[i * 4 + 3] = alpha[i];
+  }
 }
 
-// Function to draw laser glow on the glow canvas
-function drawLaserGlow(laser, context) {
-    const centerX = laser.x + laser.width / 2;
-    const centerY = laser.y + laser.height / 2;
+// Updated drawLaser function
+function drawLaser(laser) {
+  const centerX = laser.x + laser.width / 2;
+  const centerY = laser.y + laser.height / 2;
+  const radius = laser.width * 0.05;
 
-    context.save();
-    context.translate(centerX, centerY);
-    context.rotate(laser.rotation);
+  ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.rotate(laser.rotation);
 
-    // Draw the laser image on the glow canvas
-    context.drawImage(
-        laser.image,
-        -laser.width / 2,
-        -laser.height / 2,
-        laser.width,
-        laser.height
-    );
+  // Create a temporary canvas for the laser image
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = laser.width;
+  tempCanvas.height = laser.height;
+  const tempCtx = tempCanvas.getContext('2d');
 
-    context.restore();
+  // Draw the laser image onto the temporary canvas
+  tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
+
+  // Create a blurred mask for smooth blending of the center cut-out
+  const blurredMask = createGaussianBlurredMask(laser.image, radius * 2);
+
+  // Draw the blurred mask onto the temporary canvas
+  tempCtx.globalCompositeOperation = 'destination-in';
+  tempCtx.drawImage(blurredMask, 0, 0);
+
+  // Draw the modified laser image (with blended hole) onto the main canvas
+  ctx.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
+
+  ctx.restore();
 }
 
-// Function to draw laser core on the main canvas
-function drawLaserCore(laser, context) {
-    const centerX = laser.x + laser.width / 2;
-    const centerY = laser.y + laser.height / 2;
-    const radius = laser.width * 0.05; // Adjust the radius as needed
+// Updated drawLaserCenter function to use the same mask technique
+function drawLaserCenter(laser) {
+  const centerX = laser.x + laser.width / 2;
+  const centerY = laser.y + laser.height / 2;
+  const radius = laser.width * 0.05;
 
-    context.save();
-    context.translate(centerX, centerY);
-    context.rotate(laser.rotation);
+  ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.rotate(laser.rotation);
 
-    // Draw the core as a solid, opaque circle
-    context.beginPath();
-    context.arc(0, 0, radius, 0, Math.PI * 2);
-    context.fillStyle = 'black'; // Adjust the color as needed
-    context.fill();
+  // Create a temporary canvas for the center
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = laser.width;
+  tempCanvas.height = laser.height;
+  const tempCtx = tempCanvas.getContext('2d');
 
-    context.restore();
+  // Draw the full laser image
+  tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
+
+  // Create a mask with a soft edge for the center circle
+  const blurredMask = createGaussianBlurredMask(laser.image, radius * 2);
+
+  // Apply the center mask to the temporary canvas
+  tempCtx.globalCompositeOperation = 'destination-in';
+  tempCtx.drawImage(blurredMask, 0, 0);
+
+  // Draw the center onto the main canvas
+  ctx.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
+
+  ctx.restore();
+}
+
+function drawCanvas() {
+  // Clear the canvas before drawing
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw the base image (the original uploaded image)
+  ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
+
+  // Apply the selected filter (if any)
+  if (currentFilter === 'dark') {
+    applyGradientMapFilter(ctx, canvas.width, canvas.height);
+  } else if (currentFilter === 'classic') {
+    applyClassicRedFilter(ctx, canvas.width, canvas.height);
+  } else if (currentFilter === 'light') {
+    applyLightFilter(ctx, canvas.width, canvas.height);
+  }
+
+  // Apply contrast and redness adjustments
+  applyContrastAndRedness(ctx, canvas.width, canvas.height);
+
+  // Draw the flag and masked image if the flag is applied
+  if (flagApplied && savedMaskImage) {
+    const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
+    let backgroundWidth, backgroundHeight;
+
+    if (canvas.width / canvas.height > backgroundAspectRatio) {
+      backgroundWidth = canvas.width;
+      backgroundHeight = backgroundWidth / backgroundAspectRatio;
+    } else {
+      backgroundHeight = canvas.height;
+      backgroundWidth = backgroundHeight * backgroundAspectRatio;
+    }
+
+    const backgroundX = (canvas.width - backgroundWidth) / 2;
+    const backgroundY = (canvas.height - backgroundHeight) / 2;
+
+    ctx.globalAlpha = flagOpacity;
+    ctx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
+    ctx.globalAlpha = 1;
+
+    ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
+  }
+
+  ctx.imageSmoothingEnabled = false;
+
+  // Draw lasers in two passes
+  lasers.forEach(laser => {
+    drawLaser(laser, ctx);  // First pass: draw laser with hole
+  });
+  
+  lasers.forEach(laser => {
+    drawLaserCenter(laser, ctx);  // Second pass: draw centers
+  });
+
+  ctx.imageSmoothingEnabled = true;  // Re-enable it for other operations if needed
+
+  // Draw hats on top of everything
+  hats.forEach(hat => {
+    ctx.save();
+    ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
+    ctx.rotate(hat.rotation);
+    ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
+    ctx.restore();
+  });
 }
 
 function applyContrastAndRedness(context, width, height) {
