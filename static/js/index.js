@@ -878,6 +878,28 @@ function drawCanvas() {
   });
 }
 
+function applyContrastAndRedness(context, width, height) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    // Apply contrast adjustment
+    data[i] = ((data[i] - 128) * contrastValue + 128);  // Red channel
+    data[i + 1] = ((data[i + 1] - 128) * contrastValue + 128);  // Green channel
+    data[i + 2] = ((data[i + 2] - 128) * contrastValue + 128);  // Blue channel
+
+    // Calculate average intensity (grayscale value)
+    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+
+    // Apply saturation adjustment (rednessValue now represents saturation)
+    data[i] = avg + (data[i] - avg) * rednessValue;  // Red channel
+    data[i + 1] = avg + (data[i + 1] - avg) * rednessValue;  // Green channel
+    data[i + 2] = avg + (data[i + 2] - avg) * rednessValue;  // Blue channel
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
 function applyGradientMapFilter(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const data = imageData.data;
