@@ -536,20 +536,16 @@ canvas.addEventListener("touchend", function () {
 
 // Updated download button handler
 document.getElementById("download-button").addEventListener("click", function () {
+  // Create a temporary canvas for exporting the full resolution image
   const fullResCanvas = document.createElement("canvas");
   fullResCanvas.width = originalImageWidth;
   fullResCanvas.height = originalImageHeight;
-  const fullResCtx = fullResCanvas.getContext("2d", { willReadFrequently: true });
+  const fullResCtx = fullResCanvas.getContext("2d");
 
-  // Disable image smoothing globally for the full resolution context
-  fullResCtx.imageSmoothingEnabled = false;
-  fullResCtx.msImageSmoothingEnabled = false;
-  fullResCtx.webkitImageSmoothingEnabled = false;
-  
-  // Draw the original image
+  // Draw the original image at full resolution
   fullResCtx.drawImage(canvasImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
 
-  // Apply filters and adjustments
+  // Apply the selected filter directly to the fullResCanvas
   if (currentFilter === 'dark') {
     applyGradientMapFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
   } else if (currentFilter === 'classic') {
@@ -557,10 +553,11 @@ document.getElementById("download-button").addEventListener("click", function ()
   } else if (currentFilter === 'light') {
     applyLightFilter(fullResCtx, fullResCanvas.width, fullResCanvas.height);
   }
-  
+
+  // Apply contrast and redness adjustments
   applyContrastAndRedness(fullResCtx, fullResCanvas.width, fullResCanvas.height);
 
-  // Draw background if applied
+  // Draw the background if it is applied
   if (flagApplied && savedMaskImage) {
     const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
     let backgroundWidth, backgroundHeight;
@@ -573,21 +570,25 @@ document.getElementById("download-button").addEventListener("click", function ()
       backgroundWidth = backgroundHeight * backgroundAspectRatio;
     }
 
+    // Center the background on the canvas
     const backgroundX = (fullResCanvas.width - backgroundWidth) / 2;
     const backgroundY = (fullResCanvas.height - backgroundHeight) / 2;
 
     fullResCtx.globalAlpha = flagOpacity;
     fullResCtx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
     fullResCtx.globalAlpha = 1;
+  }
 
+  // Draw the masked image on top of the background (if applied)
+  if (flagApplied && savedMaskImage) {
     fullResCtx.drawImage(savedMaskImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
   }
 
-  // Calculate scale factors
+  // Calculate scale factors for full resolution
   const scaleX = fullResCanvas.width / canvas.width;
   const scaleY = fullResCanvas.height / canvas.height;
 
-  // Draw lasers with updated scale
+  // Draw lasers at full resolution in two passes
   lasers.forEach((laser) => {
     const scaledLaser = {
       ...laser,
@@ -610,12 +611,7 @@ document.getElementById("download-button").addEventListener("click", function ()
     drawLaserCenter(scaledLaser, fullResCtx);
   });
 
-  // Re-enable smoothing for hat drawing
-  fullResCtx.imageSmoothingEnabled = true;
-  fullResCtx.msImageSmoothingEnabled = true;
-  fullResCtx.webkitImageSmoothingEnabled = true;
-
-  // Draw hats
+  // Draw hats at full resolution
   hats.forEach((hat) => {
     fullResCtx.save();
     fullResCtx.translate(
@@ -633,7 +629,7 @@ document.getElementById("download-button").addEventListener("click", function ()
     fullResCtx.restore();
   });
 
-  // Export as PNG
+  // Export the final image as a PNG
   fullResCanvas.toBlob(function (blob) {
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -643,9 +639,6 @@ document.getElementById("download-button").addEventListener("click", function ()
     document.body.removeChild(link);
   }, 'image/png');
 });
-
-
-
 
 window.addEventListener("paste", function (e) {
   const items = e.clipboardData.items;
@@ -866,8 +859,6 @@ function drawCanvas() {
     ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
   }
 
-  ctx.imageSmoothingEnabled = false;
-
   // Draw lasers in two passes
   lasers.forEach(laser => {
     drawLaser(laser, ctx);  // First pass: draw laser with hole
@@ -877,8 +868,6 @@ function drawCanvas() {
     drawLaserCenter(laser, ctx);  // Second pass: draw centers
   });
 
-  ctx.imageSmoothingEnabled = true;  // Re-enable it for other operations if needed
-
   // Draw hats on top of everything
   hats.forEach(hat => {
     ctx.save();
@@ -887,28 +876,6 @@ function drawCanvas() {
     ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
     ctx.restore();
   });
-}
-
-function applyContrastAndRedness(context, width, height) {
-  const imageData = context.getImageData(0, 0, width, height);
-  const data = imageData.data;
-
-  for (let i = 0; i < data.length; i += 4) {
-    // Apply contrast adjustment
-    data[i] = ((data[i] - 128) * contrastValue + 128);  // Red channel
-    data[i + 1] = ((data[i + 1] - 128) * contrastValue + 128);  // Green channel
-    data[i + 2] = ((data[i + 2] - 128) * contrastValue + 128);  // Blue channel
-
-    // Calculate average intensity (grayscale value)
-    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-
-    // Apply saturation adjustment (rednessValue now represents saturation)
-    data[i] = avg + (data[i] - avg) * rednessValue;  // Red channel
-    data[i + 1] = avg + (data[i + 1] - avg) * rednessValue;  // Green channel
-    data[i + 2] = avg + (data[i + 2] - avg) * rednessValue;  // Blue channel
-  }
-
-  context.putImageData(imageData, 0, 0);
 }
 
 function applyGradientMapFilter(context, width, height) {
