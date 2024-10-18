@@ -731,98 +731,99 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
-function drawLaser(laser) {
+// Preprocess function to separate glow and core images
+function preprocessLaserImages(laser) {
+  // Create temporary canvases
+  const glowCanvas = document.createElement('canvas');
+  glowCanvas.width = laser.width;
+  glowCanvas.height = laser.height;
+  const glowCtx = glowCanvas.getContext('2d');
+
+  const coreCanvas = document.createElement('canvas');
+  coreCanvas.width = laser.width;
+  coreCanvas.height = laser.height;
+  const coreCtx = coreCanvas.getContext('2d');
+
+  // Draw the original laser image onto both canvases
+  glowCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
+  coreCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
+
+  // Clear the center to isolate the glow
+  glowCtx.globalCompositeOperation = 'destination-out';
+  glowCtx.beginPath();
+  glowCtx.arc(
+    laser.width / 2,
+    laser.height / 2,
+    laser.width * 0.05, // Adjust radius as needed
+    0,
+    Math.PI * 2
+  );
+  glowCtx.fill();
+
+  // Clear the glow to isolate the core
+  coreCtx.globalCompositeOperation = 'destination-out';
+  coreCtx.drawImage(glowCanvas, 0, 0);
+  coreCtx.beginPath();
+  coreCtx.arc(
+    laser.width / 2,
+    laser.height / 2,
+    laser.width * 0.05, // Adjust radius as needed
+    0,
+    Math.PI * 2
+  );
+  coreCtx.fill();
+
+  // Assign the separated images back to the laser object
+  laser.glowImage = glowCanvas;
+  laser.coreImage = coreCanvas;
+}
+
+// Call this function once for each laser after loading
+lasers.forEach(laser => {
+  preprocessLaserImages(laser);
+});
+
+// Function to draw the glow part of the laser
+function drawLaserGlow(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.05;
 
   ctx.save();
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Create a temporary canvas for the laser image
-  const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = laser.width;
-  tempCanvas.height = laser.height;
-  const tempCtx = tempCanvas.getContext('2d');
-
-  // Draw the laser image onto the temporary canvas
-  tempCtx.drawImage(
-    laser.image,
-    0,
-    0,
+  // Draw the glow image
+  ctx.drawImage(
+    laser.glowImage,
+    -laser.width / 2,
+    -laser.height / 2,
     laser.width,
     laser.height
-  );
-
-  // Clear the center circle from the temporary canvas
-  tempCtx.globalCompositeOperation = 'destination-out';
-  tempCtx.beginPath();
-  tempCtx.arc(
-    laser.width / 2,
-    laser.height / 2,
-    radius,
-    0,
-    Math.PI * 2
-  );
-  tempCtx.fill();
-
-  // Draw the modified laser image (with hole) onto the main canvas
-  ctx.drawImage(
-    tempCanvas,
-    -laser.width / 2,
-    -laser.height / 2
   );
 
   ctx.restore();
 }
 
-function drawLaserCenter(laser) {
+// Function to draw the core part of the laser
+function drawLaserCore(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.05;
 
   ctx.save();
   ctx.translate(centerX, centerY);
   ctx.rotate(laser.rotation);
 
-  // Create a temporary canvas for the center
-  const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = laser.width;
-  tempCanvas.height = laser.height;
-  const tempCtx = tempCanvas.getContext('2d');
-
-  // Draw the full laser image
-  tempCtx.drawImage(
-    laser.image,
-    0,
-    0,
+  // Draw the core image
+  ctx.drawImage(
+    laser.coreImage,
+    -laser.width / 2,
+    -laser.height / 2,
     laser.width,
     laser.height
   );
 
-  // Create a clipping path for the center circle
-  tempCtx.globalCompositeOperation = 'destination-in';
-  tempCtx.beginPath();
-  tempCtx.arc(
-    laser.width / 2,
-    laser.height / 2,
-    radius,
-    0,
-    Math.PI * 2
-  );
-  tempCtx.fill();
-
-  // Draw the center onto the main canvas
-  ctx.drawImage(
-    tempCanvas,
-    -laser.width / 2,
-    -laser.height / 2
-  );
-
   ctx.restore();
 }
-
 
 function drawCanvas() {
   // Clear the canvas before drawing
@@ -868,16 +869,20 @@ function drawCanvas() {
 
   ctx.imageSmoothingEnabled = false;
 
-  // Draw lasers in two passes
+  // Draw glows in additive blending mode
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
   lasers.forEach(laser => {
-    drawLaser(laser, ctx);  // First pass: draw laser with hole
+    drawLaserGlow(laser); // Draw only the glow part
   });
-  
+  ctx.restore();
+
+  // Draw cores normally on top
   lasers.forEach(laser => {
-    drawLaserCenter(laser, ctx);  // Second pass: draw centers
+    drawLaserCore(laser); // Draw only the core part
   });
 
-  ctx.imageSmoothingEnabled = true;  // Re-enable it for other operations if needed
+  ctx.imageSmoothingEnabled = true; // Re-enable it for other operations if needed
 
   // Draw hats on top of everything
   hats.forEach(hat => {
