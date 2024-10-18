@@ -730,7 +730,9 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
 
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
-// Function to create a Gaussian blurred alpha mask
+
+
+// Function to create a Gaussian blurred alpha mask using Canvas built-in filter
 function createGaussianBlurredMask(image, radius) {
   // Create a canvas to draw the mask
   const maskCanvas = document.createElement('canvas');
@@ -740,123 +742,16 @@ function createGaussianBlurredMask(image, radius) {
 
   // Draw the image and extract alpha channel
   maskCtx.drawImage(image, 0, 0);
-  const imageData = maskCtx.getImageData(0, 0, image.width, image.height);
-  const alphaData = new Uint8ClampedArray(imageData.data.length);
 
-  // Copy only the alpha channel
-  for (let i = 3; i < imageData.data.length; i += 4) {
-    alphaData[i] = imageData.data[i];
-  }
+  // Apply a blur effect to smooth out edges
+  maskCtx.filter = `blur(${radius}px)`;
+  maskCtx.drawImage(maskCanvas, 0, 0);
 
-  // Apply a stack blur on the alpha data
-  stackBlur(alphaData, image.width, image.height, radius);
+  // Reset filter
+  maskCtx.filter = 'none';
 
-  // Update the alpha channel in the image data
-  for (let i = 3; i < imageData.data.length; i += 4) {
-    imageData.data[i] = alphaData[i];
-  }
-
-  // Put the updated image data back on the canvas
-  maskCtx.putImageData(imageData, 0, 0);
+  // Return the blurred mask canvas
   return maskCanvas;
-}
-
-// Simple stack blur algorithm implementation (Gaussian approximation)
-function stackBlur(data, width, height, radius) {
-  if (radius < 1) return;
-
-  const wm = width - 1;
-  const hm = height - 1;
-  const wh = width * height;
-  const r1 = radius + 1;
-
-  const red = new Uint8Array(wh);
-  const green = new Uint8Array(wh);
-  const blue = new Uint8Array(wh);
-  const alpha = new Uint8Array(wh);
-  let sumAlpha, sumRed, sumGreen, sumBlue;
-
-  // Separate color channels and initialize arrays
-  for (let i = 0; i < wh; i++) {
-    red[i] = data[i * 4];
-    green[i] = data[i * 4 + 1];
-    blue[i] = data[i * 4 + 2];
-    alpha[i] = data[i * 4 + 3];
-  }
-
-  const vmin = new Uint16Array(Math.max(width, height));
-
-  // Process each channel separately
-  for (let channel of [red, green, blue, alpha]) {
-    for (let y = 0; y < height; y++) {
-      sumRed = sumGreen = sumBlue = 0;
-      sumAlpha = 0;
-
-      // Initialize the sliding window
-      for (let i = -radius; i <= radius; i++) {
-        const pixel = channel[y * width + Math.min(wm, Math.max(i, 0))];
-        sumRed += pixel;
-        sumAlpha += pixel;
-      }
-
-      // Apply blur horizontally
-      for (let x = 0; x < width; x++) {
-        const index = y * width + x;
-        channel[index] = sumRed / r1;
-
-        if (x >= radius) {
-          const pixel = channel[index - radius];
-          sumRed -= pixel;
-          sumAlpha -= pixel;
-        }
-
-        if (x + radius + 1 < width) {
-          const pixel = channel[index + radius + 1];
-          sumRed += pixel;
-          sumAlpha += pixel;
-        }
-      }
-    }
-
-    // Apply blur vertically
-    for (let x = 0; x < width; x++) {
-      sumRed = sumGreen = sumBlue = 0;
-      sumAlpha = 0;
-
-      // Initialize the sliding window
-      for (let i = -radius; i <= radius; i++) {
-        const pixel = channel[Math.min(hm, Math.max(i, 0)) * width + x];
-        sumRed += pixel;
-        sumAlpha += pixel;
-      }
-
-      // Apply blur vertically
-      for (let y = 0; y < height; y++) {
-        const index = y * width + x;
-        channel[index] = sumRed / r1;
-
-        if (y >= radius) {
-          const pixel = channel[(y - radius) * width + x];
-          sumRed -= pixel;
-          sumAlpha -= pixel;
-        }
-
-        if (y + radius + 1 < height) {
-          const pixel = channel[(y + radius + 1) * width + x];
-          sumRed += pixel;
-          sumAlpha += pixel;
-        }
-      }
-    }
-  }
-
-  // Reconstruct the original image data
-  for (let i = 0; i < wh; i++) {
-    data[i * 4] = red[i];
-    data[i * 4 + 1] = green[i];
-    data[i * 4 + 2] = blue[i];
-    data[i * 4 + 3] = alpha[i];
-  }
 }
 
 // Updated drawLaser function
@@ -879,7 +774,7 @@ function drawLaser(laser) {
   tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
 
   // Create a blurred mask for smooth blending of the center cut-out
-  const blurredMask = createGaussianBlurredMask(laser.image, radius * 2);
+  const blurredMask = createGaussianBlurredMask(laser.image, radius);
 
   // Draw the blurred mask onto the temporary canvas
   tempCtx.globalCompositeOperation = 'destination-in';
@@ -911,7 +806,7 @@ function drawLaserCenter(laser) {
   tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
 
   // Create a mask with a soft edge for the center circle
-  const blurredMask = createGaussianBlurredMask(laser.image, radius * 2);
+  const blurredMask = createGaussianBlurredMask(laser.image, radius);
 
   // Apply the center mask to the temporary canvas
   tempCtx.globalCompositeOperation = 'destination-in';
