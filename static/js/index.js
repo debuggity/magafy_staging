@@ -731,30 +731,6 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
-
-// Function to create a Gaussian blurred alpha mask using Canvas built-in filter
-function createGaussianBlurredMask(image, radius) {
-  // Create a canvas to draw the mask
-  const maskCanvas = document.createElement('canvas');
-  maskCanvas.width = image.width;
-  maskCanvas.height = image.height;
-  const maskCtx = maskCanvas.getContext('2d');
-
-  // Draw the image and extract alpha channel
-  maskCtx.drawImage(image, 0, 0);
-
-  // Apply a blur effect to smooth out edges
-  maskCtx.filter = `blur(${radius}px)`;
-  maskCtx.drawImage(maskCanvas, 0, 0);
-
-  // Reset filter
-  maskCtx.filter = 'none';
-
-  // Return the blurred mask canvas
-  return maskCanvas;
-}
-
-// Updated drawLaser function
 function drawLaser(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
@@ -771,22 +747,36 @@ function drawLaser(laser) {
   const tempCtx = tempCanvas.getContext('2d');
 
   // Draw the laser image onto the temporary canvas
-  tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
+  tempCtx.drawImage(
+    laser.image,
+    0,
+    0,
+    laser.width,
+    laser.height
+  );
 
-  // Create a blurred mask for smooth blending of the center cut-out
-  const blurredMask = createGaussianBlurredMask(laser.image, radius);
+  // Clear the center circle from the temporary canvas
+  tempCtx.globalCompositeOperation = 'destination-out';
+  tempCtx.beginPath();
+  tempCtx.arc(
+    laser.width / 2,
+    laser.height / 2,
+    radius,
+    0,
+    Math.PI * 2
+  );
+  tempCtx.fill();
 
-  // Draw the blurred mask onto the temporary canvas
-  tempCtx.globalCompositeOperation = 'destination-in';
-  tempCtx.drawImage(blurredMask, 0, 0);
-
-  // Draw the modified laser image (with blended hole) onto the main canvas
-  ctx.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
+  // Draw the modified laser image (with hole) onto the main canvas
+  ctx.drawImage(
+    tempCanvas,
+    -laser.width / 2,
+    -laser.height / 2
+  );
 
   ctx.restore();
 }
 
-// Updated drawLaserCenter function to use the same mask technique
 function drawLaserCenter(laser) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
@@ -803,20 +793,36 @@ function drawLaserCenter(laser) {
   const tempCtx = tempCanvas.getContext('2d');
 
   // Draw the full laser image
-  tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
+  tempCtx.drawImage(
+    laser.image,
+    0,
+    0,
+    laser.width,
+    laser.height
+  );
 
-  // Create a mask with a soft edge for the center circle
-  const blurredMask = createGaussianBlurredMask(laser.image, radius);
-
-  // Apply the center mask to the temporary canvas
+  // Create a clipping path for the center circle
   tempCtx.globalCompositeOperation = 'destination-in';
-  tempCtx.drawImage(blurredMask, 0, 0);
+  tempCtx.beginPath();
+  tempCtx.arc(
+    laser.width / 2,
+    laser.height / 2,
+    radius,
+    0,
+    Math.PI * 2
+  );
+  tempCtx.fill();
 
   // Draw the center onto the main canvas
-  ctx.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
+  ctx.drawImage(
+    tempCanvas,
+    -laser.width / 2,
+    -laser.height / 2
+  );
 
   ctx.restore();
 }
+
 
 function drawCanvas() {
   // Clear the canvas before drawing
