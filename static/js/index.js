@@ -795,9 +795,9 @@ function drawCanvas() {
     // Reset composite operation for core drawing
     ctx.globalCompositeOperation = 'source-over';
 
-    // Draw all laser centers on the main canvas
+    // Draw all laser cores on the main canvas
     lasers.forEach(laser => {
-        drawLaserCenter(laser, ctx);
+        drawLaserCore(laser, ctx);
     });
 
     // Re-enable image smoothing if needed
@@ -822,7 +822,7 @@ function drawLaserGlow(laser, context) {
     context.translate(centerX, centerY);
     context.rotate(laser.rotation);
 
-    // Draw the laser image as is on the glow canvas
+    // Draw the laser image on the glow canvas
     context.drawImage(
         laser.image,
         -laser.width / 2,
@@ -834,24 +834,21 @@ function drawLaserGlow(laser, context) {
     context.restore();
 }
 
-// Function to draw laser center on the main canvas
-function drawLaserCenter(laser, context) {
+// Function to draw laser core on the main canvas
+function drawLaserCore(laser, context) {
     const centerX = laser.x + laser.width / 2;
     const centerY = laser.y + laser.height / 2;
+    const radius = laser.width * 0.05; // Adjust the radius as needed
 
     context.save();
     context.translate(centerX, centerY);
     context.rotate(laser.rotation);
 
-    // Draw only the center part of the laser
-    const radius = laser.width * 0.05;
-    context.globalCompositeOperation = 'destination-out';
+    // Draw the core as a solid, opaque circle
     context.beginPath();
     context.arc(0, 0, radius, 0, Math.PI * 2);
+    context.fillStyle = 'black'; // Adjust the color as needed
     context.fill();
-
-    // Reset composite operation
-    context.globalCompositeOperation = 'source-over';
 
     context.restore();
 }
