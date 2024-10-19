@@ -217,13 +217,13 @@ document.getElementById("image-upload").addEventListener("change", function (e) 
 document.getElementById("add-laser-button").addEventListener("click", function () {
   const aspectRatio = laserImageTemplate.width / laserImageTemplate.height;
 
-  // Use a percentage of the canvas size to determine the laser size
-  let laserWidth = canvas.width * 0.3; // 30% of the canvas width as initial size
+  // Use a higher percentage of the canvas size to determine the initial laser size
+  let laserWidth = canvas.width * 0.5; // Increased to 50% of the canvas width
   let laserHeight = laserWidth / aspectRatio;
 
   // Ensure the laser fits within the canvas bounds
   if (laserHeight > canvas.height) {
-    laserHeight = canvas.height * 0.3; // 30% of canvas height if it's taller
+    laserHeight = canvas.height * 0.5; // 50% of canvas height if it's taller
     laserWidth = laserHeight * aspectRatio;
   }
 
@@ -266,13 +266,14 @@ document.getElementById("add-hat-button").addEventListener("click", function () 
 });
 
 document.getElementById("resize-slider").addEventListener("input", function (e) {
-  const scale = Math.max(parseFloat(e.target.value), 0.5); // Ensure scale does not go below 0.5
+  const scale = Math.max(parseFloat(e.target.value), 0.5); // Keep a minimum of 0.5 to avoid negatives
   lasers.forEach((laser) => {
     const aspectRatio = laser.image.width / laser.image.height;
     const centerX = laser.x + laser.width / 2;
     const centerY = laser.y + laser.height / 2;
 
-    laser.width = (MAX_WIDTH / 5) * scale; // Scaling based on a proportion of MAX_WIDTH
+    // Increase the multiplier to allow larger lasers
+    laser.width = (MAX_WIDTH / 5) * scale * 2;
     laser.height = laser.width / aspectRatio;
 
     laser.x = centerX - laser.width / 2;
@@ -280,6 +281,7 @@ document.getElementById("resize-slider").addEventListener("input", function (e) 
   });
   drawCanvas();
 });
+
 
 document.getElementById("hat-resize-slider").addEventListener("input", function (e) {
   const scale = e.target.value;
