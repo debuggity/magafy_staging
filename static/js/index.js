@@ -216,15 +216,17 @@ document.getElementById("image-upload").addEventListener("change", function (e) 
 
 document.getElementById("add-laser-button").addEventListener("click", function () {
   const aspectRatio = laserImageTemplate.width / laserImageTemplate.height;
-  
-  let laserWidth = (canvas.width / 5) * 3; // Double the size
-  let laserHeight = laserWidth / aspectRatio; // Adjust height based on aspect ratio
 
+  // Use a percentage of the canvas size to determine the laser size
+  let laserWidth = canvas.width * 0.3; // 30% of the canvas width as initial size
+  let laserHeight = laserWidth / aspectRatio;
+
+  // Ensure the laser fits within the canvas bounds
   if (laserHeight > canvas.height) {
-    laserHeight = (canvas.height / 5) * 3;
+    laserHeight = canvas.height * 0.3; // 30% of canvas height if it's taller
     laserWidth = laserHeight * aspectRatio;
   }
-  
+
   const laser = {
     image: laserImageTemplate,
     width: laserWidth,
@@ -236,6 +238,7 @@ document.getElementById("add-laser-button").addEventListener("click", function (
   lasers.push(laser);
   drawCanvas();
 });
+
 
 document.getElementById("add-hat-button").addEventListener("click", function () {
   if (!selectedHatImage) return;
@@ -263,13 +266,13 @@ document.getElementById("add-hat-button").addEventListener("click", function () 
 });
 
 document.getElementById("resize-slider").addEventListener("input", function (e) {
-  const scale = e.target.value;
+  const scale = Math.max(parseFloat(e.target.value), 0.5); // Ensure scale does not go below 0.5
   lasers.forEach((laser) => {
     const aspectRatio = laser.image.width / laser.image.height;
     const centerX = laser.x + laser.width / 2;
     const centerY = laser.y + laser.height / 2;
 
-    laser.width = (canvas.width / 5) * scale * 2;
+    laser.width = (MAX_WIDTH / 5) * scale; // Scaling based on a proportion of MAX_WIDTH
     laser.height = laser.width / aspectRatio;
 
     laser.x = centerX - laser.width / 2;
