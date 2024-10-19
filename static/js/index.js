@@ -869,11 +869,20 @@ function drawLaserCenter(laser, context) {
   // Draw the full laser image onto the temporary canvas
   tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
 
-  // Restore any masked color pixels in the center area
+  // Restore any masked pixels in the center area
   const imageData = tempCtx.getImageData(0, 0, laser.width, laser.height);
   const data = imageData.data;
 
-  // Identify the circular cutout area and restore original pixels
+  // Define colors to restore (white and the additional color)
+  const colorsToRestore = [
+    [255, 255, 255], // Pure white
+    [228, 183, 255]  // Additional color
+  ];
+
+  // Define a threshold for color distance
+  const threshold = 50;
+
+  // Identify the circular cutout area and restore pixels that were masked out
   for (let y = 0; y < laser.height; y++) {
     for (let x = 0; x < laser.width; x++) {
       const index = (y * laser.width + x) * 4;
@@ -881,9 +890,16 @@ function drawLaserCenter(laser, context) {
       const dy = y - laser.height / 2;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      // Check if the pixel is inside the circle and was previously masked out
-      if (distance < radius && data[index + 3] === 0) { // Alpha = 0 indicates previously masked
-        data[index + 3] = 255; // Restore full opacity
+      // Check if the pixel is inside the circle
+      if (distance < radius) {
+        // Check if the pixel matches any of the target colors and is masked out
+        for (let color of colorsToRestore) {
+          if (data[index + 3] === 0 && isCloseToColor(data[index], data[index + 1], data[index + 2], color, threshold)) {
+            // Restore the alpha channel for pixels close to the target colors
+            data[index + 3] = 255;
+            break;
+          }
+        }
       }
     }
   }
@@ -901,6 +917,7 @@ function drawLaserCenter(laser, context) {
   context.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
   context.restore();
 }
+
 
 function drawCanvas() {
   // Clear the canvas before drawing
