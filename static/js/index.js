@@ -904,10 +904,19 @@ function drawLaserCenter(laser, context) {
   // Put the restored image data back into the context
   tempCtx.putImageData(imageData, 0, 0);
 
-  // Draw the restored pixels without clipping, to fill the "hole" properly
+  // Create a clipping path for the center circle
+  tempCtx.globalCompositeOperation = 'destination-in';
+  tempCtx.beginPath();
+  tempCtx.arc(laser.width / 2, laser.height / 2, radius, 0, Math.PI * 2);
+  tempCtx.closePath();
+  tempCtx.fill();
+
+  // Draw the clipped center part onto the main context
+  context.globalCompositeOperation = 'source-over'; // Ensure we're drawing over the bottom layer
   context.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
   context.restore();
 }
+
 
 function drawCanvas() {
   // Clear the canvas before drawing
