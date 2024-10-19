@@ -790,63 +790,32 @@ function drawCanvas() {
   });
 }
 
-function isCloseToColor(r, g, b, target, threshold = 50) {
-  const distance = Math.sqrt(
-    Math.pow(r - target[0], 2) + 
-    Math.pow(g - target[1], 2) + 
-    Math.pow(b - target[2], 2)
-  );
-  return distance < threshold;
-}
-
-function maskWhitePixels(tempCtx, width, height) {
-  const imageData = tempCtx.getImageData(0, 0, width, height);
-  const data = imageData.data;
-  const whiteColor = [255, 255, 255];
-  const additionalColor = [228, 183, 255];
-  const whiteThreshold = 50; // Distance threshold to consider a pixel "white" or close to our additional color
-
-  for (let i = 0; i < data.length; i += 4) {
-    const red = data[i];
-    const green = data[i + 1];
-    const blue = data[i + 2];
-
-    // Mask out pixels that are close to white or the additional target color
-    if (isCloseToColor(red, green, blue, whiteColor, whiteThreshold) ||
-        isCloseToColor(red, green, blue, additionalColor, whiteThreshold)) {
-      data[i + 3] = 0; // Set alpha channel to 0 (fully transparent)
-    }
-  }
-
-  tempCtx.putImageData(imageData, 0, 0);
-}
 
 function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.02;
+  const radius = laser.width * 0.021;
 
   context.save();
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
 
+  // Create a temporary canvas for the laser image
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d');
 
+  // Draw the laser image onto the temporary canvas
   tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
 
-  // Mask out white pixels and those close to the additional target color
-  maskWhitePixels(tempCtx, laser.width, laser.height);
-
-  // Draw the radial cutout (eye's center)
+  // Clear the center circle from the temporary canvas
   tempCtx.globalCompositeOperation = 'destination-out';
   tempCtx.beginPath();
   tempCtx.arc(laser.width / 2, laser.height / 2, radius, 0, Math.PI * 2);
   tempCtx.fill();
 
-  // Draw the modified laser image onto the main context
+  // Draw the modified laser image (with hole) onto the main context
   context.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
   context.restore();
 }
@@ -854,65 +823,28 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.0212; // Adjust as needed
+  const radius = laser.width * 0.0222;
 
   context.save();
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
 
-  // Create a temporary canvas for the entire laser area
+  // Create a temporary canvas for the center
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d');
 
-  // Draw the full laser image onto the temporary canvas
+  // Draw the full laser image
   tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
-
-  // Restore any masked pixels throughout the entire laser area
-  const imageData = tempCtx.getImageData(0, 0, laser.width, laser.height);
-  const data = imageData.data;
-
-  // Define colors to restore (white and the additional color)
-  const colorsToRestore = [
-    [255, 255, 255], // Pure white
-    [228, 183, 255]  // Additional color
-  ];
-
-  // Define a threshold for color distance
-  const threshold = 50;
-
-  // Iterate over the entire image data to restore masked pixels
-  for (let y = 0; y < laser.height; y++) {
-    for (let x = 0; x < laser.width; x++) {
-      const index = (y * laser.width + x) * 4;
-
-      // Check if the pixel was previously masked out
-      if (data[index + 3] === 0) {
-        // Check if the pixel is close to any of the target colors
-        for (let color of colorsToRestore) {
-          if (isCloseToColor(data[index], data[index + 1], data[index + 2], color, threshold)) {
-            // Restore the alpha channel for pixels close to the target colors
-            data[index + 3] = 255;
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  // Put the restored image data back into the context
-  tempCtx.putImageData(imageData, 0, 0);
 
   // Create a clipping path for the center circle
   tempCtx.globalCompositeOperation = 'destination-in';
   tempCtx.beginPath();
   tempCtx.arc(laser.width / 2, laser.height / 2, radius, 0, Math.PI * 2);
-  tempCtx.closePath();
   tempCtx.fill();
 
-  // Draw the clipped center part onto the main context
-  context.globalCompositeOperation = 'source-over'; // Ensure we're drawing over the bottom layer
+  // Draw the center onto the main context
   context.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
   context.restore();
 }
