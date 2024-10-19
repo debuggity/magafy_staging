@@ -854,21 +854,42 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.0212;
+  const radius = laser.width * 0.0212; // Adjust as needed
 
   context.save();
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
 
+  // Create a temporary canvas for the center
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d');
 
+  // Draw the full laser image onto the temporary canvas
   tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
 
-  // Mask out white pixels and those close to the additional target color
-  maskWhitePixels(tempCtx, laser.width, laser.height);
+  // Restore any masked color pixels in the center area
+  const imageData = tempCtx.getImageData(0, 0, laser.width, laser.height);
+  const data = imageData.data;
+
+  // Identify the circular cutout area and restore original pixels
+  for (let y = 0; y < laser.height; y++) {
+    for (let x = 0; x < laser.width; x++) {
+      const index = (y * laser.width + x) * 4;
+      const dx = x - laser.width / 2;
+      const dy = y - laser.height / 2;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Check if the pixel is inside the circle and was previously masked out
+      if (distance < radius && data[index + 3] === 0) { // Alpha = 0 indicates previously masked
+        data[index + 3] = 255; // Restore full opacity
+      }
+    }
+  }
+
+  // Put the restored image data back into the context
+  tempCtx.putImageData(imageData, 0, 0);
 
   // Create a clipping path for the center circle
   tempCtx.globalCompositeOperation = 'destination-in';
