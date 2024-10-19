@@ -811,12 +811,47 @@ function drawLaserCenter(laser, context) {
   context.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
   context.rotate(laser.rotation);
 
-  // Draw the laser top image in the center
-  const topWidth = laser.width * 1; // Adjust these values based on the size of your laser_top.png
+  // Calculate the width and height of the laserTopImage to match the laser size
+  const topWidth = laser.width * 1;
   const topHeight = topWidth * (laserTopImage.height / laserTopImage.width);
 
-  context.drawImage(
+  // Create a temporary canvas to draw the feathered center effect
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = topWidth;
+  tempCanvas.height = topHeight;
+  const tempCtx = tempCanvas.getContext('2d');
+
+  // Draw the center eye image onto the temporary canvas
+  tempCtx.drawImage(
     laserTopImage,
+    0,
+    0,
+    topWidth,
+    topHeight
+  );
+
+  // Create a radial gradient mask to apply a soft edge
+  const gradient = tempCtx.createRadialGradient(
+    topWidth / 2,
+    topHeight / 2,
+    0,
+    topWidth / 2,
+    topHeight / 2,
+    Math.min(topWidth, topHeight) / 2
+  );
+
+  // Define gradient colors (white in the center, transparent at the edges)
+  gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+  gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+  // Apply the gradient mask as a global composite operation
+  tempCtx.globalCompositeOperation = 'destination-in';
+  tempCtx.fillStyle = gradient;
+  tempCtx.fillRect(0, 0, topWidth, topHeight);
+
+  // Draw the feathered center image onto the main context
+  context.drawImage(
+    tempCanvas,
     -topWidth / 2,
     -topHeight / 2,
     topWidth,
@@ -825,6 +860,7 @@ function drawLaserCenter(laser, context) {
 
   context.restore();
 }
+
 
 function drawCanvas() {
   // Clear the canvas before drawing
