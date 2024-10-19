@@ -812,7 +812,7 @@ function drawLaserCenter(laser, context) {
   context.rotate(laser.rotation);
 
   // Draw the laser top image in the center
-  const topWidth = laser.width * 0.3; // Adjust these values based on the size of your laser_top.png
+  const topWidth = laser.width * 1; // Adjust these values based on the size of your laser_top.png
   const topHeight = topWidth * (laserTopImage.height / laserTopImage.width);
 
   context.drawImage(
