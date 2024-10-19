@@ -789,7 +789,7 @@ function drawCanvas() {
 function drawLaser(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.04;
+  const radius = laser.width * 0.02;
 
   context.save();
   context.translate(centerX, centerY);
@@ -818,7 +818,7 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.0407;
+  const radius = laser.width * 0.0207;
 
   context.save();
   context.translate(centerX, centerY);
