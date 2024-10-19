@@ -1,8 +1,13 @@
 const canvas = document.getElementById("meme-canvas");
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
 const laserImageTemplate = new Image();
 laserImageTemplate.src = "https://dmagafy-staging.netlify.app/laser_large.png";
 laserImageTemplate.crossOrigin = "anonymous";
+
+let laserTopImage = new Image();
+laserTopImage.src = "https://dmagafy-staging.netlify.app/laser_top.png"; // Replace with your actual URL
+laserTopImage.crossOrigin = "anonymous";
 
 let canvasImage = new Image();
 let lasers = [];
@@ -790,65 +795,36 @@ function drawCanvas() {
   });
 }
 
-
 function drawLaser(laser, context) {
-  const centerX = laser.x + laser.width / 2;
-  const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.021;
-
   context.save();
-  context.translate(centerX, centerY);
+  context.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
   context.rotate(laser.rotation);
 
-  // Create a temporary canvas for the laser image
-  const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = laser.width;
-  tempCanvas.height = laser.height;
-  const tempCtx = tempCanvas.getContext('2d');
-
-  // Draw the laser image onto the temporary canvas
-  tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
-
-  // Clear the center circle from the temporary canvas
-  tempCtx.globalCompositeOperation = 'destination-out';
-  tempCtx.beginPath();
-  tempCtx.arc(laser.width / 2, laser.height / 2, radius, 0, Math.PI * 2);
-  tempCtx.fill();
-
-  // Draw the modified laser image (with hole) onto the main context
-  context.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
+  // Draw the laser image onto the main context (no cutout here anymore)
+  context.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
+  
   context.restore();
 }
 
 function drawLaserCenter(laser, context) {
-  const centerX = laser.x + laser.width / 2;
-  const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.0222;
-
   context.save();
-  context.translate(centerX, centerY);
+  context.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
   context.rotate(laser.rotation);
 
-  // Create a temporary canvas for the center
-  const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = laser.width;
-  tempCanvas.height = laser.height;
-  const tempCtx = tempCanvas.getContext('2d');
+  // Draw the laser top image in the center
+  const topWidth = laser.width * 0.3; // Adjust these values based on the size of your laser_top.png
+  const topHeight = topWidth * (laserTopImage.height / laserTopImage.width);
 
-  // Draw the full laser image
-  tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
+  context.drawImage(
+    laserTopImage,
+    -topWidth / 2,
+    -topHeight / 2,
+    topWidth,
+    topHeight
+  );
 
-  // Create a clipping path for the center circle
-  tempCtx.globalCompositeOperation = 'destination-in';
-  tempCtx.beginPath();
-  tempCtx.arc(laser.width / 2, laser.height / 2, radius, 0, Math.PI * 2);
-  tempCtx.fill();
-
-  // Draw the center onto the main context
-  context.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
   context.restore();
 }
-
 
 function drawCanvas() {
   // Clear the canvas before drawing

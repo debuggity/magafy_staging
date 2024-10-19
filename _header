@@ -1,6 +1,9 @@
 /laser_large.png
   Access-Control-Allow-Origin: *
 
+/laser_top.png
+  Access-Control-Allow-Origin: *
+
 /hat_front_1.png
   Access-Control-Allow-Origin: *
 
@@ -18,3 +21,4 @@
 
 /lightning.png
   Access-Control-Allow-Origin: *
+
