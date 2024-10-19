@@ -790,26 +790,34 @@ function drawCanvas() {
   });
 }
 
+function isCloseToColor(r, g, b, target, threshold = 50) {
+  const distance = Math.sqrt(
+    Math.pow(r - target[0], 2) + 
+    Math.pow(g - target[1], 2) + 
+    Math.pow(b - target[2], 2)
+  );
+  return distance < threshold;
+}
 
-function maskWhitePixels(tempCtx, width, height, whiteThreshold = 240) {
-  // Get the image data of the laser
+function maskWhitePixels(tempCtx, width, height) {
   const imageData = tempCtx.getImageData(0, 0, width, height);
   const data = imageData.data;
+  const whiteColor = [255, 255, 255];
+  const additionalColor = [228, 183, 255];
+  const whiteThreshold = 50; // Distance threshold to consider a pixel "white" or close to our additional color
 
-  // Identify white pixels and include them in the mask
   for (let i = 0; i < data.length; i += 4) {
     const red = data[i];
     const green = data[i + 1];
     const blue = data[i + 2];
 
-    // Check if the pixel is close to white
-    if (red > whiteThreshold && green > whiteThreshold && blue > whiteThreshold) {
-      // Set the alpha channel to 0 to mask the white pixel
-      data[i + 3] = 0;
+    // Mask out pixels that are close to white or the additional target color
+    if (isCloseToColor(red, green, blue, whiteColor, whiteThreshold) ||
+        isCloseToColor(red, green, blue, additionalColor, whiteThreshold)) {
+      data[i + 3] = 0; // Set alpha channel to 0 (fully transparent)
     }
   }
 
-  // Put the modified image data back into the context
   tempCtx.putImageData(imageData, 0, 0);
 }
 
@@ -822,25 +830,23 @@ function drawLaser(laser, context) {
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
 
-  // Create a temporary canvas for the laser image
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d');
 
-  // Draw the laser image onto the temporary canvas
   tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
 
-  // Mask white pixels
+  // Mask out white pixels and those close to the additional target color
   maskWhitePixels(tempCtx, laser.width, laser.height);
 
-  // Clear the center circle from the temporary canvas
+  // Draw the radial cutout (eye's center)
   tempCtx.globalCompositeOperation = 'destination-out';
   tempCtx.beginPath();
   tempCtx.arc(laser.width / 2, laser.height / 2, radius, 0, Math.PI * 2);
   tempCtx.fill();
 
-  // Draw the modified laser image (with hole and white pixels masked) onto the main context
+  // Draw the modified laser image onto the main context
   context.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
   context.restore();
 }
@@ -848,22 +854,20 @@ function drawLaser(laser, context) {
 function drawLaserCenter(laser, context) {
   const centerX = laser.x + laser.width / 2;
   const centerY = laser.y + laser.height / 2;
-  const radius = laser.width * 0.0212; // Slightly larger radius if needed
+  const radius = laser.width * 0.0212;
 
   context.save();
   context.translate(centerX, centerY);
   context.rotate(laser.rotation);
 
-  // Create a temporary canvas for the center
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = laser.width;
   tempCanvas.height = laser.height;
   const tempCtx = tempCanvas.getContext('2d');
 
-  // Draw the full laser image onto the temporary canvas
   tempCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
 
-  // Mask white pixels
+  // Mask out white pixels and those close to the additional target color
   maskWhitePixels(tempCtx, laser.width, laser.height);
 
   // Create a clipping path for the center circle
@@ -872,12 +876,10 @@ function drawLaserCenter(laser, context) {
   tempCtx.arc(laser.width / 2, laser.height / 2, radius, 0, Math.PI * 2);
   tempCtx.fill();
 
-  // Draw the center onto the main context
+  // Draw the modified center onto the main context
   context.drawImage(tempCanvas, -laser.width / 2, -laser.height / 2);
   context.restore();
 }
-
-
 
 function drawCanvas() {
   // Clear the canvas before drawing
