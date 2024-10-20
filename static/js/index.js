@@ -1058,39 +1058,3 @@ document.getElementById("remove-all-hats-button").addEventListener("click", func
   hats = [];
   drawCanvas();
 });
-
-const fullScreenButton = document.getElementById('full-screen-button');
-const canvasContainer = document.getElementById('canvas-container');
-let isFullScreen = false;
-
-fullScreenButton.addEventListener('click', function () {
-  if (!isFullScreen) {
-    // Enter full-screen mode
-    canvasContainer.classList.add('full-screen');
-    fullScreenButton.textContent = 'Exit Full Screen';
-    isFullScreen = true;
-  } else {
-    // Exit full-screen mode
-    canvasContainer.classList.remove('full-screen');
-    fullScreenButton.textContent = 'Enter Full Screen';
-    isFullScreen = false;
-  }
-});
-
-// Exit full-screen mode when pressing the back button or Escape key on mobile/keyboard
-document.addEventListener('keydown', function (e) {
-  if (isFullScreen && (e.key === 'Escape' || e.key === 'Backspace')) {
-    canvasContainer.classList.remove('full-screen');
-    fullScreenButton.textContent = 'Enter Full Screen';
-    isFullScreen = false;
-  }
-});
-
-// Also detect if the user clicks outside of the canvas to exit full screen
-document.addEventListener('click', function (e) {
-  if (isFullScreen && !canvasContainer.contains(e.target)) {
-    canvasContainer.classList.remove('full-screen');
-    fullScreenButton.textContent = 'Enter Full Screen';
-    isFullScreen = false;
-  }
-});
