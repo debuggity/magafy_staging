@@ -813,7 +813,7 @@ function drawLaserCenter(laser, context) {
 
   // Calculate the width and height of the laserTopImage to match the laser size
   const topWidth = laser.width;
-  const topHeight = laser.height * (laserTopImage.height / laserTopImage.width);
+  const topHeight = laser.height;
 
   // Draw the laser center directly, without additional temporary canvas or composite operations
   context.drawImage(
