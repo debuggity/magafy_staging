@@ -1059,41 +1059,38 @@ document.getElementById("remove-all-hats-button").addEventListener("click", func
   drawCanvas();
 });
 
-// Full-Screen Button Event Listener
-document.getElementById('fullscreen-button').addEventListener('click', function() {
-  const canvasContainer = document.getElementById('canvas-container');
-  if (!document.fullscreenElement) {
+const fullScreenButton = document.getElementById('full-screen-button');
+const canvasContainer = document.getElementById('canvas-container');
+let isFullScreen = false;
+
+fullScreenButton.addEventListener('click', function () {
+  if (!isFullScreen) {
     // Enter full-screen mode
-    canvasContainer.requestFullscreen().catch(err => {
-      alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-    });
+    canvasContainer.classList.add('full-screen');
+    fullScreenButton.textContent = 'Exit Full Screen';
+    isFullScreen = true;
   } else {
     // Exit full-screen mode
-    document.exitFullscreen();
+    canvasContainer.classList.remove('full-screen');
+    fullScreenButton.textContent = 'Enter Full Screen';
+    isFullScreen = false;
   }
 });
 
-// Update Button Text Based on Full-Screen State
-document.addEventListener('fullscreenchange', function() {
-  const fullscreenButton = document.getElementById('fullscreen-button');
-  if (document.fullscreenElement) {
-    // In full-screen mode
-    fullscreenButton.textContent = 'Exit Full Screen';
-    // Adjust canvas size
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    drawCanvas(); // Redraw to adjust to new size
-  } else {
-    // Not in full-screen mode
-    fullscreenButton.textContent = 'Full Screen';
-    // Reset canvas size
-    const scale = Math.min(
-      MAX_WIDTH / canvasImage.width,
-      MAX_HEIGHT / canvasImage.height,
-      1
-    );
-    canvas.width = canvasImage.width * scale;
-    canvas.height = canvasImage.height * scale;
-    drawCanvas(); // Redraw to adjust to new size
+// Exit full-screen mode when pressing the back button or Escape key on mobile/keyboard
+document.addEventListener('keydown', function (e) {
+  if (isFullScreen && (e.key === 'Escape' || e.key === 'Backspace')) {
+    canvasContainer.classList.remove('full-screen');
+    fullScreenButton.textContent = 'Enter Full Screen';
+    isFullScreen = false;
+  }
+});
+
+// Also detect if the user clicks outside of the canvas to exit full screen
+document.addEventListener('click', function (e) {
+  if (isFullScreen && !canvasContainer.contains(e.target)) {
+    canvasContainer.classList.remove('full-screen');
+    fullScreenButton.textContent = 'Enter Full Screen';
+    isFullScreen = false;
   }
 });
