@@ -390,6 +390,22 @@ h1 {
   margin-bottom: 5px;                /* Add some space below for alignment */
 }
 
+#canvas-container:fullscreen {
+  width: 100%;
+  height: 100%;
+}
+
+#canvas-container:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+}
+
+#meme-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+
 /* Adjustments for mobile */
 @media (max-width: 700px) {
 

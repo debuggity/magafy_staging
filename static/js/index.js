@@ -1058,3 +1058,42 @@ document.getElementById("remove-all-hats-button").addEventListener("click", func
   hats = [];
   drawCanvas();
 });
+
+// Full-Screen Button Event Listener
+document.getElementById('fullscreen-button').addEventListener('click', function() {
+  const canvasContainer = document.getElementById('canvas-container');
+  if (!document.fullscreenElement) {
+    // Enter full-screen mode
+    canvasContainer.requestFullscreen().catch(err => {
+      alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+    });
+  } else {
+    // Exit full-screen mode
+    document.exitFullscreen();
+  }
+});
+
+// Update Button Text Based on Full-Screen State
+document.addEventListener('fullscreenchange', function() {
+  const fullscreenButton = document.getElementById('fullscreen-button');
+  if (document.fullscreenElement) {
+    // In full-screen mode
+    fullscreenButton.textContent = 'Exit Full Screen';
+    // Adjust canvas size
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    drawCanvas(); // Redraw to adjust to new size
+  } else {
+    // Not in full-screen mode
+    fullscreenButton.textContent = 'Full Screen';
+    // Reset canvas size
+    const scale = Math.min(
+      MAX_WIDTH / canvasImage.width,
+      MAX_HEIGHT / canvasImage.height,
+      1
+    );
+    canvas.width = canvasImage.width * scale;
+    canvas.height = canvasImage.height * scale;
+    drawCanvas(); // Redraw to adjust to new size
+  }
+});
