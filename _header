@@ -16,6 +16,12 @@
 /hat_right.png
   Access-Control-Allow-Origin: *
 
+/goth-front-hat.png
+  Access-Control-Allow-Origin: *
+
+/goth-side-hat.png
+  Access-Control-Allow-Origin: *
+
 /AmericanFlag.png
   Access-Control-Allow-Origin: *
 
