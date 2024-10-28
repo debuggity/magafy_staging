@@ -288,8 +288,9 @@ h1 {
 }
 
 .hat-option {
-  width: 45px;  /* Larger hat options */
+  width: auto;
   height: auto;
+  max-width: 60px;
   cursor: pointer;
   border: 2px solid transparent;
   transition: transform 0.2s, border-color 0.3s;
