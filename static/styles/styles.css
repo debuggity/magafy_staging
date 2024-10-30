@@ -306,7 +306,7 @@ h1 {
 
 .hat-option:hover,
 .hat-option.selected {
-  border: 2px solid #ff0000;
+  border: 2px solid #ff000023;
   transform: scale(1.1);
   box-shadow: 0 0 10px 5px rgba(255, 0, 0, 0.6); /* Red glow effect */
 }
