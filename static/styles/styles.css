@@ -285,17 +285,39 @@ h1 {
 .hat-options {
   display: grid;
   grid-template-columns: repeat(4, 1fr); /* 4 hats per row */
-  gap: 15px; /* Space between each hat */
-  justify-items: center; /* Center each hat within its grid cell */
+  gap: 15px;
+  justify-items: center;
 }
 
 .hat-option {
-  width: 100%; /* Full width of the grid cell */
-  height: auto; /* Maintain original aspect ratio */
-  max-width: 80px; /* Optional: limit max width if hats are very large */
+  width: 100%; 
+  height: auto;
+  max-width: 80px;  
+  max-height: 80px; 
   cursor: pointer;
   border: 2px solid transparent;
   transition: transform 0.2s, border-color 0.3s;
+  object-fit: contain;
+  position: relative; /* Required for positioning the pseudo-element */
+}
+
+.hat-option::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: red;
+  border-radius: 8px; /* Adjust if you want rounded corners */
+  filter: blur(8px); /* Creates the glow effect */
+  opacity: 0; /* Start invisible */
+  transition: opacity 0.3s ease; /* Smooth fade-in on hover */
+  z-index: -1; /* Ensure it stays behind the hat image */
+}
+
+.hat-option:hover::before {
+  opacity: 1; /* Show the glow on hover */
 }
 
 .hat-option:hover,
@@ -303,6 +325,7 @@ h1 {
   border: 2px solid #ff0000;
   transform: scale(1.1);
 }
+
 
 #contrast-slider {
   background: linear-gradient(to right, #000000, #FFFFFF);
