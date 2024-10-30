@@ -402,53 +402,68 @@ h1 {
   margin-bottom: 5px;                /* Add some space below for alignment */
 }
 
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 /* Header Styles */
 .header {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px 30px;
-  background-color: #111;
-  border-bottom: 2px solid #f3040d;
+  background-color: transparent; /* Fully transparent */
+  position: fixed; /* Fixes the header to the top */
+  top: 0;
+  left: 0;
+  z-index: 1000; /* Ensures the header is on top of other content */
+}
+
+/* Left Side: Title and Link */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Space between title and link */
 }
 
 .header-title {
   font-size: 24px;
-  color: #f3040d; /* Matching the red tone */
-  margin: 0;
-}
-
-.header-right {
-  display: flex;
-  gap: 20px;
-  align-items: center;
+  color: white; /* White font color */
+  text-decoration: underline; /* White underline for title */
 }
 
 .header-link {
-  color: #e3a61d; /* Slight yellow-orange tone */
+  color: white; /* White font color */
   text-decoration: none;
   font-size: 16px;
   transition: color 0.3s;
 }
 
 .header-link:hover {
-  color: #f3040d; /* Highlight on hover */
+  color: #e3a61d; /* Slight yellow-orange tone on hover */
 }
 
+/* Right Side: Buy Button */
 .buy-button {
   padding: 10px 20px;
-  background-color: #f3040d;
+  background-color: #f3040d; /* Red button color */
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 16px;
   transition: background-color 0.3s, transform 0.3s;
 }
 
 .buy-button:hover {
-  background-color: #e3a61d;
-  transform: scale(1.05);
+  background-color: #e3a61d; /* Change to yellow-orange on hover */
+  transform: scale(1.05); /* Slight scale for hover effect */
 }
+
 
 
 /* Adjustments for mobile */
