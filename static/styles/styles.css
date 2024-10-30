@@ -292,40 +292,19 @@ h1 {
 .hat-option {
   width: 100%; 
   height: auto;
-  max-width: 80px;  
-  max-height: 80px; 
+  max-width: 80px;
+  max-height: 80px;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: transform 0.2s, border-color 0.3s;
+  transition: transform 0.2s, border-color 0.3s, box-shadow 0.3s;
   object-fit: contain;
-  position: relative; /* Required for positioning the pseudo-element */
 }
 
-.hat-option::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: red;
-  border-radius: 8px; /* Adjust if you want rounded corners */
-  filter: blur(8px); /* Creates the glow effect */
-  opacity: 0; /* Start invisible */
-  transition: opacity 0.3s ease; /* Smooth fade-in on hover */
-  z-index: -1; /* Ensure it stays behind the hat image */
-}
-
-.hat-option:hover::before {
-  opacity: 1; /* Show the glow on hover */
-}
-
-.hat-option:hover,
-.hat-option.selected {
+.hat-option:hover {
   border: 2px solid #ff0000;
   transform: scale(1.1);
+  box-shadow: 0 0 10px 5px rgba(255, 0, 0, 0.6); /* Red glow effect */
 }
-
 
 #contrast-slider {
   background: linear-gradient(to right, #000000, #FFFFFF);
