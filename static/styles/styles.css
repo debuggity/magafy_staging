@@ -402,6 +402,44 @@ h1 {
   margin-bottom: 5px;                /* Add some space below for alignment */
 }
 
+#main-header {
+  width: 100%;
+  padding: 20px;
+  background-color: #111; /* Dark background to match the theme */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #E3A61D; /* Adds a border for visual separation */
+}
+
+.header-left a {
+  color: #f3040d; /* Bright red color for the link */
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s;
+}
+
+.header-left a:hover {
+  color: #ff6600; /* Lighter red/orange when hovering for a highlight effect */
+}
+
+.header-right h1 {
+  color: white;
+  font-size: 24px;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px; /* Slightly increase letter spacing for a modern look */
+}
+
+#pfp-title {
+  font-family: 'Arial', sans-serif; /* Use a clean font for readability */
+}
+
+#darkmaga-link {
+  font-weight: bold;
+  font-family: 'Arial', sans-serif;
+}
+
 /* Adjustments for mobile */
 @media (max-width: 700px) {
 
