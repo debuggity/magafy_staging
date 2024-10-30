@@ -296,6 +296,10 @@ h1 {
   max-height: 80px;
   cursor: pointer;
   border: 2px solid transparent;
+  background-color: #8d6565; /* Set your preferred background color */
+  border-radius: 10px; /* Optional: adds rounded corners */
+  padding: 5px; /* Optional: space between image and border */
+  box-sizing: border-box;
   transition: transform 0.2s, border-color 0.3s, box-shadow 0.3s;
   object-fit: contain;
 }
