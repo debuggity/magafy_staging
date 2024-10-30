@@ -284,19 +284,17 @@ h1 {
 
 .hat-options {
   display: flex;
-  flex-wrap: wrap; /* Allows wrapping to multiple rows */
+  flex-wrap: wrap;
   gap: 15px;
-  justify-content: center; /* Centers the items in each row */
+  justify-content: center;
 }
 
 .hat-option {
-  max-height: 60px;
-  height: auto;
-  width: auto;
+  width: calc(25% - 15px); /* Allows 4 hats per row with spacing */
+  height: auto; /* Maintains original aspect ratio */
   cursor: pointer;
   border: 2px solid transparent;
   transition: transform 0.2s, border-color 0.3s;
-  flex: 1 1 45%; /* Adjusts each hat to take up about half the row */
 }
 
 .hat-option:hover,
@@ -304,6 +302,7 @@ h1 {
   border: 2px solid #ff0000;
   transform: scale(1.1);
 }
+
 
 #contrast-slider {
   background: linear-gradient(to right, #000000, #FFFFFF);
