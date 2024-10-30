@@ -434,12 +434,14 @@ h1 {
   font-size: 24px;
   color: white; /* White font color */
   text-decoration: underline; /* White underline for title */
+  margin: 0;
 }
 
 .header-link {
   color: white; /* White font color */
+  font-size: 24px; /* Match the title font size */
   text-decoration: none;
-  font-size: 16px;
+  line-height: 1; /* Ensures vertical alignment with title */
   transition: color 0.3s;
 }
 
@@ -455,7 +457,7 @@ h1 {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 12px;
   transition: background-color 0.3s, transform 0.3s;
 }
 
@@ -463,8 +465,6 @@ h1 {
   background-color: #e3a61d; /* Change to yellow-orange on hover */
   transform: scale(1.05); /* Slight scale for hover effect */
 }
-
-
 
 /* Adjustments for mobile */
 @media (max-width: 700px) {
