@@ -402,43 +402,54 @@ h1 {
   margin-bottom: 5px;                /* Add some space below for alignment */
 }
 
-#main-header {
-  width: 100%;
-  padding: 20px;
-  background-color: #111; /* Dark background to match the theme */
+/* Header Styles */
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #E3A61D; /* Adds a border for visual separation */
+  padding: 15px 30px;
+  background-color: #111;
+  border-bottom: 2px solid #f3040d;
 }
 
-.header-left a {
-  color: #f3040d; /* Bright red color for the link */
+.header-title {
+  font-size: 24px;
+  color: #f3040d; /* Matching the red tone */
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.header-link {
+  color: #e3a61d; /* Slight yellow-orange tone */
   text-decoration: none;
-  font-size: 18px;
+  font-size: 16px;
   transition: color 0.3s;
 }
 
-.header-left a:hover {
-  color: #ff6600; /* Lighter red/orange when hovering for a highlight effect */
+.header-link:hover {
+  color: #f3040d; /* Highlight on hover */
 }
 
-.header-right h1 {
+.buy-button {
+  padding: 10px 20px;
+  background-color: #f3040d;
   color: white;
-  font-size: 24px;
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 1px; /* Slightly increase letter spacing for a modern look */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
 }
 
-#pfp-title {
-  font-family: 'Arial', sans-serif; /* Use a clean font for readability */
+.buy-button:hover {
+  background-color: #e3a61d;
+  transform: scale(1.05);
 }
 
-#darkmaga-link {
-  font-weight: bold;
-  font-family: 'Arial', sans-serif;
-}
 
 /* Adjustments for mobile */
 @media (max-width: 700px) {
