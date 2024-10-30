@@ -296,7 +296,7 @@ h1 {
   max-height: 80px;
   cursor: pointer;
   border: 2px solid transparent;
-  background-color: rgba(73, 41, 41, 0.7); /* Semi-transparent background */
+  background-color: rgba(73, 63, 63, 0.7); /* Semi-transparent background */
   border-radius: 10px; /* Optional: rounded corners */
   padding: 5px; /* Space between image and border */
   box-sizing: border-box;
