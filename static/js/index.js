@@ -65,48 +65,50 @@ function canvasToClient(canvas, x, y) {
   };
 }
 
-let magnifierUpdateScheduled = false;
-
+// Function to update the magnifier's background using the offscreen canvas
 function updateMagnifierBackground(x, y) {
-  if (magnifierUpdateScheduled) return;
-  magnifierUpdateScheduled = true;
+  // Determine the center of the selected object
+  let objectCenterX, objectCenterY;
+  if (currentLaser) {
+    objectCenterX = currentLaser.x + currentLaser.width / 2;
+    objectCenterY = currentLaser.y + currentLaser.height / 2;
+  } else if (currentHat) {
+    objectCenterX = currentHat.x + currentHat.width / 2;
+    objectCenterY = currentHat.y + currentHat.height / 2;
+  } else {
+    return; // No object selected
+  }
 
-  requestAnimationFrame(() => {
-    magnifierUpdateScheduled = false;
+  // Calculate the area to capture from the main canvas
+  const captureX = objectCenterX - (magnifierSize / 2 - 25) / magnification;
+  const captureY = objectCenterY - (magnifierSize / 2 - 25) / magnification;
 
-    // Your current magnifier code
-    let objectCenterX, objectCenterY;
-    if (currentLaser) {
-      objectCenterX = currentLaser.x + currentLaser.width / 2;
-      objectCenterY = currentLaser.y + currentLaser.height / 2;
-    } else if (currentHat) {
-      objectCenterX = currentHat.x + currentHat.width / 2;
-      objectCenterY = currentHat.y + currentHat.height / 2;
-    } else {
-      return; // No object selected
-    }
+  // Clear the offscreen canvas
+  offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
 
-    const captureX = objectCenterX - (magnifierSize / 2) / magnification;
-    const captureY = objectCenterY - (magnifierSize / 2) / magnification;
+  // Draw the captured area onto the offscreen canvas, scaling it up
+  offscreenCtx.drawImage(
+    canvas,
+    captureX,
+    captureY,
+    magnifierSize / magnification,
+    magnifierSize / magnification,
+    0,
+    0,
+    magnifierSize * magnification,
+    magnifierSize * magnification
+  );
 
-    offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
-    offscreenCtx.drawImage(
-      canvas,
-      captureX,
-      captureY,
-      magnifierSize / magnification,
-      magnifierSize / magnification,
-      0,
-      0,
-      magnifierSize * magnification,
-      magnifierSize * magnification
-    );
+  // Update the magnifier's background with the offscreen canvas
+  //magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`;
+  //magnifier.style.backgroundSize = `${magnifierSize * magnification}px ${magnifierSize * magnification}px`;
+  
+  // Use the offscreen canvas directly instead of generating a data URL
+  // Apply the offscreen canvas as a background to the magnifier
+  magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`; // Optional if direct application isn't possible
+  magnifier.style.backgroundSize = `${magnifierSize * magnification}px ${magnifierSize * magnification}px`;
 
-    magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`;
-    magnifier.style.backgroundSize = `${magnifierSize * magnification}px ${magnifierSize * magnification}px`;
-  });
 }
-
 
 // Function to show the magnifier, centered on the object's center but avoiding the touch point
 function showMagnifier(x, y) {
