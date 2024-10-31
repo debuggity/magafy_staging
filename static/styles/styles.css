@@ -500,12 +500,12 @@ h1 {
   .header-title {
     font-size: 14px; /* Reduce font size for mobile */
     padding-left: 0; /* Remove extra padding on smaller screens */
-    padding-right: 10px;
+    padding-right: 12px;
     text-underline-offset: 8px; /* Adjust underline offset */
   }
 
   .header-left {
-    gap: 8px; /* Reduce gap between title and link on mobile */
+    gap: 10px; /* Reduce gap between title and link on mobile */
   }
 
   .header-link {
