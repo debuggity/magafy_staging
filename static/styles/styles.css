@@ -552,10 +552,10 @@ h1 {
     font-size: 14px; /* Adjust font size for better readability */
   }
 
-  .tab-container {
+  /*.tab-container {
     max-width: 85%;
     padding: 20px;
-  }
+  }*/
 
   /* Center the tab content on mobile */
   .tab-content.current {
