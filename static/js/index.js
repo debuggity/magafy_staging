@@ -45,7 +45,7 @@ const offscreenCtx = offscreenCanvas.getContext('2d');
 
 // Set magnifier properties
 const magnifierSize = 150; // Diameter in pixels
-const magnification = 3;   // Zoom level
+const magnification = 1.5;   // Zoom level
 
 offscreenCanvas.width = magnifierSize * magnification;
 offscreenCanvas.height = magnifierSize * magnification;
