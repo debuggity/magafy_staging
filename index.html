@@ -74,6 +74,15 @@
       <div class="controls-container">
         <div class="hat-container">
           <div class="hat-selection">
+            <div class="control">
+              <span>Resize Hat</span>
+              <input type="range" id="hat-resize-slider" min="0.2" max="2" step="0.05" value="1" />
+            </div>
+            <div class="control">
+              <span>Rotate Hat</span>
+              <input type="range" id="hat-rotate-slider" min="-180" max="180" step="1" value="0" />
+            </div>
+            <br>
             <span>Select Hat</span>
             <div class="hat-options">
               <img class="hat-option" src="hat_front_1.png" alt="Hat 1" data-hat="hat1" />
@@ -84,15 +93,7 @@
               <img class="hat-option" src="goth-side-hat.png" alt="Goth Left" data-hat="gothLeft" />
             </div>
           </div>
-          <br>
-          <div class="control">
-            <span>Resize Hat</span>
-            <input type="range" id="hat-resize-slider" min="0.2" max="2" step="0.05" value="1" />
-          </div>
-          <div class="control">
-            <span>Rotate Hat</span>
-            <input type="range" id="hat-rotate-slider" min="-180" max="180" step="1" value="0" />
-          </div>
+          
           <div class="add-hat-button-container">
             <button id="add-hat-button">Add Hat</button>
           </div>
