@@ -106,7 +106,8 @@ function updateMagnifierBackground(x, y) {
 // Function to show the magnifier, centered on the object's center but avoiding the touch point
 function showMagnifier(x, y) {
   if (!currentLaser) {
-    return; // Only allow magnification for lasers
+    hideMagnifier(); // Only show magnifier for lasers, hide it for hats
+    return;
   }
 
   magnifier.style.display = "block";
@@ -562,7 +563,7 @@ canvas.addEventListener("mouseup", function () {
   }
 });
 
-// Touch Start Event - Only shows magnifier for lasers
+// Touch Start Event - Shows magnifier only for lasers, but allows dragging for hats too
 canvas.addEventListener("touchstart", function (e) {
   e.preventDefault();
   const touch = e.touches[0];
@@ -599,19 +600,45 @@ canvas.addEventListener("touchstart", function (e) {
     }
   });
 
-  // Skip hats when checking for closest object, only magnify if laser is selected
-  if (currentLaser) {
+  // Identify the closest hat if no closer laser is found
+  hats.forEach((hat) => {
+    const centerX = hat.x + hat.width / 2;
+    const centerY = hat.y + hat.height / 2;
+    const distance = Math.sqrt(
+      Math.pow(touchX - centerX, 2) + Math.pow(touchY - centerY, 2)
+    );
+
+    if (
+      touchX > hat.x &&
+      touchX < hat.x + hat.width &&
+      touchY > hat.y &&
+      touchY < hat.y + hat.height &&
+      distance < closestDistance
+    ) {
+      closestDistance = distance;
+      currentHat = hat;
+      currentLaser = null;
+      offsetX = touchX - hat.x;
+      offsetY = touchY - hat.y;
+    }
+  });
+
+  // Set dragging flag and show magnifier only for lasers
+  if (currentLaser || currentHat) {
     isDragging = true;
 
-    // Calculate the center of the selected laser
-    const objectCenterX = currentLaser.x + currentLaser.width / 2;
-    const objectCenterY = currentLaser.y + currentLaser.height / 2;
+    // Show magnifier only if a laser is selected
+    if (currentLaser) {
+      // Calculate the center of the selected laser
+      const objectCenterX = currentLaser.x + currentLaser.width / 2;
+      const objectCenterY = currentLaser.y + currentLaser.height / 2;
 
-    // Convert canvas coordinates to client (screen) coordinates
-    const clientPos = canvasToClient(canvas, objectCenterX, objectCenterY);
+      // Convert canvas coordinates to client (screen) coordinates
+      const clientPos = canvasToClient(canvas, objectCenterX, objectCenterY);
 
-    // Show the magnifier centered on the laser's center
-    showMagnifier(clientPos.clientX, clientPos.clientY);
+      // Show the magnifier centered on the laser's center
+      showMagnifier(clientPos.clientX, clientPos.clientY);
+    }
   }
 });
 
@@ -658,7 +685,7 @@ canvas.addEventListener("touchmove", function (e) {
   }
 });
 
-// Touch End Event
+// Touch End Event - Hide magnifier regardless of item type
 canvas.addEventListener("touchend", function () {
   if (isDragging) {
     if (currentLaser) {
