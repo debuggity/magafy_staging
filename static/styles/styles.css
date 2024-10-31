@@ -114,6 +114,7 @@ label:active {
   background-color: #161616;
   border-radius: 2px;
   border: 2px solid #000000;
+  margin-bottom: 2rem; /* Add some space at the bottom */
 }
 
 /* Tab links at the top */
@@ -153,6 +154,7 @@ label:active {
 .tab-content {
   display: none;
   justify-content: center;
+  min-height: 0; /* Prevent unwanted expansion */
 }
 
 .tab-content.current {
