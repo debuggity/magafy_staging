@@ -489,7 +489,7 @@ h1 {
   }
 
   .header-left {
-    gap: 5px; /* Reduce gap between title and link on mobile */
+    gap: 8px; /* Reduce gap between title and link on mobile */
   }
 
   .header-link {
@@ -576,7 +576,15 @@ h1 {
     padding: 10px 20px;  /* Adjust padding for smaller screens */
   }
 
+  .hat-options {
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); /* Responsive grid */
+    justify-items: start; /* Align items to the left */
+    gap: 10px; /* Slightly reduced gap for mobile */
+    width: 100%; /* Ensure full width */
+    padding-left: 0; /* Remove any left padding */
+  }
+  
   .hat-option {
-    width: 50px;  /* Slightly smaller hat options for mobile */
+    justify-self: start; /* Ensure each hat aligns to the left */
   }
 }
