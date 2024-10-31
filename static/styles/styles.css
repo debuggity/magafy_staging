@@ -115,6 +115,7 @@ label:active {
   border-radius: 2px;
   border: 2px solid #000000;
   margin-bottom: 2rem; /* Add some space at the bottom */
+  padding: 20px;
 }
 
 /* Tab links at the top */
@@ -497,9 +498,9 @@ h1 {
   }
 
   .header-title {
-    font-size: 15px; /* Reduce font size for mobile */
+    font-size: 14px; /* Reduce font size for mobile */
     padding-left: 0; /* Remove extra padding on smaller screens */
-    padding-right: 2px;
+    padding-right: 10px;
     text-underline-offset: 8px; /* Adjust underline offset */
   }
 
@@ -508,7 +509,7 @@ h1 {
   }
 
   .header-link {
-    font-size: 15px; /* Reduce font size for better fit */
+    font-size: 14px; /* Reduce font size for better fit */
   }
 
   .buy-button {
