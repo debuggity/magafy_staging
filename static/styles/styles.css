@@ -1,4 +1,7 @@
+/* Ensure the background fills the viewport */
 body {
+  height: 100%;
+  margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -6,9 +9,7 @@ body {
   background-size: cover;                    /* Ensures image covers entire viewport */
   background-position: center;               /* Centers background image */
   background-repeat: no-repeat;              /* Prevents tiling of background image */
-  margin: 0;
 }
-
 
 #canvas-container {
   position: relative;
@@ -551,10 +552,10 @@ h1 {
 
   /* Center the canvas container */
   #canvas-container {
-    display: flex;
-    justify-content: center;
-    width: 100%; /* Full width to prevent overflow */
-    max-width: 100%;
+    position: relative;
+    margin-top: calc(24px + 15px); /* Matches padding from .header to keep it aligned */
+    padding-top: 80px; /* Additional padding to ensure separation from header */
+    width: 100%; /* Makes sure canvas container fills the width */
   }
 
   button, label {
