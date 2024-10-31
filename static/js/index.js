@@ -79,8 +79,8 @@ function updateMagnifierBackground(x, y) {
   }
 
   // Calculate the area to capture from the main canvas
-  const captureX = objectCenterX - (magnifierSize / 2) / magnification;
-  const captureY = objectCenterY - (magnifierSize / 2) / magnification;
+  const captureX = objectCenterX - (magnifierSize / 2 + 25) / magnification;
+  const captureY = objectCenterY - (magnifierSize / 2 + 25) / magnification;
 
   // Clear the offscreen canvas
   offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
