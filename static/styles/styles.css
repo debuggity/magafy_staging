@@ -474,6 +474,21 @@ h1 {
   transform: scale(1.05) translateX(-80px); /* Slight scale and move left */
 }
 
+/* Magnifier Styles */
+#magnifier {
+  position: absolute;
+  pointer-events: none; /* Allows interactions to pass through */
+  width: 150px; /* Diameter of the magnifier */
+  height: 150px;
+  border: 3px solid #f3040d; /* Red border color */
+  border-radius: 50%;
+  overflow: hidden;
+  display: none; /* Hidden by default */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 1001; /* Above other elements */
+  background-repeat: no-repeat;
+  background-size: 300%; /* 3x zoom */
+}
 
 @media (max-width: 900px) {
   /* Header adjustments for mobile */

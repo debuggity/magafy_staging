@@ -39,6 +39,10 @@ let flagOpacity = .5; // Default opacity
 
 let u2netSession;
 
+const magnifier = document.getElementById("magnifier");
+const magnifierSize = 150; // Size in pixels
+const magnification = 3; // Zoom level
+
 // Load the ONNX model
 async function loadModel() {
   u2netSession = await ort.InferenceSession.create('./u2netp.onnx');
@@ -164,8 +168,70 @@ function postprocessONNXOutput(output, imageElement) {
   return newImgElement;
 }
 
+function showMagnifier(x, y) {
+  magnifier.style.display = "block";
+  const offset = 20; // Offset to position magnifier away from touch/cursor
 
+  let left = x + offset;
+  let top = y + offset;
 
+  // Prevent magnifier from going off-screen
+  if (left + magnifierSize > window.innerWidth) {
+    left = x - magnifierSize - offset;
+  }
+  if (top + magnifierSize > window.innerHeight) {
+    top = y - magnifierSize - offset;
+  }
+
+  magnifier.style.left = `${left}px`;
+  magnifier.style.top = `${top}px`;
+
+  // Capture the current state of the main canvas
+  const dataURL = canvas.toDataURL();
+  magnifier.style.backgroundImage = `url(${dataURL})`;
+
+  // Calculate background position to center the magnifier on the cursor/touch point
+  const canvasRect = canvas.getBoundingClientRect();
+  const canvasX = x - canvasRect.left;
+  const canvasY = y - canvasRect.top;
+
+  const bgX = -((canvasX * magnification) - magnifierSize / 2);
+  const bgY = -((canvasY * magnification) - magnifierSize / 2);
+
+  magnifier.style.backgroundPosition = `${bgX}px ${bgY}px`;
+}
+
+function moveMagnifier(x, y) {
+  const offset = 20; // Offset to position magnifier away from touch/cursor
+
+  let left = x + offset;
+  let top = y + offset;
+
+  // Prevent magnifier from going off-screen
+  if (left + magnifierSize > window.innerWidth) {
+    left = x - magnifierSize - offset;
+  }
+  if (top + magnifierSize > window.innerHeight) {
+    top = y - magnifierSize - offset;
+  }
+
+  magnifier.style.left = `${left}px`;
+  magnifier.style.top = `${top}px`;
+
+  // Update background position based on new cursor/touch position
+  const canvasRect = canvas.getBoundingClientRect();
+  const canvasX = x - canvasRect.left;
+  const canvasY = y - canvasRect.top;
+
+  const bgX = -((canvasX * magnification) - magnifierSize / 2);
+  const bgY = -((canvasY * magnification) - magnifierSize / 2);
+
+  magnifier.style.backgroundPosition = `${bgX}px ${bgY}px`;
+}
+
+function hideMagnifier() {
+  magnifier.style.display = "none";
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   // Set resize slider to the middle
@@ -446,7 +512,6 @@ canvas.addEventListener("mouseup", function () {
   }
 });
 
-// Add touch event listeners
 canvas.addEventListener("touchstart", function (e) {
   e.preventDefault();
   const touch = e.touches[0];
@@ -460,7 +525,7 @@ canvas.addEventListener("touchstart", function (e) {
   currentLaser = null;
   currentHat = null;
 
-  // Check lasers for closest
+  // Identify the closest laser
   lasers.forEach((laser) => {
     const centerX = laser.x + laser.width / 2;
     const centerY = laser.y + laser.height / 2;
@@ -477,13 +542,13 @@ canvas.addEventListener("touchstart", function (e) {
     ) {
       closestDistance = distance;
       currentLaser = laser;
-      currentHat = null; // Ensure no hat is selected if a laser is closer
+      currentHat = null;
       offsetX = mouseX - laser.x;
       offsetY = mouseY - laser.y;
     }
   });
 
-  // Check hats for closest, but only if no closer laser is found
+  // Identify the closest hat if no closer laser is found
   hats.forEach((hat) => {
     const centerX = hat.x + hat.width / 2;
     const centerY = hat.y + hat.height / 2;
@@ -500,7 +565,7 @@ canvas.addEventListener("touchstart", function (e) {
     ) {
       closestDistance = distance;
       currentHat = hat;
-      currentLaser = null; // Ensure no laser is selected if a hat is closer
+      currentLaser = null;
       offsetX = mouseX - hat.x;
       offsetY = mouseY - hat.y;
     }
@@ -508,6 +573,9 @@ canvas.addEventListener("touchstart", function (e) {
 
   if (currentLaser || currentHat) {
     isDragging = true;
+
+    // Show the magnifier at the initial touch position
+    showMagnifier(touch.clientX, touch.clientY);
   }
 });
 
@@ -521,6 +589,7 @@ canvas.addEventListener("touchmove", function (e) {
     const mouseX = (touch.clientX - rect.left) * scaleX;
     const mouseY = (touch.clientY - rect.top) * scaleY;
 
+    // Update positions of the selected element
     if (currentLaser) {
       currentLaser.x = mouseX - offsetX;
       currentLaser.y = mouseY - offsetY;
@@ -531,15 +600,29 @@ canvas.addEventListener("touchmove", function (e) {
       currentHat.y = mouseY - offsetY;
     }
 
-    drawCanvas();  // Redraw canvas with updated positions
+    drawCanvas();
+
+    // Move the magnifier with the touch point
+    moveMagnifier(touch.clientX, touch.clientY);
   }
 });
 
 canvas.addEventListener("touchend", function () {
-  if (currentLaser) {
-    currentLaser.isDragging = false;
+  if (isDragging) {
+    if (currentLaser) {
+      currentLaser.isDragging = false;
+    }
+
+    if (currentHat) {
+      currentHat.isDragging = false;
+    }
+
     isDragging = false;
     currentLaser = null;
+    currentHat = null;
+
+    // Hide the magnifier when dragging ends
+    hideMagnifier();
   }
 });
 
