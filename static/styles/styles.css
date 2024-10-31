@@ -482,23 +482,23 @@ h1 {
   }
 
   .header-title {
-    font-size: 16px; /* Reduce font size for mobile */
+    font-size: 15px; /* Reduce font size for mobile */
     padding-left: 0; /* Remove extra padding on smaller screens */
     padding-right: 2px;
     text-underline-offset: 8px; /* Adjust underline offset */
   }
 
   .header-left {
-    gap: 10px; /* Reduce gap between title and link on mobile */
+    gap: 5px; /* Reduce gap between title and link on mobile */
   }
 
   .header-link {
-    font-size: 16px; /* Reduce font size for better fit */
+    font-size: 15px; /* Reduce font size for better fit */
   }
 
   .buy-button {
-    padding: 10px 10px; /* Reduce padding for smaller button size */
-    font-size: 14px; /* Adjust font size */
+    padding: 10px 5px; /* Reduce padding for smaller button size */
+    font-size: 12px; /* Adjust font size */
     transform: translateX(0); /* Remove translate to keep centered */
   }
   .buy-button:hover {
