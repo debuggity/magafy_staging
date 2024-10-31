@@ -576,15 +576,37 @@ h1 {
     padding: 10px 20px;  /* Adjust padding for smaller screens */
   }
 
-  .hat-options {
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); /* Responsive grid */
-    justify-items: start; /* Align items to the left */
-    gap: 10px; /* Slightly reduced gap for mobile */
-    width: 100%; /* Ensure full width */
-    padding-left: 0; /* Remove any left padding */
+  .controls-container {
+    width: 100%;
+    align-items: center; /* Keep controls centered */
   }
-  
+
+  .control {
+    width: 100%; /* Full width for sliders */
+  }
+
+  /* Only the buttons should be left-aligned */
+  .background-options,
+  .button-container,
+  .add-hat-button-container {
+    align-self: flex-start;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .hat-options {
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    justify-items: start;
+    gap: 10px;
+    width: 100%;
+  }
+
   .hat-option {
-    justify-self: start; /* Ensure each hat aligns to the left */
+    justify-self: start;
+  }
+
+  /* Ensure sliders take full width */
+  .control input[type="range"] {
+    width: 100%;
   }
 }
