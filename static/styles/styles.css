@@ -13,7 +13,7 @@ body {
   align-items: center;
   background-image: url('/background.webp');
   background-size: cover;
-  background-position: center;
+  background-position: top center; /* Changed from 'center' to 'top center' */
   background-repeat: no-repeat;
   background-attachment: fixed; /* Keep background fixed while scrolling */
   position: relative; /* For proper stacking context */
