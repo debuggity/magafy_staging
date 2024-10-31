@@ -180,9 +180,6 @@ window.addEventListener('DOMContentLoaded', () => {
 document.getElementById("image-upload").addEventListener("change", function (e) {
   const reader = new FileReader();
   reader.onload = function (event) {
-      // Hide any previous titles or placeholders
-      document.getElementById("h1-title").style.display = "none";
-      
       // Reset the flag and mask state when a new image is uploaded
       flagApplied = false;
       savedMaskImage = null;
@@ -659,7 +656,6 @@ window.addEventListener("paste", function (e) {
       const file = items[i].getAsFile();
       const reader = new FileReader();
       reader.onload = function (event) {
-        document.getElementById("h1-title").style.display = "none";
         canvasImage.onload = function () {
           originalImageWidth = canvasImage.width;
           originalImageHeight = canvasImage.height;
@@ -692,7 +688,6 @@ canvas.addEventListener("drop", function (e) {
   if (file && file.type.indexOf("image") !== -1) {
     const reader = new FileReader();
     reader.onload = function (event) {
-      document.getElementById("h1-title").style.display = "none";
       canvasImage.onload = function () {
         originalImageWidth = canvasImage.width;
         originalImageHeight = canvasImage.height;
