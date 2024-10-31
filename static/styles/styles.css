@@ -431,15 +431,19 @@ h1 {
 }
 
 .header-title {
+  font-family: 'Inter', sans-serif; /* Apply Inter font */
   font-size: 24px;
-  color: white; /* White font color */
+  color: #FFFFFF; /* White color */
+  font-weight: 800; /* Bold weight as specified */
   text-decoration: underline; /* White underline for title */
   margin: 0;
 }
 
 .header-link {
-  color: white; /* White font color */
+  font-family: 'Inter', sans-serif; /* Apply Inter font */
   font-size: 24px; /* Match the title font size */
+  color: #FFFFFF; /* White color */
+  font-weight: 800; /* Bold weight to match title */
   text-decoration: none;
   line-height: 1; /* Ensures vertical alignment with title */
   transition: color 0.3s;
@@ -453,11 +457,13 @@ h1 {
 .buy-button {
   padding: 10px 20px;
   background-color: #f3040d; /* Red button color */
-  color: white;
+  color: #FFFFFF; /* White text color */
+  font-family: 'Inter', sans-serif; /* Apply Inter font */
+  font-size: 16px;
+  font-weight: 800;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 12px;
   transition: background-color 0.3s, transform 0.3s;
 }
 
@@ -465,6 +471,7 @@ h1 {
   background-color: #e3a61d; /* Change to yellow-orange on hover */
   transform: scale(1.05); /* Slight scale for hover effect */
 }
+
 
 /* Adjustments for mobile */
 @media (max-width: 700px) {
