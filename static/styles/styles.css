@@ -2,9 +2,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #000;
+  background-image: url('/background.webp'); /* Set image as background */
+  background-size: cover;                    /* Ensures image covers entire viewport */
+  background-position: center;               /* Centers background image */
+  background-repeat: no-repeat;              /* Prevents tiling of background image */
   margin: 0;
 }
+
 
 #canvas-container {
   position: relative;
@@ -30,61 +34,16 @@ canvas {
   max-width: 300px;
 }
 
-.control span {
-  color: white;
-  margin-bottom: 5px;
-}
-
-.control input[type="range"] {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 6px;
-  background: #32406C;
-  outline: none;
-  border-radius: 5px;
-  transition: background 0.3s;
-  touch-action: none;
-}
-
-.control input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #2A334E;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  transition: background 0.3s, transform 0.3s;
-}
-
-.control input[type="range"]::-webkit-slider-thumb:hover {
-  background: #3B4B7E;
-  transform: scale(1.1);
-}
-
-.control input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #2A334E;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  transition: background 0.3s, transform 0.3s;
-}
-
-.control input[type="range"]::-moz-range-thumb:hover {
-  background: #3B4B7E;
-  transform: scale(1.1);
-}
-
 .filter-options {
   display: flex;
   gap: 10px;
 }
 
 .filter-option {
-  padding: 5px 10px;
+  display: flex; /* Enables flexbox for centering */
+  align-items: center; /* Centers text vertically */
+  justify-content: center; /* Centers text horizontally */
+  padding: 7px 15px;
   background-color: #333;
   color: white;
   border-radius: 5px;
@@ -98,22 +57,27 @@ canvas {
 }
 
 .filter-option:hover {
-  background-color: #E3A61D;
+  background-color: #DB0A25; /* Keep the background color the same */
+  transform: scale(1.05); /* Slightly increase size */
+  box-shadow: 0 0 10px rgba(219, 10, 37, 0.9); /* Add a soft red glow */
 }
 
 button {
+  margin-top: 10px;
   padding: 10px 20px;
   border: none;
-  border-radius: 5px;
-  background-color: #333;
+  border-radius: 2px;
+  background-color: #DB0A25;
   color: white;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
 }
 
 button:hover {
-  background-color: #E3A61D;
+  background-color: #DB0A25; /* Keep the background color the same */
+  transform: scale(1.05); /* Slightly increase size */
+  box-shadow: 0 0 10px rgba(219, 10, 37, 0.9); /* Add a soft red glow */
 }
 
 button:active {
@@ -131,12 +95,12 @@ label:active {
 /* Container for the tab content */
 .tab-container {
   width: 90%;
-  max-width: 900px;  /* Increase the width to give more space to the controls */
-  margin: 0 auto;   /* Center the entire tab container */
-  padding: 30px;
-  background-color: #161616;  /* Background color for containment effect */
-  border-radius: 10px;  /* Soft rounded corners for a modern look */
-  border: 2px solid #000000;  /* Slight border to define the container */
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px; /* Reduced padding for a more compact look */
+  background-color: #161616;
+  border-radius: 2px;
+  border: 2px solid #000000;
 }
 
 /* Tab links at the top */
@@ -144,31 +108,33 @@ label:active {
   display: flex;
   list-style: none;
   padding: 0;
-  margin: 0 0 20px 0;  /* Add more margin to separate tabs from content */
-  border-bottom: 2px solid #32406C;  /* Consistent border with container */
+  margin: 0 0 10px 0; /* Reduced margin to match a compact style */
 }
 
 .tab-link {
   flex: 1;
   text-align: center;
-  padding: 20px;  /* Increase padding for a more prominent tab */
+  padding: 12px 1px; /* Adjusted padding for a tighter, more refined look */
   cursor: pointer;
-  background-color: #333;
-  color: white;
-  transition: background-color 0.3s, transform 0.2s;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  font-size: 18px;  /* Increase font size for better readability */
+  background-color: transparent; /* Fully transparent background when not active */
+  color: white; /* White color for font */
+  font-family: 'Jockey One', sans-serif; /* Set font to Jockey One */
+  font-size: 18px; /* Match the specified font size */
+  font-weight: 400; /* Match the specified font weight */
+  transition: background-color 0.3s;
+  word-wrap: break-word; /* Ensure text wraps if needed */
 }
 
 .tab-link:hover {
-  background-color: #E3A61D;
+  background-color: #f3040d; /* Red background on hover */
 }
 
 .tab-link.current {
-  background-color: #f3040d;
-  transform: scale(1.05);  /* Slight scale on active tab */
+  background-color: #f3040d; /* Active tab background color */
+  color: white; /* Ensure text is white on red background */
+  font-weight: 400;
 }
+
 
 /* Content for each tab */
 .tab-content {
@@ -198,8 +164,8 @@ label:active {
 .control input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
-  height: 8px;  /* Increase slider height */
-  background: #32406C;
+  height: 5px;  /* Increase slider height */
+  background: #A8A8A8;
   outline: none;
   border-radius: 5px;
   transition: background 0.3s;
@@ -212,15 +178,19 @@ label:active {
   width: 24px;  /* Increase thumb size */
   height: 24px;
   border-radius: 50%;
-  background: #2A334E;
+  background: #DB0A25;
   cursor: pointer;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   transition: background 0.3s, transform 0.3s;
 }
 
 .control input[type="range"]::-webkit-slider-thumb:hover {
-  background: #3B4B7E;
+  background: #DB0A25;
   transform: scale(1.1);
+}
+
+.control input[type="range"]:hover{
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.8); /* Red glow effect on hover */
 }
 
 .control input[type="range"]::-moz-range-thumb {
@@ -238,41 +208,44 @@ label:active {
   transform: scale(1.1);
 }
 
-.filter-option {
-  padding: 10px 20px;  /* Increase padding for a more button-like feel */
-  background-color: #333;
-  color: white;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.filter-option.selected {
-  background-color: #f3040d;
-  transform: scale(1.1);
-}
-
-.filter-option:hover {
-  background-color: #E3A61D;
-}
-
 input[type="file"] {
   display: none;
 }
 
 label {
-  padding: 15px 30px;  /* Larger labels to match button size */
+  display: inline-block;
+  padding: 10px 20px; /* Changed from 20px 10px to match button padding */
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  border-radius: 2px;
+  background-color: #DB0A25;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+label[for="image-upload"] {
+  margin-top: 10px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 5px;
-  background-color: #333;
+  border-radius: 2px;
+  background-color: #DB0A25;
   color: white;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  height: 41px; /* Force exact same height */
+  line-height: 21px; /* Consistent line height */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 label:hover {
-  background-color: #E3A61D;
+  background-color: #DB0A25; /* Keep the background color the same */
+  transform: scale(1.05); /* Slightly increase size */
+  box-shadow: 0 0 10px rgba(219, 10, 37, 0.9); /* Add a soft red glow */
 }
 
 h1 {
@@ -297,7 +270,7 @@ h1 {
   cursor: pointer;
   border: 2px solid transparent;
   background-color: rgba(73, 63, 63, 0.7); /* Semi-transparent background */
-  border-radius: 10px; /* Optional: rounded corners */
+  border-radius: 5px; /* Optional: rounded corners */
   padding: 5px; /* Space between image and border */
   box-sizing: border-box;
   transition: transform 0.2s, border-color 0.3s, box-shadow 0.3s;
@@ -309,7 +282,8 @@ h1 {
 .hat-option.selected {
   border: 2px solid #ff000023;
   transform: scale(1.1);
-  box-shadow: 0 0 10px 5px rgba(255, 0, 0, 0.6); /* Red glow effect */
+  background-color: rgba(255, 0, 0, 0.7);
+  box-shadow: 0 0 8px 3px rgba(255, 0, 0, 0.6); /* Red glow effect */
 }
 
 #contrast-slider {
@@ -392,14 +366,20 @@ h1 {
   width: 12px;                 /* Size of the inner dot */
   height: 12px;
   border-radius: 50%;
-  background-color: #f3040d;   /* Red dot when selected */
+  background-color: #E3A61D;   /* Red dot when selected */
 }
 .controls-container span {
+  display: flex; /* Enables flexbox for centering */
+  align-items: center; /* Centers text vertically */
+  justify-content: center; /* Centers text horizontally */
+  text-align: center; /* Center text alignment within span */
+  width: 100%; /* Ensures the span takes up full width */
   font-family: 'Arial', sans-serif;  /* Correct font */
   font-size: 16px;                   /* Font size to match the rest */
   color: white;                      /* Ensure the text is white */
   display: inline-block;             /* Make sure the span doesn't wrap awkwardly */
-  margin-bottom: 5px;                /* Add some space below for alignment */
+  margin-bottom: 15px;                /* Add some space below for alignment */
+  margin-top: 15px;
 }
 
 /* General Reset */
@@ -415,7 +395,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 40px 30px 15px; /* Increased top padding by 25px */
+  padding: 24px 30px 15px; /* Increased top padding by 25px */
   background-color: transparent; /* Fully transparent */
   position: fixed; /* Fixes the header to the top */
   top: 0;
@@ -434,45 +414,83 @@ h1 {
   font-family: 'Inter', sans-serif; /* Apply Inter font */
   font-size: 24px;
   color: #FFFFFF; /* White color */
-  font-weight: 800; /* Bold weight as specified */
+  font-weight: 700; /* Bold weight as specified */
   text-decoration: underline; /* White underline for title */
   text-decoration-thickness: 2px; /* Set the thickness of the underline */
-  text-underline-offset: 6px; /* Increases the gap between text and underline */
+  text-underline-offset: 20px; /* Increases the gap between text and underline */
   margin: 0;
+  padding-right: 30px;
+  padding-left: 60px;
 }
 
 .header-link {
   font-family: 'Inter', sans-serif; /* Apply Inter font */
   font-size: 24px; /* Match the title font size */
-  color: #FFFFFF; /* White color */
-  font-weight: 800; /* Bold weight to match title */
+  color: #CEC2C2; /* White color */
+  font-weight: 600; /* Bold weight to match title */
   text-decoration: none;
   line-height: 1; /* Ensures vertical alignment with title */
   transition: color 0.3s;
 }
 
 .header-link:hover {
-  color: #e3a61d; /* Slight yellow-orange tone on hover */
+  color: #f3040d; /* Slight yellow-orange tone on hover */
 }
 
 /* Right Side: Buy Button */
 .buy-button {
-  padding: 15px 25px; /* Increased padding for button height */
+  display: inline-block; /* Ensures the link behaves like a button */
+  padding: 25px 38px; /* Increased padding for button height */
   background-color: #f3040d; /* Red button color */
   color: #FFFFFF; /* White text color */
   font-family: 'Inter', sans-serif; /* Apply Inter font */
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 600;
   border: none;
-  border-radius: 5px;
+  border-radius: 2px;
   cursor: pointer;
+  text-decoration: none; /* Removes underline from link */
+  transform: translateX(-80px); /* Moves button 20px to the left */
   transition: background-color 0.3s, transform 0.3s;
 }
 
 .buy-button:hover {
-  background-color: #e3a61d; /* Change to yellow-orange on hover */
-  transform: scale(1.05); /* Slight scale for hover effect */
+  background-color: #f3040d; /* Change to a brighter red on hover */
+  transform: scale(1.05) translateX(-80px); /* Slight scale and move left */
 }
+
+
+@media (max-width: 900px) {
+  /* Header adjustments for mobile */
+  .header {
+    padding: 12px 20px 10px; /* Reduce padding for mobile */
+  }
+
+  .header-title {
+    font-size: 18px; /* Reduce font size for mobile */
+    padding-left: 0; /* Remove extra padding on smaller screens */
+    padding-right: 2px;
+    text-underline-offset: 8px; /* Adjust underline offset */
+  }
+
+  .header-left {
+    gap: 10px; /* Reduce gap between title and link on mobile */
+  }
+
+  .header-link {
+    font-size: 16px; /* Reduce font size for better fit */
+  }
+
+  .buy-button {
+    padding: 10px 20px; /* Reduce padding for smaller button size */
+    font-size: 14px; /* Adjust font size */
+    transform: translateX(0); /* Remove translate to keep centered */
+  }
+  .buy-button:hover {
+    transform: translateX(0); /* Remove translate to keep centered */
+  }
+}
+
 
 /* Adjustments for mobile */
 @media (max-width: 700px) {
@@ -509,6 +527,15 @@ h1 {
     padding: 20px;
   }
 
+  /* Center the tab content on mobile */
+  .tab-content.current {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically if needed */
+    align-items: center; /* Center items horizontally */
+    text-align: center;
+    width: 100%; /* Ensure full width within container */
+  }
+
   #canvas-container {
     display: flex;
     justify-content: center;
@@ -522,7 +549,11 @@ h1 {
     height: auto;     /* Maintain the aspect ratio */
   }
 
-  .controls-container {
+  /* Center the canvas container */
+  #canvas-container {
+    display: flex;
+    justify-content: center;
+    width: 100%; /* Full width to prevent overflow */
     max-width: 100%;
   }
 
