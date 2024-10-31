@@ -39,9 +39,120 @@ let flagOpacity = .5; // Default opacity
 
 let u2netSession;
 
+// Create an offscreen canvas for magnifier
+const offscreenCanvas = document.createElement('canvas');
+const offscreenCtx = offscreenCanvas.getContext('2d');
+
+// Set magnifier properties
+const magnifierSize = 150; // Diameter in pixels
+const magnification = 3;   // Zoom level
+
+offscreenCanvas.width = magnifierSize * magnification;
+offscreenCanvas.height = magnifierSize * magnification;
+
+// Magnifier Element
 const magnifier = document.getElementById("magnifier");
-const magnifierSize = 150; // Size in pixels
-const magnification = 3; // Zoom level
+
+// Function to convert canvas coordinates to client (screen) coordinates
+function canvasToClient(canvas, x, y) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = rect.width / canvas.width;
+  const scaleY = rect.height / canvas.height;
+  return {
+    clientX: x * scaleX + rect.left,
+    clientY: y * scaleY + rect.top
+  };
+}
+
+// Function to update the magnifier's background using the offscreen canvas
+function updateMagnifierBackground(x, y) {
+  // Determine the center of the selected object
+  let objectCenterX, objectCenterY;
+  if (currentLaser) {
+    objectCenterX = currentLaser.x + currentLaser.width / 2;
+    objectCenterY = currentLaser.y + currentLaser.height / 2;
+  } else if (currentHat) {
+    objectCenterX = currentHat.x + currentHat.width / 2;
+    objectCenterY = currentHat.y + currentHat.height / 2;
+  } else {
+    return; // No object selected
+  }
+
+  // Calculate the area to capture from the main canvas
+  const captureX = objectCenterX - (magnifierSize / 2) / magnification;
+  const captureY = objectCenterY - (magnifierSize / 2) / magnification;
+
+  // Clear the offscreen canvas
+  offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+
+  // Draw the captured area onto the offscreen canvas, scaling it up
+  offscreenCtx.drawImage(
+    canvas,
+    captureX,
+    captureY,
+    magnifierSize / magnification,
+    magnifierSize / magnification,
+    0,
+    0,
+    magnifierSize * magnification,
+    magnifierSize * magnification
+  );
+
+  // Update the magnifier's background with the offscreen canvas
+  magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`;
+  magnifier.style.backgroundSize = `${magnifierSize * magnification}px ${magnifierSize * magnification}px`;
+}
+
+// Function to show the magnifier centered on the object's center
+function showMagnifier(x, y) {
+  magnifier.style.display = "block";
+  const offset = 20; // Offset to position magnifier away from touch point
+
+  let left = x + offset;
+  let top = y + offset;
+
+  // Prevent magnifier from going off-screen
+  if (left + magnifierSize > window.innerWidth) {
+    left = x - magnifierSize - offset;
+  }
+  if (top + magnifierSize > window.innerHeight) {
+    top = y - magnifierSize - offset;
+  }
+
+  magnifier.style.left = `${left}px`;
+  magnifier.style.top = `${top}px`;
+
+  // Update magnifier background
+  updateMagnifierBackground(x, y);
+}
+
+// Function to move the magnifier as the object is dragged
+function moveMagnifier(x, y) {
+  const offset = 20; // Offset to position magnifier away from touch point
+
+  let left = x + offset;
+  let top = y + offset;
+
+  // Prevent magnifier from going off-screen
+  if (left + magnifierSize > window.innerWidth) {
+    left = x - magnifierSize - offset;
+  }
+  if (top + magnifierSize > window.innerHeight) {
+    top = y - magnifierSize - offset;
+  }
+
+  magnifier.style.left = `${left}px`;
+  magnifier.style.top = `${top}px`;
+
+  // Update magnifier background
+  updateMagnifierBackground(x, y);
+}
+
+// Function to hide the magnifier
+function hideMagnifier() {
+  magnifier.style.display = "none";
+}
+
 
 // Load the ONNX model
 async function loadModel() {
@@ -166,71 +277,6 @@ function postprocessONNXOutput(output, imageElement) {
   const newImgElement = new Image();
   newImgElement.src = offscreenCanvas.toDataURL();
   return newImgElement;
-}
-
-function showMagnifier(x, y) {
-  magnifier.style.display = "block";
-  const offset = 20; // Offset to position magnifier away from touch/cursor
-
-  let left = x + offset;
-  let top = y + offset;
-
-  // Prevent magnifier from going off-screen
-  if (left + magnifierSize > window.innerWidth) {
-    left = x - magnifierSize - offset;
-  }
-  if (top + magnifierSize > window.innerHeight) {
-    top = y - magnifierSize - offset;
-  }
-
-  magnifier.style.left = `${left}px`;
-  magnifier.style.top = `${top}px`;
-
-  // Capture the current state of the main canvas
-  const dataURL = canvas.toDataURL();
-  magnifier.style.backgroundImage = `url(${dataURL})`;
-
-  // Calculate background position to center the magnifier on the cursor/touch point
-  const canvasRect = canvas.getBoundingClientRect();
-  const canvasX = x - canvasRect.left;
-  const canvasY = y - canvasRect.top;
-
-  const bgX = -((canvasX * magnification) - magnifierSize / 2);
-  const bgY = -((canvasY * magnification) - magnifierSize / 2);
-
-  magnifier.style.backgroundPosition = `${bgX}px ${bgY}px`;
-}
-
-function moveMagnifier(x, y) {
-  const offset = 20; // Offset to position magnifier away from touch/cursor
-
-  let left = x + offset;
-  let top = y + offset;
-
-  // Prevent magnifier from going off-screen
-  if (left + magnifierSize > window.innerWidth) {
-    left = x - magnifierSize - offset;
-  }
-  if (top + magnifierSize > window.innerHeight) {
-    top = y - magnifierSize - offset;
-  }
-
-  magnifier.style.left = `${left}px`;
-  magnifier.style.top = `${top}px`;
-
-  // Update background position based on new cursor/touch position
-  const canvasRect = canvas.getBoundingClientRect();
-  const canvasX = x - canvasRect.left;
-  const canvasY = y - canvasRect.top;
-
-  const bgX = -((canvasX * magnification) - magnifierSize / 2);
-  const bgY = -((canvasY * magnification) - magnifierSize / 2);
-
-  magnifier.style.backgroundPosition = `${bgX}px ${bgY}px`;
-}
-
-function hideMagnifier() {
-  magnifier.style.display = "none";
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -512,14 +558,15 @@ canvas.addEventListener("mouseup", function () {
   }
 });
 
+// Touch Start Event
 canvas.addEventListener("touchstart", function (e) {
   e.preventDefault();
   const touch = e.touches[0];
   const rect = canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
-  const mouseX = (touch.clientX - rect.left) * scaleX;
-  const mouseY = (touch.clientY - rect.top) * scaleY;
+  const touchX = (touch.clientX - rect.left) * scaleX;
+  const touchY = (touch.clientY - rect.top) * scaleY;
 
   let closestDistance = Infinity;
   currentLaser = null;
@@ -530,21 +577,21 @@ canvas.addEventListener("touchstart", function (e) {
     const centerX = laser.x + laser.width / 2;
     const centerY = laser.y + laser.height / 2;
     const distance = Math.sqrt(
-      Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2)
+      Math.pow(touchX - centerX, 2) + Math.pow(touchY - centerY, 2)
     );
 
     if (
-      mouseX > laser.x &&
-      mouseX < laser.x + laser.width &&
-      mouseY > laser.y &&
-      mouseY < laser.y + laser.height &&
+      touchX > laser.x &&
+      touchX < laser.x + laser.width &&
+      touchY > laser.y &&
+      touchY < laser.y + laser.height &&
       distance < closestDistance
     ) {
       closestDistance = distance;
       currentLaser = laser;
       currentHat = null;
-      offsetX = mouseX - laser.x;
-      offsetY = mouseY - laser.y;
+      offsetX = touchX - laser.x;
+      offsetY = touchY - laser.y;
     }
   });
 
@@ -553,32 +600,46 @@ canvas.addEventListener("touchstart", function (e) {
     const centerX = hat.x + hat.width / 2;
     const centerY = hat.y + hat.height / 2;
     const distance = Math.sqrt(
-      Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2)
+      Math.pow(touchX - centerX, 2) + Math.pow(touchY - centerY, 2)
     );
 
     if (
-      mouseX > hat.x &&
-      mouseX < hat.x + hat.width &&
-      mouseY > hat.y &&
-      mouseY < hat.y + hat.height &&
+      touchX > hat.x &&
+      touchX < hat.x + hat.width &&
+      touchY > hat.y &&
+      touchY < hat.y + hat.height &&
       distance < closestDistance
     ) {
       closestDistance = distance;
       currentHat = hat;
       currentLaser = null;
-      offsetX = mouseX - hat.x;
-      offsetY = mouseY - hat.y;
+      offsetX = touchX - hat.x;
+      offsetY = touchY - hat.y;
     }
   });
 
   if (currentLaser || currentHat) {
     isDragging = true;
 
-    // Show the magnifier at the initial touch position
-    showMagnifier(touch.clientX, touch.clientY);
+    // Calculate the center of the selected object
+    let objectCenterX, objectCenterY;
+    if (currentLaser) {
+      objectCenterX = currentLaser.x + currentLaser.width / 2;
+      objectCenterY = currentLaser.y + currentLaser.height / 2;
+    } else if (currentHat) {
+      objectCenterX = currentHat.x + currentHat.width / 2;
+      objectCenterY = currentHat.y + currentHat.height / 2;
+    }
+
+    // Convert canvas coordinates to client (screen) coordinates
+    const clientPos = canvasToClient(canvas, objectCenterX, objectCenterY);
+
+    // Show the magnifier centered on the object's center
+    showMagnifier(clientPos.clientX, clientPos.clientY);
   }
 });
 
+// Touch Move Event
 canvas.addEventListener("touchmove", function (e) {
   if (isDragging) {
     e.preventDefault();
@@ -586,27 +647,42 @@ canvas.addEventListener("touchmove", function (e) {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    const mouseX = (touch.clientX - rect.left) * scaleX;
-    const mouseY = (touch.clientY - rect.top) * scaleY;
+    const touchX = (touch.clientX - rect.left) * scaleX;
+    const touchY = (touch.clientY - rect.top) * scaleY;
 
     // Update positions of the selected element
     if (currentLaser) {
-      currentLaser.x = mouseX - offsetX;
-      currentLaser.y = mouseY - offsetY;
+      currentLaser.x = touchX - offsetX;
+      currentLaser.y = touchY - offsetY;
     }
 
     if (currentHat) {
-      currentHat.x = mouseX - offsetX;
-      currentHat.y = mouseY - offsetY;
+      currentHat.x = touchX - offsetX;
+      currentHat.y = touchY - offsetY;
     }
 
+    // Redraw the canvas with updated positions
     drawCanvas();
 
-    // Move the magnifier with the touch point
-    moveMagnifier(touch.clientX, touch.clientY);
+    // Calculate the new center of the selected object
+    let objectCenterX, objectCenterY;
+    if (currentLaser) {
+      objectCenterX = currentLaser.x + currentLaser.width / 2;
+      objectCenterY = currentLaser.y + currentLaser.height / 2;
+    } else if (currentHat) {
+      objectCenterX = currentHat.x + currentHat.width / 2;
+      objectCenterY = currentHat.y + currentHat.height / 2;
+    }
+
+    // Convert canvas coordinates to client (screen) coordinates
+    const clientPos = canvasToClient(canvas, objectCenterX, objectCenterY);
+
+    // Update the magnifier's background to reflect the current canvas state
+    updateMagnifierBackground(clientPos.clientX, clientPos.clientY);
   }
 });
 
+// Touch End Event
 canvas.addEventListener("touchend", function () {
   if (isDragging) {
     if (currentLaser) {
@@ -858,11 +934,11 @@ function drawCanvas() {
 
   // Draw lasers in two passes
   lasers.forEach(laser => {
-    drawLaser(laser, ctx);  // First pass: draw laser with hole
+    drawLaser(laser, ctx);  // First pass: draw laser
   });
   
   lasers.forEach(laser => {
-    drawLaserCenter(laser, ctx);  // Second pass: draw centers
+    drawLaserCenter(laser, ctx);  // Second pass: draw laser center
   });
 
   // Draw hats on top of everything
