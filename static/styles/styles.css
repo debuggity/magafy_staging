@@ -588,7 +588,7 @@ h1 {
   body {
     background-attachment: scroll;
   }
-  
+
   /* Header adjustments for mobile */
   .header {
     padding: 12px 20px 10px; /* Reduce padding for mobile */
@@ -623,6 +623,12 @@ h1 {
 /* Adjustments for mobile */
 @media (max-width: 700px) {
 
+  .add-hat-button-container, .remove-all-button-container {
+    display: flex;
+    justify-content: flex-start; /* Align buttons to the left */
+    align-items: flex-start;     /* Ensure they start from the top */
+  }
+
   .circle-img {
     width: 75px;
     height: 75px;
@@ -655,11 +661,6 @@ h1 {
     font-size: 14px; /* Adjust font size for better readability */
   }
 
-  /*.tab-container {
-    max-width: 85%;
-    padding: 20px;
-  }*/
-
   /* Center the tab content on mobile */
   .tab-content.current {
     display: flex;
@@ -686,7 +687,4 @@ h1 {
     padding: 10px 20px;  /* Adjust padding for smaller screens */
   }
 
-  .hat-option {
-    width: 50px;  /* Slightly smaller hat options for mobile */
-  }
 }
