@@ -66,7 +66,7 @@ function canvasToClient(canvas, x, y) {
 }
 
 // Function to update the magnifier's background using the offscreen canvas
-function updateMagnifierBackground(x, y) {
+async function updateMagnifierBackground(x, y) {
   // Determine the center of the selected object
   let objectCenterX, objectCenterY;
   if (currentLaser) {
@@ -99,16 +99,14 @@ function updateMagnifierBackground(x, y) {
     magnifierSize * magnification
   );
 
-  // Update the magnifier's background with the offscreen canvas
-  //magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`;
-  //magnifier.style.backgroundSize = `${magnifierSize * magnification}px ${magnifierSize * magnification}px`;
-  
-  // Use the offscreen canvas directly instead of generating a data URL
-  // Apply the offscreen canvas as a background to the magnifier
-  magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`; // Optional if direct application isn't possible
-  magnifier.style.backgroundSize = `${magnifierSize * magnification}px ${magnifierSize * magnification}px`;
+  // Convert the offscreen canvas to an image bitmap
+  const bitmap = await createImageBitmap(offscreenCanvas);
 
+  // Apply the bitmap as the background to the magnifier element
+  magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`;
+  magnifier.style.backgroundSize = `${magnifierSize * magnification}px ${magnifierSize * magnification}px`;
 }
+
 
 // Function to show the magnifier, centered on the object's center but avoiding the touch point
 function showMagnifier(x, y) {
