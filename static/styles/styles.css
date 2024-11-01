@@ -618,6 +618,11 @@ h1 {
 /* Adjustments for mobile */
 @media (max-width: 700px) {
 
+  .circle-img {
+    width: 75px;
+    height: 75px;
+  }
+
   .background-options {
     justify-content: flex-start;     /* Align to the left on small screens */
   }
