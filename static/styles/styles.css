@@ -20,21 +20,21 @@ body {
   align-items: center;
   background-image: url('/background.png');
   background-size: cover;
-  background-position: top center; /* Changed from 'center' to 'top center' */
+  background-position: center center; /* Centered horizontally and vertically */
   background-repeat: no-repeat;
-  background-attachment: fixed; /* Keep background fixed while scrolling */
-  position: relative; /* For proper stacking context */
+  background-attachment: fixed;
+  position: relative;
 }
 
-/* Apply the background to both body and load screen */
 .background-style {
-  background-color: #1a1a1a; /* Example background color */
-  background-image: url("/background.png"); /* Background image if you have one */
+  background-color: #1a1a1a;
+  background-image: url("/background.png");
   background-size: cover;
-  background-position: center;
+  background-position: center center; /* Centered horizontally and vertically */
   height: 100vh;
   overflow: hidden;
 }
+
 
 
 /* Ensure content doesn't create unwanted space */
