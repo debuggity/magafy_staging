@@ -302,16 +302,11 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 document.getElementById("image-upload").addEventListener("change", function (e) {
-  
-  // Hide the initial load screen
-  document.getElementById("initial-load-screen").style.display = "none";
-  
-  // Show the PFP maker (if hidden)
-  document.getElementById("canvas-container").style.display = "block";
-  document.querySelector(".button-container").style.display = "flex";
-  
   const reader = new FileReader();
   reader.onload = function (event) {
+      // Hide the initial load screen
+      document.getElementById("initial-load-screen").style.display = "none";
+
       // Reset the flag and mask state when a new image is uploaded
       flagApplied = false;
       savedMaskImage = null;
@@ -346,6 +341,7 @@ document.getElementById("image-upload").addEventListener("change", function (e) 
   // Read the file as a data URL
   reader.readAsDataURL(e.target.files[0]);
 });
+
 
 
 document.getElementById("add-laser-button").addEventListener("click", function () {
