@@ -301,6 +301,10 @@ window.addEventListener('DOMContentLoaded', () => {
   rotateSlider.value = '0';  // Middle value between 0 and 360
 });
 
+document.querySelector(".upload-btn").addEventListener("click", () => {
+  document.getElementById("image-upload").click();
+});
+
 document.getElementById("image-upload").addEventListener("change", function (e) {
   const reader = new FileReader();
   reader.onload = function (event) {
