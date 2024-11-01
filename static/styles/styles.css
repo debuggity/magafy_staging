@@ -83,7 +83,7 @@ canvas {
 }
 
 .filter-option.selected {
-  background-color: #f3040d;
+  background-color: #DB0A25;
   transform: scale(1.1);
 }
 
@@ -159,11 +159,11 @@ label:active {
 }
 
 .tab-link:hover {
-  background-color: #f3040d; /* Red background on hover */
+  background-color: #DB0A25; /* Red background on hover */
 }
 
 .tab-link.current {
-  background-color: #f3040d; /* Active tab background color */
+  background-color: #DB0A25; /* Active tab background color */
   color: white; /* Ensure text is white on red background */
   font-weight: 400;
 }
@@ -468,14 +468,14 @@ h1 {
 }
 
 .header-link:hover {
-  color: #f3040d; /* Slight yellow-orange tone on hover */
+  color: #DB0A25; /* Slight yellow-orange tone on hover */
 }
 
 /* Right Side: Buy Button */
 .buy-button {
   display: inline-block; /* Ensures the link behaves like a button */
   padding: 25px 38px; /* Increased padding for button height */
-  background-color: #f3040d; /* Red button color */
+  background-color: #DB0A25; /* Red button color */
   color: #FFFFFF; /* White text color */
   font-family: 'Inter', sans-serif; /* Apply Inter font */
   font-size: 16px;
@@ -489,7 +489,7 @@ h1 {
 }
 
 .buy-button:hover {
-  background-color: #f3040d; /* Change to a brighter red on hover */
+  background-color: #DB0A25; /* Change to a brighter red on hover */
   transform: scale(1.05) translateX(-80px); /* Slight scale and move left */
 }
 
@@ -499,7 +499,7 @@ h1 {
   pointer-events: none; /* Allows interactions to pass through */
   width: 150px; /* Diameter of the magnifier */
   height: 150px;
-  border: 3px solid #f3040d; /* Red border color */
+  border: 3px solid #DB0A25; /* Red border color */
   border-radius: 50%;
   overflow: hidden;
   display: none; /* Hidden by default */
@@ -584,6 +584,11 @@ h1 {
 
 
 @media (max-width: 900px) {
+
+  body {
+    background-attachment: scroll;
+  }
+  
   /* Header adjustments for mobile */
   .header {
     padding: 12px 20px 10px; /* Reduce padding for mobile */
