@@ -66,7 +66,7 @@ function canvasToClient(canvas, x, y) {
 }
 
 // Function to update the magnifier's background using the offscreen canvas
-async function updateMagnifierBackground(x, y) {
+function updateMagnifierBackground(x, y) {
   // Determine the center of the selected object
   let objectCenterX, objectCenterY;
   if (currentLaser) {
@@ -99,30 +99,31 @@ async function updateMagnifierBackground(x, y) {
     magnifierSize * magnification
   );
 
-  // Convert the offscreen canvas to an image bitmap
-  const bitmap = await createImageBitmap(offscreenCanvas);
-
-  // Apply the bitmap as the background to the magnifier element
-  magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`;
+  // Update the magnifier's background with the offscreen canvas
+  //magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`;
+  //magnifier.style.backgroundSize = `${magnifierSize * magnification}px ${magnifierSize * magnification}px`;
+  
+  // Use the offscreen canvas directly instead of generating a data URL
+  // Apply the offscreen canvas as a background to the magnifier
+  magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`; // Optional if direct application isn't possible
   magnifier.style.backgroundSize = `${magnifierSize * magnification}px ${magnifierSize * magnification}px`;
+
 }
 
-
-// Function to show the magnifier without changing the display property
+// Function to show the magnifier, centered on the object's center but avoiding the touch point
 function showMagnifier(x, y) {
   if (!currentLaser) {
     hideMagnifier(); // Only show magnifier for lasers, hide it for hats
     return;
   }
 
-  // Set opacity instead of display property for visibility control
-  magnifier.style.opacity = "1";
+  magnifier.style.display = "block";
   const offset = 50; // Offset to position magnifier away from touch point
 
-  // Position the magnifier with bounds checking
   let left = x + offset;
   let top = y + offset;
 
+  // Prevent magnifier from going off-screen
   if (left + magnifierSize > window.innerWidth) {
     left = x - magnifierSize - offset;
   }
@@ -130,21 +131,21 @@ function showMagnifier(x, y) {
     top = y - magnifierSize - offset;
   }
 
-  // Use requestAnimationFrame for smoother updates
-  requestAnimationFrame(() => {
-    magnifier.style.left = `${left}px`;
-    magnifier.style.top = `${top}px`;
-  });
+  magnifier.style.left = `${left}px`;
+  magnifier.style.top = `${top}px`;
 
-  updateMagnifierBackground(x, y); // Update background with current position
+  // Update magnifier background with current laser position
+  updateMagnifierBackground(x, y);
 }
 
 // Function to move the magnifier as the object is dragged
 function moveMagnifier(x, y) {
   const offset = 20; // Offset to position magnifier away from touch point
+
   let left = x + offset;
   let top = y + offset;
 
+  // Prevent magnifier from going off-screen
   if (left + magnifierSize > window.innerWidth) {
     left = x - magnifierSize - offset;
   }
@@ -152,19 +153,18 @@ function moveMagnifier(x, y) {
     top = y - magnifierSize - offset;
   }
 
-  // Use requestAnimationFrame for smoother updates
-  requestAnimationFrame(() => {
-    magnifier.style.left = `${left}px`;
-    magnifier.style.top = `${top}px`;
-  });
+  magnifier.style.left = `${left}px`;
+  magnifier.style.top = `${top}px`;
 
-  updateMagnifierBackground(x, y); // Update background during move
+  // Update magnifier background
+  updateMagnifierBackground(x, y);
 }
 
-// Function to hide the magnifier using opacity
+// Function to hide the magnifier
 function hideMagnifier() {
-  magnifier.style.opacity = "0"; // Use opacity to "hide" the element
+  magnifier.style.display = "none";
 }
+
 
 // Load the ONNX model
 async function loadModel() {
