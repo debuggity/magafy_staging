@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'Biergärten Light';
+  src: url('https://www.fontsaddict.com/fontface/biergarten-light.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* Fix for background image coverage */
 html, body {
   height: 100vh;  /* Use viewport height */
@@ -18,6 +25,17 @@ body {
   background-attachment: fixed; /* Keep background fixed while scrolling */
   position: relative; /* For proper stacking context */
 }
+
+/* Apply the background to both body and load screen */
+.background-style {
+  background-color: #1a1a1a; /* Example background color */
+  background-image: url("/background.webp"); /* Background image if you have one */
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
 
 /* Ensure content doesn't create unwanted space */
 #canvas-container {
@@ -416,7 +434,7 @@ h1 {
   position: fixed; /* Fixes the header to the top */
   top: 0;
   left: 0;
-  z-index: 1000; /* Ensures the header is on top of other content */
+  z-index: 1001; /* Ensures the header is on top of other content */
 }
 
 /* Left Side: Title and Link */
