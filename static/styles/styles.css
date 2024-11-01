@@ -587,10 +587,10 @@ h1 {
 
   body {
     background-attachment: scroll;
-    background-position: calc(50% - 50px) center; /* Shift 20px to the left */
+    background-position: calc(50% - 150px) center; /* Shift 20px to the left */
   }
   .background-style {
-    background-position: calc(50% - 50px) center; /* Shift 20px to the left */
+    background-position: calc(50% - 150px) center; /* Shift 20px to the left */
   }
 
   /* Header adjustments for mobile */
