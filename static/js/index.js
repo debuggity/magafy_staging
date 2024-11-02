@@ -166,33 +166,81 @@ function hideMagnifier() {
 }
 
 
+let modelLoaded = false;
+const loadingOverlay = document.getElementById("loading-overlay");
+const errorIndicator = document.getElementById("error-indicator");
+
 // Load the ONNX model
 async function loadModel() {
-  u2netSession = await ort.InferenceSession.create('./u2netp.onnx');
+  try {
+    u2netSession = await ort.InferenceSession.create('./u2netp.onnx');
+    modelLoaded = true;
+  } catch (error) {
+    modelLoaded = false;
+    console.error("Failed to load ONNX model:", error);
+    showErrorIndicator();
+  }
 }
+
+// Show loading overlay
+function showLoadingOverlay() {
+  loadingOverlay.classList.remove("hidden");
+}
+
+// Hide loading overlay
+function hideLoadingOverlay() {
+  loadingOverlay.classList.add("hidden");
+}
+
+// Show error indicator
+function showErrorIndicator() {
+  errorIndicator.classList.remove("hidden");
+}
+
+// Hide error indicator
+function hideErrorIndicator() {
+  errorIndicator.classList.add("hidden");
+}
+
 
 // State variable to track if the flag is applied
 let flagApplied = false;
 
+// Updated addFlagWithBackgroundRemoval function to handle loading states
 async function addFlagWithBackgroundRemoval() {
+  if (!modelLoaded) {
+    showErrorIndicator();  // Show "X" if the model is not loaded
+    return;
+  }
+
+  hideErrorIndicator(); // Hide error if model is loaded
+
   if (!canvasImage) return;
 
   const inputTensor = preprocessImageForONNX(canvasImage);
 
-  // Perform inference with the ONNX model
-  const output = await u2netSession.run({ 'input.1': inputTensor });
-  const maskImage = postprocessONNXOutput(output[Object.keys(output)[0]], canvasImage);
+  // Show loading animation while processing
+  showLoadingOverlay();
 
-  maskImage.onload = function () {
+  try {
+    // Perform inference with the ONNX model
+    const output = await u2netSession.run({ 'input.1': inputTensor });
+    const maskImage = postprocessONNXOutput(output[Object.keys(output)[0]], canvasImage);
+
+    maskImage.onload = function () {
       // Set flagApplied to true since the user has added the flag
       flagApplied = true;
-
-      // Save the mask image for later use in drawCanvas
       savedMaskImage = maskImage;
 
-      // Redraw everything, including the flag and mask
-      drawCanvas();
-  };
+      drawCanvas();  // Redraw everything, including the flag and mask
+    };
+  } catch (error) {
+    console.error("Error during background removal:", error);
+    showErrorIndicator();
+  } finally {
+    // Hide loading overlay after processing
+    hideLoadingOverlay();
+  }
 }
 
 // Event listeners for adding the flag
