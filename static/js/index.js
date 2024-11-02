@@ -185,11 +185,13 @@ async function loadModel() {
 // Show loading overlay only during background removal
 function showLoadingOverlay() {
   loadingOverlay.classList.remove("hidden");
+  loadingOverlay.style.display = "flex";
 }
 
 // Hide loading overlay after background removal completes
 function hideLoadingOverlay() {
   loadingOverlay.classList.add("hidden");
+  loadingOverlay.style.display = "none";
 }
 
 // Show error indicator if the model fails
