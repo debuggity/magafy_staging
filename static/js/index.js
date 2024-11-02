@@ -170,7 +170,7 @@ let modelLoaded = false;
 const loadingOverlay = document.getElementById("loading-overlay");
 const errorIndicator = document.getElementById("error-indicator");
 
-// Load the ONNX model
+// Load the ONNX model without showing the loading overlay
 async function loadModel() {
   try {
     u2netSession = await ort.InferenceSession.create('./u2netp.onnx');
@@ -182,26 +182,25 @@ async function loadModel() {
   }
 }
 
-// Show loading overlay
+// Show loading overlay only during background removal
 function showLoadingOverlay() {
   loadingOverlay.classList.remove("hidden");
 }
 
-// Hide loading overlay
+// Hide loading overlay after background removal completes
 function hideLoadingOverlay() {
   loadingOverlay.classList.add("hidden");
 }
 
-// Show error indicator
+// Show error indicator if the model fails
 function showErrorIndicator() {
   errorIndicator.classList.remove("hidden");
 }
 
-// Hide error indicator
+// Hide error indicator once the model is loaded
 function hideErrorIndicator() {
   errorIndicator.classList.add("hidden");
 }
-
 
 // State variable to track if the flag is applied
 let flagApplied = false;
@@ -238,12 +237,12 @@ async function addFlagWithBackgroundRemoval() {
     console.error("Error during background removal:", error);
     showErrorIndicator();
   } finally {
-    // Hide loading overlay after processing
+    // Hide loading overlay after processing completes
     hideLoadingOverlay();
   }
 }
 
-// Event listeners for adding the flag
+// Event listener for the "Add Background" button
 document.getElementById("add-background-button").addEventListener("click", function () {
   const selectedOption = document.querySelector('input[name="background"]:checked').value;
   if (selectedOption === "americanFlag") {
@@ -252,7 +251,7 @@ document.getElementById("add-background-button").addEventListener("click", funct
     selectedBackgroundImage = lightningImage;
   }
 
-  addFlagWithBackgroundRemoval();  // Re-use the existing function to apply the selected background
+  addFlagWithBackgroundRemoval();  // Run background removal only when button is clicked
 });
 
 document.getElementById("flag-opacity-slider").addEventListener("input", function (e) {
