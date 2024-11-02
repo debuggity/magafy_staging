@@ -351,12 +351,11 @@ h1 {
 
 .add-hat-button-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-top: 20px;
-  margin-bottom: 10px;
+  flex-direction: row;  /* Ensure buttons are aligned side-by-side */
+  justify-content: space-between;  /* Align buttons to left and right */
+  width: 100%;  /* Full width to ensure buttons align as expected */
   gap: 10px;
+  margin-top: 20px;
 }
 
 #add-hat-button,
