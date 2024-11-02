@@ -350,18 +350,8 @@ h1 {
 }
 
 .add-hat-button-container {
-  display: flex;
-  flex-direction: row;  /* Ensure buttons are aligned side-by-side */
-  justify-content: space-between;  /* Align buttons to left and right */
-  width: 100%;  /* Full width to ensure buttons align as expected */
-  gap: 10px;
-  margin-top: 20px;
-}
-
-#add-hat-button,
-#remove-all-hats-button {
-  margin: 0;
-  flex-shrink: 0;
+  margin-top: 10px;  /* This provides the vertical spacing */
+  margin-bottom: 10px;
 }
 
 .background-options {
@@ -683,14 +673,10 @@ h1 {
     padding-bottom: 100px; /* Reduced padding for mobile */
   }
 
-  .add-hat-button-container {
-    gap: 8px;
-  }
-  
-  #add-hat-button,
-  #remove-all-hats-button {
-    padding: 10px 15px;
-    font-size: 14px;
+  .add-hat-button-container, .remove-all-button-container {
+    display: flex;
+    justify-content: flex-start; /* Align buttons to the left */
+    align-items: flex-start;     /* Ensure they start from the top */
   }
 
   .circle-img {
