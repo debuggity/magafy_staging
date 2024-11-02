@@ -38,8 +38,6 @@ let selectedBackgroundImage = americanFlagImage;  // Default to American Flag
 
 let flagOpacity = .5; // Default opacity
 
-let u2netSession;
-
 // Create an offscreen canvas for magnifier
 const offscreenCanvas = document.createElement('canvas');
 const offscreenCtx = offscreenCanvas.getContext('2d');
@@ -170,17 +168,23 @@ let modelLoaded = false;
 const loadingOverlay = document.getElementById("loading-overlay");
 const errorIndicator = document.getElementById("error-indicator");
 
-// Load the ONNX model without showing the loading overlay
+let u2netSession = null; // Initialize only once
+
 async function loadModel() {
+  if (u2netSession) return; // Avoid reloading if already loaded
+
   try {
     u2netSession = await ort.InferenceSession.create('./u2netp.onnx');
     modelLoaded = true;
   } catch (error) {
-    modelLoaded = false;
     console.error("Failed to load ONNX model:", error);
     showErrorIndicator();
   }
 }
+
+// Call this only once during page load
+window.addEventListener('DOMContentLoaded', loadModel);
+
 
 // Show loading overlay only during background removal
 function showLoadingOverlay() {
@@ -235,6 +239,11 @@ async function addFlagWithBackgroundRemoval() {
 
       drawCanvas();  // Redraw everything, including the flag and mask
     };
+
+    // Dispose of input and output tensors
+    inputTensor.dispose();
+    Object.values(output).forEach(tensor => tensor.dispose());
+    
   } catch (error) {
     console.error("Error during background removal:", error);
     showErrorIndicator();
