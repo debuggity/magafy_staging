@@ -6,6 +6,10 @@ const laserImageTemplate = new Image();
 laserImageTemplate.src = "https://dmagafy-staging.netlify.app/laser_large.png";
 laserImageTemplate.crossOrigin = "anonymous";
 
+let laserRadialImage = new Image();
+laserRadialImage.src = "https://dmagafy-staging.netlify.app/laser_radial.png";
+laserRadialImage.crossOrigin = "anonymous";
+
 let laserTopImage = new Image();
 laserTopImage.src = "https://dmagafy-staging.netlify.app/laser_top.png"; // Replace with your actual URL
 laserTopImage.crossOrigin = "anonymous";
@@ -51,6 +55,17 @@ offscreenCanvas.height = magnifierSize * magnification;
 
 // Magnifier Element
 const magnifier = document.getElementById("magnifier");
+
+let selectedLaserType = 'default';  // Default laser type
+
+document.querySelectorAll('.laser-option').forEach(option => {
+  option.addEventListener('click', function () {
+    document.querySelectorAll('.laser-option').forEach(opt => opt.classList.remove('selected'));
+    this.classList.add('selected');
+
+    selectedLaserType = this.getAttribute('data-laser-type');
+  });
+});
 
 // Function to convert canvas coordinates to client (screen) coordinates
 function canvasToClient(canvas, x, y) {
@@ -407,30 +422,31 @@ document.getElementById("image-upload").addEventListener("change", function (e) 
 
 
 document.getElementById("add-laser-button").addEventListener("click", function () {
-  const aspectRatio = laserImageTemplate.width / laserImageTemplate.height;
+  const aspectRatio = (selectedLaserType === 'radial') 
+    ? laserRadialImage.width / laserRadialImage.height
+    : laserImageTemplate.width / laserImageTemplate.height;
 
-  // Use a higher percentage of the canvas size to determine the initial laser size
   let laserWidth = canvas.width * 0.5; // Increased to 50% of the canvas width
   let laserHeight = laserWidth / aspectRatio;
 
-  // Ensure the laser fits within the canvas bounds
   if (laserHeight > canvas.height) {
-    laserHeight = canvas.height * 0.5; // 50% of canvas height if it's taller
+    laserHeight = canvas.height * 0.5;
     laserWidth = laserHeight * aspectRatio;
   }
 
   const laser = {
-    image: laserImageTemplate,
+    image: (selectedLaserType === 'radial') ? laserRadialImage : laserImageTemplate,
     width: laserWidth,
     height: laserHeight,
     x: canvas.width / 2 - laserWidth / 2,
     y: canvas.height / 2 - laserHeight / 2,
     rotation: 0,
+    // For radial lasers, no top image is needed
+    hasTopImage: (selectedLaserType === 'radial') ? false : true
   };
   lasers.push(laser);
   drawCanvas();
 });
-
 
 document.getElementById("add-hat-button").addEventListener("click", function () {
   if (!selectedHatImage) return;
@@ -1039,15 +1055,17 @@ function drawLaser(laser, context) {
 }
 
 function drawLaserCenter(laser, context) {
+  if (!laser.hasTopImage) {
+    return;  // If the laser type does not have a top image, skip drawing the second pass
+  }
+
   context.save();
   context.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
   context.rotate(laser.rotation);
 
-  // Calculate the width and height of the laserTopImage to match the laser size
   const topWidth = laser.width;
   const topHeight = laser.height;
 
-  // Draw the laser center directly, without additional temporary canvas or composite operations
   context.drawImage(
     laserTopImage,
     -topWidth / 2,

@@ -65,6 +65,34 @@ canvas {
   max-width: 300px;
 }
 
+.laser-options {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.laser-option {
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background-color: rgba(73, 63, 63, 0.7); /* Semi-transparent background */
+  border-radius: 5px; /* Optional: rounded corners */
+  padding: 5px; /* Space between image and border */
+  box-sizing: border-box;
+  transition: transform 0.2s, border-color 0.3s, box-shadow 0.3s;
+  object-fit: contain;
+}
+
+.laser-option:hover,
+.laser-option.selected {
+  border: 2px solid #ff000023;
+  transform: scale(1.1);
+  background-color: rgba(255, 0, 0, 0.7);
+  box-shadow: 0 0 8px 3px rgba(255, 0, 0, 0.6); /* Red glow effect */
+}
+
+
 .filter-options {
   display: flex;
   gap: 10px;
