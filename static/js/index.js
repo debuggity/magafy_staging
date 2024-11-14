@@ -7,7 +7,7 @@ laserImageTemplate.src = "https://dmagafy-staging.netlify.app/laser_large.png";
 laserImageTemplate.crossOrigin = "anonymous";
 
 let laserRadialImage = new Image();
-laserRadialImage.src = "https://dmagafy-staging.netlify.app/laser_radial.webp";
+laserRadialImage.src = "https://dmagafy-staging.netlify.app/laser_radial.png";
 laserRadialImage.crossOrigin = "anonymous";
 
 let laserTopImage = new Image();
