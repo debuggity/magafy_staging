@@ -10,6 +10,9 @@
 /laser_top.png
   Access-Control-Allow-Origin: *
 
+/radial_top.webp
+  Access-Control-Allow-Origin: *
+
 /hat_front_1.png
   Access-Control-Allow-Origin: *
 
