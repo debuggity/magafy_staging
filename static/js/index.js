@@ -15,7 +15,7 @@ laserTopImage.src = "https://dmagafy-staging.netlify.app/laser_top.png"; // Repl
 laserTopImage.crossOrigin = "anonymous";
 
 let radialTopImage = new Image();
-radialTopImage.src = "https://dmagafy-staging.netlify.app/radial_top.webp";
+radialTopImage.src = "https://dmagafy-staging.netlify.app/radial_top.png";
 radialTopImage.crossOrigin = "anonymous";
 
 let canvasImage = new Image();
