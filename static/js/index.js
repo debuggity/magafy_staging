@@ -14,6 +14,10 @@ let laserTopImage = new Image();
 laserTopImage.src = "https://dmagafy-staging.netlify.app/laser_top.png"; // Replace with your actual URL
 laserTopImage.crossOrigin = "anonymous";
 
+let radialTopImage = new Image();
+radialTopImage.src = "https://dmagafy-staging.netlify.app/radial_top.webp";
+radialTopImage.crossOrigin = "anonymous";
+
 let canvasImage = new Image();
 let lasers = [];
 let isDragging = false;
@@ -441,12 +445,12 @@ document.getElementById("add-laser-button").addEventListener("click", function (
     x: canvas.width / 2 - laserWidth / 2,
     y: canvas.height / 2 - laserHeight / 2,
     rotation: 0,
-    // For radial lasers, no top image is needed
-    hasTopImage: (selectedLaserType === 'radial') ? false : true
+    topImage: (selectedLaserType === 'radial') ? radialTopImage : laserTopImage
   };
   lasers.push(laser);
   drawCanvas();
 });
+
 
 document.getElementById("add-hat-button").addEventListener("click", function () {
   if (!selectedHatImage) return;
@@ -1055,9 +1059,7 @@ function drawLaser(laser, context) {
 }
 
 function drawLaserCenter(laser, context) {
-  if (!laser.hasTopImage) {
-    return;  // If the laser type does not have a top image, skip drawing the second pass
-  }
+  if (!laser.topImage) return;  // Skip if no top image
 
   context.save();
   context.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
@@ -1067,7 +1069,7 @@ function drawLaserCenter(laser, context) {
   const topHeight = laser.height;
 
   context.drawImage(
-    laserTopImage,
+    laser.topImage,
     -topWidth / 2,
     -topHeight / 2,
     topWidth,
