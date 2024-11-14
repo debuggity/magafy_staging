@@ -24,6 +24,12 @@ let isDragging = false;
 let currentLaser = null;
 let offsetX, offsetY;
 
+let maskCanvas = document.createElement('canvas');
+let maskCtx = maskCanvas.getContext('2d');
+let isMasking = false;
+let brushSize = 20;
+let brushShape = 'circle';
+
 let selectedHatImage = null;
 let hats = [];
 let currentHat = null;
@@ -406,6 +412,10 @@ document.getElementById("image-upload").addEventListener("change", function (e) 
           // Set canvas dimensions based on the scaled image
           canvas.width = canvasImage.width * scale;
           canvas.height = canvasImage.height * scale;
+
+          maskCanvas.width = canvas.width;
+          maskCanvas.height = canvas.height;
+          clearMask();  // Clears any existing mask for a fresh start
 
           // Clear the canvas before drawing the new image
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -848,6 +858,11 @@ document.getElementById("download-button").addEventListener("click", function ()
     fullResCtx.drawImage(savedMaskImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
   }
 
+  // Apply the negative space mask on the full-resolution canvas
+  fullResCtx.globalCompositeOperation = 'destination-out';
+  fullResCtx.drawImage(maskCanvas, 0, 0, fullResCanvas.width, fullResCanvas.height);
+  fullResCtx.globalCompositeOperation = 'source-over';
+
   // Calculate scale factors for full resolution
   const scaleX = fullResCanvas.width / canvas.width;
   const scaleY = fullResCanvas.height / canvas.height;
@@ -963,6 +978,101 @@ canvas.addEventListener("drop", function (e) {
   }
 });
 
+// For mask drawing (negative space)
+canvas.addEventListener("mousedown", function (e) {
+  if (document.querySelector('.tab-link[data-tab="tab-5"]').classList.contains('current')) {
+    isMasking = true;
+    applyMask(e.offsetX, e.offsetY);
+  }
+});
+
+canvas.addEventListener("mousemove", function (e) {
+  if (isMasking) {
+    applyMask(e.offsetX, e.offsetY);
+  }
+});
+
+canvas.addEventListener("mouseup", function (e) {
+  if (isMasking) {
+    isMasking = false;
+  }
+});
+
+canvas.addEventListener("mouseleave", function (e) {
+  if (isMasking) {
+    isMasking = false;
+  }
+});
+
+// Touch events for masking
+canvas.addEventListener("touchstart", function (e) {
+  if (document.querySelector('.tab-link[data-tab="tab-5"]').classList.contains('current')) {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const offsetX = touch.clientX - rect.left;
+    const offsetY = touch.clientY - rect.top;
+    isMasking = true;
+    applyMask(offsetX, offsetY);
+  }
+});
+
+canvas.addEventListener("touchmove", function (e) {
+  if (isMasking) {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const offsetX = touch.clientX - rect.left;
+    const offsetY = touch.clientY - rect.top;
+    applyMask(offsetX, offsetY);
+  }
+});
+
+canvas.addEventListener("touchend", function (e) {
+  if (isMasking) {
+    isMasking = false;
+  }
+});
+
+function applyMask(x, y) {
+  // Convert canvas coordinates based on scaling
+  const scaleX = maskCanvas.width / canvas.offsetWidth;
+  const scaleY = maskCanvas.height / canvas.offsetHeight;
+  const adjustedX = x * scaleX;
+  const adjustedY = y * scaleY;
+
+  maskCtx.globalCompositeOperation = 'destination-out';
+  maskCtx.fillStyle = '#000'; 
+  if (brushShape === 'circle') {
+    maskCtx.beginPath();
+    maskCtx.arc(adjustedX, adjustedY, brushSize * scaleX, 0, 2 * Math.PI);
+    maskCtx.fill();
+  } else if (brushShape === 'square') {
+    maskCtx.fillRect(adjustedX - brushSize * scaleX / 2, adjustedY - brushSize * scaleY / 2, brushSize * scaleX, brushSize * scaleY);
+  }
+  maskCtx.globalCompositeOperation = 'source-over';
+  drawCanvas();
+}
+
+function clearMask() {
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+}
+
+// Mask tab event listeners
+document.querySelectorAll('input[name="brushShape"]').forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    brushShape = e.target.value;
+  });
+});
+
+document.getElementById("brush-size-slider").addEventListener("input", function (e) {
+  brushSize = parseInt(e.target.value, 10);
+});
+
+document.getElementById("clear-mask-button").addEventListener("click", function () {
+  clearMask();
+  drawCanvas();
+});
+
 document.getElementById("contrast-slider").addEventListener("input", function (e) {
   contrastValue = e.target.value;
   drawCanvas();
@@ -1005,6 +1115,12 @@ function drawCanvas() {
   // Apply contrast and redness adjustments
   applyContrastAndRedness(ctx, canvas.width, canvas.height);
 
+  // Apply the negative space mask to prevent filters and backgrounds where masked
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
   // Draw the flag and masked image if the flag is applied
   if (flagApplied && savedMaskImage) {
     const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
@@ -1032,7 +1148,7 @@ function drawCanvas() {
   lasers.forEach(laser => {
     drawLaser(laser, ctx);  // First pass: draw laser
   });
-  
+
   lasers.forEach(laser => {
     drawLaserCenter(laser, ctx);  // Second pass: draw laser center
   });
@@ -1045,6 +1161,12 @@ function drawCanvas() {
     ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
     ctx.restore();
   });
+
+  // Re-apply the negative space mask so that background elements won't appear on masked areas either
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
+  ctx.restore();
 }
 
 function drawLaser(laser, context) {
