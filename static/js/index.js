@@ -1389,22 +1389,22 @@ function applyFullResGradientMapFilter(context, width, height) {
   }
 }
 
-// Tab functionality
 document.querySelectorAll('.tab-link').forEach(tab => {
   tab.addEventListener('click', function() {
-    const tab_id = this.getAttribute('data-tab');
+    console.log("Tab clicked:", this.getAttribute('data-tab'));
 
-    document.querySelectorAll('.tab-link').forEach(tab => {
-      tab.classList.remove('current');
-    });
-    document.querySelectorAll('.tab-content').forEach(content => {
-      content.classList.remove('current');
-    });
+    // Remove 'current' class from all tabs and content sections
+    document.querySelectorAll('.tab-link').forEach(tab => tab.classList.remove('current'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('current'));
 
+    // Add 'current' to the clicked tab and corresponding content
     this.classList.add('current');
-    document.getElementById(tab_id).classList.add('current');
+    const tabId = this.getAttribute('data-tab');
+    console.log("Showing tab content:", tabId);
+    document.getElementById(tabId).classList.add('current');
   });
 });
+
 
 document.getElementById("remove-all-lasers-button").addEventListener("click", function () {
   lasers = [];
