@@ -656,6 +656,7 @@ h1 {
   gap: 10px;
 }
 
+/* Base Style for Eye Color Buttons */
 .eye-color-option {
   display: flex;
   align-items: center;
@@ -665,19 +666,51 @@ h1 {
   color: white;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
 }
 
-.eye-color-option.selected {
-  background-color: #DB0A25;
-  transform: scale(1.1);
-}
-
+/* Hover state uses data attribute to set glow color */
 .eye-color-option:hover {
-  background-color: #DB0A25; 
   transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(219, 10, 37, 0.9); 
+  box-shadow: 0 0 10px currentColor;
 }
+
+/* Selected state uses data attribute to set background & shadow color */
+.eye-color-option.selected {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* Assign text and glow colors based on the data-color attribute */
+.eye-color-option[data-color="blue"] {
+  background-color: #1E90FF; /* DodgerBlue for background */
+  color: #fff;
+}
+.eye-color-option[data-color="blue"]:hover,
+.eye-color-option[data-color="blue"].selected {
+  background-color: #1E90FF; /* Keep the same background on hover */
+}
+
+/* For Red color option */
+.eye-color-option[data-color="red"] {
+  background-color: #DB0A25; /* Original Red color */
+  color: #fff;
+}
+.eye-color-option[data-color="red"]:hover,
+.eye-color-option[data-color="red"].selected {
+  background-color: #FF0000; /* Brighter red on hover & selected */
+}
+
+/* For Purple color option */
+.eye-color-option[data-color="purple"] {
+  background-color: #800080; /* A purple background */
+  color: #fff;
+}
+.eye-color-option[data-color="purple"]:hover,
+.eye-color-option[data-color="purple"].selected {
+  background-color: #9932CC; /* Brighter purple on hover & selected */
+}
+
 
 @media (max-width: 900px) {
 
