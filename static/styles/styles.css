@@ -672,13 +672,13 @@ h1 {
 /* Hover state uses data attribute to set glow color */
 .eye-color-option:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 10px currentColor;
+  box-shadow: 0 0 10px #ff4040;
 }
 
 /* Selected state uses data attribute to set background & shadow color */
 .eye-color-option.selected {
   transform: scale(1.1);
-  box-shadow: 0 0 10px currentColor;
+  box-shadow: 0 0 10px #ff4040;
 }
 
 /* Assign text and glow colors based on the data-color attribute */
