@@ -35,8 +35,6 @@ body {
   overflow: hidden;
 }
 
-
-
 /* Ensure content doesn't create unwanted space */
 #canvas-container {
   position: relative;
@@ -651,6 +649,34 @@ h1 {
   font-size: 20px;
   border-radius: 50%;
   z-index: 1000;
+}
+
+.eye-color-options {
+  display: flex;
+  gap: 10px;
+}
+
+.eye-color-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 15px;
+  background-color: #333;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.eye-color-option.selected {
+  background-color: #DB0A25;
+  transform: scale(1.1);
+}
+
+.eye-color-option:hover {
+  background-color: #DB0A25; 
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(219, 10, 37, 0.9); 
 }
 
 @media (max-width: 900px) {

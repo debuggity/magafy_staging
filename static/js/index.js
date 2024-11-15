@@ -2,6 +2,8 @@ const canvas = document.getElementById("meme-canvas");
 const ctx = canvas.getContext("2d");
 //const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
+let selectedEyeColor = 'blue';
+
 const laserImageTemplate = new Image();
 laserImageTemplate.src = "https://dmagafy-staging.netlify.app/laser_large.png";
 laserImageTemplate.crossOrigin = "anonymous";
@@ -68,6 +70,15 @@ document.querySelectorAll('.laser-option').forEach(option => {
     this.classList.add('selected');
 
     selectedLaserType = this.getAttribute('data-laser-type');
+  });
+});
+
+document.querySelectorAll('.eye-color-option').forEach(option => {
+  option.addEventListener('click', function () {
+    document.querySelectorAll('.eye-color-option').forEach(opt => opt.classList.remove('selected'));
+    this.classList.add('selected');
+    selectedEyeColor = this.getAttribute('data-color');
+    drawCanvas(); // Redraw canvas to apply new color
   });
 });
 
@@ -1052,11 +1063,26 @@ function drawLaser(laser, context) {
   context.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
   context.rotate(laser.rotation);
 
-  // Draw the laser image onto the main context (no cutout here anymore)
-  context.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
-  
+  // Create an offscreen canvas to apply hue shift
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width = laser.width;
+  offCanvas.height = laser.height;
+  const offCtx = offCanvas.getContext('2d');
+  offCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
+
+  // Apply color transformation if not blue
+  if (selectedEyeColor !== 'blue') {
+    const imageData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
+    hueShiftImageData(imageData, selectedEyeColor);
+    offCtx.putImageData(imageData, 0, 0);
+  }
+
+  // Draw the offscreen canvas onto the main canvas
+  context.drawImage(offCanvas, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
+
   context.restore();
 }
+
 
 function drawLaserCenter(laser, context) {
   if (!laser.topImage) return;  // Skip if no top image
@@ -1065,11 +1091,24 @@ function drawLaserCenter(laser, context) {
   context.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
   context.rotate(laser.rotation);
 
+  // Create an offscreen canvas to apply hue shift to the top image
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width = laser.width;
+  offCanvas.height = laser.height;
+  const offCtx = offCanvas.getContext('2d');
+  offCtx.drawImage(laser.topImage, 0, 0, laser.width, laser.height);
+
+  if (selectedEyeColor !== 'blue') {
+    const imageData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
+    hueShiftImageData(imageData, selectedEyeColor);
+    offCtx.putImageData(imageData, 0, 0);
+  }
+
   const topWidth = laser.width;
   const topHeight = laser.height;
 
   context.drawImage(
-    laser.topImage,
+    offCanvas,
     -topWidth / 2,
     -topHeight / 2,
     topWidth,
@@ -1077,6 +1116,85 @@ function drawLaserCenter(laser, context) {
   );
 
   context.restore();
+}
+
+function hueShiftImageData(imageData, color) {
+  const data = imageData.data;
+
+  let hueOffset;
+  if (color === 'red') {
+    // Assume original laser color is mostly blue; blue to red hue difference is approximately 120 degrees
+    hueOffset = 120;
+  } else if (color === 'yellow') {
+    // Blue to yellow hue difference is about 60 degrees
+    hueOffset = 60; 
+  }
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+
+    // Convert to HSV
+    const hsv = rgbToHsv(r, g, b);
+    hsv[0] = (hsv[0] + hueOffset / 360) % 1; // Apply hue offset
+    const rgb = hsvToRgb(hsv[0], hsv[1], hsv[2]);
+
+    data[i] = rgb[0];
+    data[i + 1] = rgb[1];
+    data[i + 2] = rgb[2];
+  }
+}
+
+function rgbToHsv(r, g, b) {
+  r /= 255; 
+  g /= 255; 
+  b /= 255;
+  const max = Math.max(r, g, b), 
+        min = Math.min(r, g, b);
+  const diff = max - min;
+  let h = 0;
+  let s = (max === 0 ? 0 : diff / max);
+  let v = max;
+
+  if (diff !== 0) {
+    if (max === r) {
+      h = ((g - b) / diff) % 6;
+    } else if (max === g) {
+      h = (b - r) / diff + 2;
+    } else {
+      h = (r - g) / diff + 4;
+    }
+    if (h < 0) {
+      h += 6;
+    }
+    h /= 6;
+  }
+  return [h, s, v];
+}
+
+function hsvToRgb(h, s, v) {
+  let r, g, b;
+  let i = Math.floor(h * 6);
+  let f = h * 6 - i;
+  let p = v * (1 - s);
+  let q = v * (1 - f * s);
+  let t = v * (1 - (1 - f) * s);
+
+  switch (i % 6) {
+    case 0: r = v, g = t, b = p; break;
+    case 1: r = q, g = v, b = p; break;
+    case 2: r = p, g = v, b = t; break;
+    case 3: r = p, g = q, b = v; break;
+    case 4: r = t, g = p, b = v; break;
+    case 5: r = v, g = p, b = q; break;
+  }
+
+  return [
+    Math.round(r * 255), 
+    Math.round(g * 255), 
+    Math.round(b * 255)
+  ];
 }
 
 function drawCanvas() {
