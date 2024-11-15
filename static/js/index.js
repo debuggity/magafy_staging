@@ -72,6 +72,7 @@ document.querySelectorAll('.laser-option').forEach(option => {
   option.addEventListener('click', function () {
     document.querySelectorAll('.laser-option').forEach(opt => opt.classList.remove('selected'));
     this.classList.add('selected');
+
     selectedLaserType = this.getAttribute('data-laser-type');
   });
 });
@@ -122,8 +123,14 @@ function updateMagnifierBackground(x, y) {
   );
 
   // Update the magnifier's background with the offscreen canvas
-  magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`;
+  //magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`;
+  //magnifier.style.backgroundSize = `${magnifierSize * magnification}px ${magnifierSize * magnification}px`;
+  
+  // Use the offscreen canvas directly instead of generating a data URL
+  // Apply the offscreen canvas as a background to the magnifier
+  magnifier.style.backgroundImage = `url(${offscreenCanvas.toDataURL()})`; // Optional if direct application isn't possible
   magnifier.style.backgroundSize = `${magnifierSize * magnification}px ${magnifierSize * magnification}px`;
+
 }
 
 // Function to show the magnifier, centered on the object's center but avoiding the touch point
@@ -181,6 +188,7 @@ function hideMagnifier() {
   magnifier.style.display = "none";
 }
 
+
 let modelLoaded = false;
 const loadingOverlay = document.getElementById("loading-overlay");
 const errorIndicator = document.getElementById("error-indicator");
@@ -201,6 +209,7 @@ async function loadModel() {
 
 // Call this only once during page load
 window.addEventListener('DOMContentLoaded', loadModel);
+
 
 // Show loading overlay only during background removal
 function showLoadingOverlay() {
@@ -259,7 +268,7 @@ async function addFlagWithBackgroundRemoval() {
     // Dispose of input and output tensors
     inputTensor.dispose();
     Object.values(output).forEach(tensor => tensor.dispose());
-
+    
   } catch (error) {
     console.error("Error during background removal:", error);
     showErrorIndicator();
@@ -313,9 +322,9 @@ function preprocessImageForONNX(imageElement) {
   const tensorData = new Float32Array(1 * 3 * width * height);
 
   for (let i = 0; i < imageData.data.length; i += 4) {
-    tensorData[i / 4] = imageData.data[i] / 255; // Red
-    tensorData[(i / 4) + (width * height)] = imageData.data[i + 1] / 255; // Green
-    tensorData[(i / 4) + (2 * width * height)] = imageData.data[i + 2] / 255; // Blue
+      tensorData[i / 4] = imageData.data[i] / 255; // Red
+      tensorData[(i / 4) + (width * height)] = imageData.data[i + 1] / 255; // Green
+      tensorData[(i / 4) + (2 * width * height)] = imageData.data[i + 2] / 255; // Blue
   }
 
   return new ort.Tensor('float32', tensorData, [1, 3, width, height]);
@@ -382,47 +391,49 @@ document.querySelector(".upload-btn").addEventListener("click", () => {
 document.getElementById("image-upload").addEventListener("change", function (e) {
   const reader = new FileReader();
   reader.onload = function (event) {
-    // Hide the initial load screen
-    document.getElementById("initial-load-screen").style.display = "none";
+      // Hide the initial load screen
+      document.getElementById("initial-load-screen").style.display = "none";
 
-    // Reset the flag and mask state when a new image is uploaded
-    flagApplied = false;
-    savedMaskImage = null;
+      // Reset the flag and mask state when a new image is uploaded
+      flagApplied = false;
+      savedMaskImage = null;
 
-    canvasImage.onload = function () {
-      originalImageWidth = canvasImage.width;
-      originalImageHeight = canvasImage.height;
+      canvasImage.onload = function () {
+          originalImageWidth = canvasImage.width;
+          originalImageHeight = canvasImage.height;
 
-      // Scale the image to fit within the specified limits
-      const scale = Math.min(
-        MAX_WIDTH / canvasImage.width,
-        MAX_HEIGHT / canvasImage.height,
-        1
-      );
+          // Scale the image to fit within the specified limits
+          const scale = Math.min(
+              MAX_WIDTH / canvasImage.width,
+              MAX_HEIGHT / canvasImage.height,
+              1
+          );
 
-      // Set canvas dimensions based on the scaled image
-      canvas.width = canvasImage.width * scale;
-      canvas.height = canvasImage.height * scale;
+          // Set canvas dimensions based on the scaled image
+          canvas.width = canvasImage.width * scale;
+          canvas.height = canvasImage.height * scale;
 
-      maskCanvas.width = canvas.width;
-      maskCanvas.height = canvas.height;
-      clearMask();  // Clears any existing mask for a fresh start
+          maskCanvas.width = canvas.width;
+          maskCanvas.height = canvas.height;
+          clearMask();  // Clears any existing mask for a fresh start
 
-      // Clear the canvas before drawing the new image
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawCanvas(); // Redraw with the new image and reset state
+          // Clear the canvas before drawing the new image
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          drawCanvas(); // Redraw with the new image and reset state
 
-      // Display the button container for further actions
-      document.querySelector(".button-container").style.display = "flex";
-    };
+          // Display the button container for further actions
+          document.querySelector(".button-container").style.display = "flex";
+      };
 
-    // Set the new image source, which triggers the onload event
-    canvasImage.src = event.target.result;
+      // Set the new image source, which triggers the onload event
+      canvasImage.src = event.target.result;
   };
 
   // Read the file as a data URL
   reader.readAsDataURL(e.target.files[0]);
 });
+
+
 
 document.getElementById("add-laser-button").addEventListener("click", function () {
   const aspectRatio = (selectedLaserType === 'radial') 
@@ -449,6 +460,7 @@ document.getElementById("add-laser-button").addEventListener("click", function (
   lasers.push(laser);
   drawCanvas();
 });
+
 
 document.getElementById("add-hat-button").addEventListener("click", function () {
   if (!selectedHatImage) return;
@@ -492,6 +504,7 @@ document.getElementById("resize-slider").addEventListener("input", function (e) 
   drawCanvas();
 });
 
+
 document.getElementById("hat-resize-slider").addEventListener("input", function (e) {
   const scale = e.target.value;
   hats.forEach((hat) => {
@@ -523,6 +536,7 @@ document.getElementById("hat-rotate-slider").addEventListener("input", function 
   });
   drawCanvas();
 });
+
 
 document.querySelectorAll('.hat-option').forEach(option => {
   option.addEventListener('click', function () {
@@ -557,74 +571,66 @@ document.querySelectorAll('.filter-option').forEach(option => {
 });
 
 canvas.addEventListener("mousedown", function (e) {
-  // Check if we are masking
-  if (document.querySelector('.tab-link[data-tab="tab-5"]').classList.contains('current')) {
-    isMasking = true;
-    applyMask(e.offsetX, e.offsetY);
-  } else {
-    const mouseX = e.offsetX;
-    const mouseY = e.offsetY;
-    let closestDistance = Infinity;
-    currentLaser = null;
-    currentHat = null;
+  const mouseX = e.offsetX;
+  const mouseY = e.offsetY;
+  let closestDistance = Infinity;
+  currentLaser = null;
+  currentHat = null;
 
-    // Check lasers for closest
-    lasers.forEach((laser) => {
-      const centerX = laser.x + laser.width / 2;
-      const centerY = laser.y + laser.height / 2;
-      const distance = Math.sqrt(
-        Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2)
-      );
+  // Check lasers for closest
+  lasers.forEach((laser) => {
+    const centerX = laser.x + laser.width / 2;
+    const centerY = laser.y + laser.height / 2;
+    const distance = Math.sqrt(
+      Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2)
+    );
 
-      if (
-        mouseX > laser.x &&
-        mouseX < laser.x + laser.width &&
-        mouseY > laser.y &&
-        mouseY < laser.y + laser.height &&
-        distance < closestDistance
-      ) {
-        closestDistance = distance;
-        currentLaser = laser;
-        currentHat = null; // Reset currentHat to ensure only one is selected
-        offsetX = mouseX - laser.x;
-        offsetY = mouseY - laser.y;
-      }
-    });
-
-    // Check hats for closest, only if closer than the closest laser
-    hats.forEach((hat) => {
-      const centerX = hat.x + hat.width / 2;
-      const centerY = hat.y + hat.height / 2;
-      const distance = Math.sqrt(
-        Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2)
-      );
-
-      if (
-        mouseX > hat.x &&
-        mouseX < hat.x + hat.width &&
-        mouseY > hat.y &&
-        mouseY < hat.y + hat.height &&
-        distance < closestDistance
-      ) {
-        closestDistance = distance;
-        currentHat = hat;
-        currentLaser = null; // Reset currentLaser to ensure only one is selected
-        offsetX = mouseX - hat.x;
-        offsetY = mouseY - hat.y;
-      }
-    });
-
-    // Set dragging flag if either laser or hat is selected
-    if (currentLaser || currentHat) {
-      isDragging = true;
+    if (
+      mouseX > laser.x &&
+      mouseX < laser.x + laser.width &&
+      mouseY > laser.y &&
+      mouseY < laser.y + laser.height &&
+      distance < closestDistance
+    ) {
+      closestDistance = distance;
+      currentLaser = laser;
+      currentHat = null; // Reset currentHat to ensure only one is selected
+      offsetX = mouseX - laser.x;
+      offsetY = mouseY - laser.y;
     }
+  });
+
+  // Check hats for closest, only if closer than the closest laser
+  hats.forEach((hat) => {
+    const centerX = hat.x + hat.width / 2;
+    const centerY = hat.y + hat.height / 2;
+    const distance = Math.sqrt(
+      Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2)
+    );
+
+    if (
+      mouseX > hat.x &&
+      mouseX < hat.x + hat.width &&
+      mouseY > hat.y &&
+      mouseY < hat.y + hat.height &&
+      distance < closestDistance
+    ) {
+      closestDistance = distance;
+      currentHat = hat;
+      currentLaser = null; // Reset currentLaser to ensure only one is selected
+      offsetX = mouseX - hat.x;
+      offsetY = mouseY - hat.y;
+    }
+  });
+
+  // Set dragging flag if either laser or hat is selected
+  if (currentLaser || currentHat) {
+    isDragging = true;
   }
 });
 
 canvas.addEventListener("mousemove", function (e) {
-  if (isMasking) {
-    applyMask(e.offsetX, e.offsetY);
-  } else if (isDragging) {
+  if (isDragging) {
     const mouseX = e.offsetX;
     const mouseY = e.offsetY;
 
@@ -645,9 +651,6 @@ canvas.addEventListener("mousemove", function (e) {
 });
 
 canvas.addEventListener("mouseup", function () {
-  if (isMasking) {
-    isMasking = false;
-  }
   if (isDragging) {
     if (currentLaser) {
       currentLaser.isDragging = false;
@@ -663,107 +666,88 @@ canvas.addEventListener("mouseup", function () {
   }
 });
 
-canvas.addEventListener("mouseleave", function (e) {
-  if (isMasking) {
-    isMasking = false;
-  }
-});
-
 // Touch Start Event - Shows magnifier only for lasers, but allows dragging for hats too
 canvas.addEventListener("touchstart", function (e) {
-  if (document.querySelector('.tab-link[data-tab="tab-5"]').classList.contains('current')) {
-    const touch = e.touches[0];
-    applyMask(touch.clientX - canvas.getBoundingClientRect().left, touch.clientY - canvas.getBoundingClientRect().top);
-    isMasking = true;
-  } else {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const touchX = (touch.clientX - rect.left) * scaleX;
-    const touchY = (touch.clientY - rect.top) * scaleY;
+  e.preventDefault();
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const touchX = (touch.clientX - rect.left) * scaleX;
+  const touchY = (touch.clientY - rect.top) * scaleY;
 
-    let closestDistance = Infinity;
-    currentLaser = null;
-    currentHat = null;
+  let closestDistance = Infinity;
+  currentLaser = null;
+  currentHat = null;
 
-    // Identify the closest laser
-    lasers.forEach((laser) => {
-      const centerX = laser.x + laser.width / 2;
-      const centerY = laser.y + laser.height / 2;
-      const distance = Math.sqrt(
-        Math.pow(touchX - centerX, 2) + Math.pow(touchY - centerY, 2)
-      );
+  // Identify the closest laser
+  lasers.forEach((laser) => {
+    const centerX = laser.x + laser.width / 2;
+    const centerY = laser.y + laser.height / 2;
+    const distance = Math.sqrt(
+      Math.pow(touchX - centerX, 2) + Math.pow(touchY - centerY, 2)
+    );
 
-      if (
-        touchX > laser.x &&
-        touchX < laser.x + laser.width &&
-        touchY > laser.y &&
-        touchY < laser.y + laser.height &&
-        distance < closestDistance
-      ) {
-        closestDistance = distance;
-        currentLaser = laser;
-        currentHat = null;
-        offsetX = touchX - laser.x;
-        offsetY = touchY - laser.y;
-      }
-    });
+    if (
+      touchX > laser.x &&
+      touchX < laser.x + laser.width &&
+      touchY > laser.y &&
+      touchY < laser.y + laser.height &&
+      distance < closestDistance
+    ) {
+      closestDistance = distance;
+      currentLaser = laser;
+      currentHat = null;
+      offsetX = touchX - laser.x;
+      offsetY = touchY - laser.y;
+    }
+  });
 
-    // Identify the closest hat if no closer laser is found
-    hats.forEach((hat) => {
-      const centerX = hat.x + hat.width / 2;
-      const centerY = hat.y + hat.height / 2;
-      const distance = Math.sqrt(
-        Math.pow(touchX - centerX, 2) + Math.pow(touchY - centerY, 2)
-      );
+  // Identify the closest hat if no closer laser is found
+  hats.forEach((hat) => {
+    const centerX = hat.x + hat.width / 2;
+    const centerY = hat.y + hat.height / 2;
+    const distance = Math.sqrt(
+      Math.pow(touchX - centerX, 2) + Math.pow(touchY - centerY, 2)
+    );
 
-      if (
-        touchX > hat.x &&
-        touchX < hat.x + hat.width &&
-        touchY > hat.y &&
-        touchY < hat.y + hat.height &&
-        distance < closestDistance
-      ) {
-        closestDistance = distance;
-        currentHat = hat;
-        currentLaser = null;
-        offsetX = touchX - hat.x;
-        offsetY = touchY - hat.y;
-      }
-    });
+    if (
+      touchX > hat.x &&
+      touchX < hat.x + hat.width &&
+      touchY > hat.y &&
+      touchY < hat.y + hat.height &&
+      distance < closestDistance
+    ) {
+      closestDistance = distance;
+      currentHat = hat;
+      currentLaser = null;
+      offsetX = touchX - hat.x;
+      offsetY = touchY - hat.y;
+    }
+  });
 
-    // Set dragging flag and show magnifier only if a laser is selected
-    if (currentLaser || currentHat) {
-      isDragging = true;
+  // Set dragging flag and show magnifier only for lasers
+  if (currentLaser || currentHat) {
+    isDragging = true;
 
-      // Show magnifier only if a laser is selected
-      if (currentLaser) {
-        // Calculate the center of the selected laser
-        const objectCenterX = currentLaser.x + currentLaser.width / 2;
-        const objectCenterY = currentLaser.y + currentLaser.height / 2;
+    // Show magnifier only if a laser is selected
+    if (currentLaser) {
+      // Calculate the center of the selected laser
+      const objectCenterX = currentLaser.x + currentLaser.width / 2;
+      const objectCenterY = currentLaser.y + currentLaser.height / 2;
 
-        // Convert canvas coordinates to client (screen) coordinates
-        const clientPos = canvasToClient(canvas, objectCenterX, objectCenterY);
+      // Convert canvas coordinates to client (screen) coordinates
+      const clientPos = canvasToClient(canvas, objectCenterX, objectCenterY);
 
-        // Show the magnifier centered on the laser's center
-        showMagnifier(clientPos.clientX, clientPos.clientY);
-      }
+      // Show the magnifier centered on the laser's center
+      showMagnifier(clientPos.clientX, clientPos.clientY);
     }
   }
 });
 
 // Touch Move Event
 canvas.addEventListener("touchmove", function (e) {
-  if (isMasking) {
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    const offsetX = touch.clientX - rect.left;
-    const offsetY = touch.clientY - rect.top;
-    applyMask(offsetX, offsetY);
-  } else if (isDragging) {
+  if (isDragging) {
     e.preventDefault();
     const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
@@ -797,19 +781,15 @@ canvas.addEventListener("touchmove", function (e) {
     }
 
     // Convert canvas coordinates to client (screen) coordinates
-    if (objectCenterX && objectCenterY) {
-      const clientPos = canvasToClient(canvas, objectCenterX, objectCenterY);
-      // Update the magnifier's background to reflect the current canvas state
-      updateMagnifierBackground(clientPos.clientX, clientPos.clientY);
-    }
+    const clientPos = canvasToClient(canvas, objectCenterX, objectCenterY);
+
+    // Update the magnifier's background to reflect the current canvas state
+    updateMagnifierBackground(clientPos.clientX, clientPos.clientY);
   }
 });
 
 // Touch End Event - Hide magnifier regardless of item type
 canvas.addEventListener("touchend", function () {
-  if (isMasking) {
-    isMasking = false;
-  }
   if (isDragging) {
     if (currentLaser) {
       currentLaser.isDragging = false;
@@ -879,32 +859,9 @@ document.getElementById("download-button").addEventListener("click", function ()
   }
 
   // Apply the negative space mask on the full-resolution canvas
-  // Inverse the mask area to not apply filters
-  const maskData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
-  const scaledMaskCanvas = document.createElement('canvas');
-  scaledMaskCanvas.width = fullResCanvas.width;
-  scaledMaskCanvas.height = fullResCanvas.height;
-  const scaledMaskCtx = scaledMaskCanvas.getContext('2d');
-  scaledMaskCtx.drawImage(maskCanvas, 0, 0, fullResCanvas.width, fullResCanvas.height);
-  const fullResMaskData = scaledMaskCtx.getImageData(0, 0, fullResCanvas.width, fullResCanvas.height);
-
-  // Create a new canvas to store final compositing
-  const finalCanvas = document.createElement("canvas");
-  finalCanvas.width = fullResCanvas.width;
-  finalCanvas.height = fullResCanvas.height;
-  const finalCtx = finalCanvas.getContext("2d");
-
-  // Draw original filtered image
-  finalCtx.drawImage(fullResCanvas, 0, 0);
-
-  // Remove filtered areas where mask is applied
-  finalCtx.globalCompositeOperation = 'destination-out';
-  finalCtx.drawImage(scaledMaskCanvas, 0, 0);
-  finalCtx.globalCompositeOperation = 'source-over';
-
-  // Draw original image over these areas
-  finalCtx.globalCompositeOperation = 'destination-over';
-  finalCtx.drawImage(canvasImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
+  fullResCtx.globalCompositeOperation = 'destination-out';
+  fullResCtx.drawImage(maskCanvas, 0, 0, fullResCanvas.width, fullResCanvas.height);
+  fullResCtx.globalCompositeOperation = 'source-over';
 
   // Calculate scale factors for full resolution
   const scaleX = fullResCanvas.width / canvas.width;
@@ -919,7 +876,7 @@ document.getElementById("download-button").addEventListener("click", function ()
       width: laser.width * scaleX,
       height: laser.height * scaleY
     };
-    drawLaser(scaledLaser, finalCtx);
+    drawLaser(scaledLaser, fullResCtx);
   });
 
   lasers.forEach((laser) => {
@@ -930,29 +887,29 @@ document.getElementById("download-button").addEventListener("click", function ()
       width: laser.width * scaleX,
       height: laser.height * scaleY
     };
-    drawLaserCenter(scaledLaser, finalCtx);
+    drawLaserCenter(scaledLaser, fullResCtx);
   });
 
   // Draw hats at full resolution
   hats.forEach((hat) => {
-    finalCtx.save();
-    finalCtx.translate(
+    fullResCtx.save();
+    fullResCtx.translate(
       (hat.x + hat.width / 2) * scaleX,
       (hat.y + hat.height / 2) * scaleY
     );
-    finalCtx.rotate(hat.rotation);
-    finalCtx.drawImage(
+    fullResCtx.rotate(hat.rotation);
+    fullResCtx.drawImage(
       hat.image,
       -hat.width * scaleX / 2,
       -hat.height * scaleY / 2,
       hat.width * scaleX,
       hat.height * scaleY
     );
-    finalCtx.restore();
+    fullResCtx.restore();
   });
 
   // Export the final image as a PNG
-  finalCanvas.toBlob(function (blob) {
+  fullResCanvas.toBlob(function (blob) {
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "dark_pfp_with_background.png";
@@ -970,30 +927,30 @@ window.addEventListener("paste", function (e) {
       const reader = new FileReader();
       reader.onload = function (event) {
         canvasImage.onload = function () {
-          originalImageWidth = canvasImage.width;
-          originalImageHeight = canvasImage.height;
-
-          const scale = Math.min(
-            MAX_WIDTH / canvasImage.width,
-            MAX_HEIGHT / canvasImage.height,
-            1
-          );
-          canvas.width = canvasImage.width * scale;
-          canvas.height = canvasImage.height * scale;
-
-          // Ensure maskCanvas matches the main canvas dimensions
-          maskCanvas.width = canvas.width;
-          maskCanvas.height = canvas.height;
-
-          clearMask();  // Clears any existing mask for a fresh start
-
-          // Clear the canvas before drawing the new image
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          drawCanvas(); // Redraw with the new image and reset state
-
-          document.querySelector(".button-container").style.display = "flex";
+            originalImageWidth = canvasImage.width;
+            originalImageHeight = canvasImage.height;
+        
+            const scale = Math.min(
+                MAX_WIDTH / canvasImage.width,
+                MAX_HEIGHT / canvasImage.height,
+                1
+            );
+            canvas.width = canvasImage.width * scale;
+            canvas.height = canvasImage.height * scale;
+        
+            // Ensure maskCanvas matches the main canvas dimensions
+            maskCanvas.width = canvas.width;
+            maskCanvas.height = canvas.height;
+        
+            clearMask();  // Clears any existing mask for a fresh start
+        
+            // Clear the canvas before drawing the new image
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawCanvas(); // Redraw with the new image and reset state
+        
+            document.querySelector(".button-container").style.display = "flex";
         };
-
+        
         canvasImage.src = event.target.result;
       };
       reader.readAsDataURL(file);
@@ -1023,17 +980,7 @@ canvas.addEventListener("drop", function (e) {
         );
         canvas.width = canvasImage.width * scale;
         canvas.height = canvasImage.height * scale;
-
-        // Ensure maskCanvas matches the main canvas dimensions
-        maskCanvas.width = canvas.width;
-        maskCanvas.height = canvas.height;
-
-        clearMask();  // Clears any existing mask for a fresh start
-
-        // Clear the canvas before drawing the new image
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawCanvas(); // Redraw with the new image and reset state
-
+        drawCanvas();
         document.querySelector(".button-container").style.display = "flex";
       };
       canvasImage.src = event.target.result;
@@ -1098,24 +1045,24 @@ canvas.addEventListener("touchend", function (e) {
 });
 
 function applyMask(x, y) {
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = maskCanvas.width / rect.width;
-  const scaleY = maskCanvas.height / rect.height;
+  const scaleX = maskCanvas.width / canvas.offsetWidth;
+  const scaleY = maskCanvas.height / canvas.offsetHeight;
   const adjustedX = x * scaleX;
   const adjustedY = y * scaleY;
 
   maskCtx.globalCompositeOperation = 'destination-out';
-  maskCtx.fillStyle = '#000';
+  maskCtx.fillStyle = '#000'; 
   if (brushShape === 'circle') {
-    maskCtx.beginPath();
-    maskCtx.arc(adjustedX, adjustedY, brushSize * scaleX, 0, 2 * Math.PI);
-    maskCtx.fill();
+      maskCtx.beginPath();
+      maskCtx.arc(adjustedX, adjustedY, brushSize * scaleX, 0, 2 * Math.PI);
+      maskCtx.fill();
   } else if (brushShape === 'square') {
-    maskCtx.fillRect(adjustedX - brushSize * scaleX / 2, adjustedY - brushSize * scaleY / 2, brushSize * scaleX, brushSize * scaleY);
+      maskCtx.fillRect(adjustedX - brushSize * scaleX / 2, adjustedY - brushSize * scaleY / 2, brushSize * scaleX, brushSize * scaleY);
   }
   maskCtx.globalCompositeOperation = 'source-over';
   drawCanvas();
 }
+
 
 function clearMask() {
   maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
@@ -1156,6 +1103,7 @@ document.getElementById("reset-adjustments-button").addEventListener("click", fu
   drawCanvas();
 });
 
+
 let contrastValue = 1;  // Default contrast value
 let rednessValue = 1;   // Default redness value
 
@@ -1166,13 +1114,13 @@ function drawCanvas() {
   // Draw the base image (the original uploaded image)
   ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
 
-  // **1.** Apply the mask to the image to show the original image in masked areas (removing filters)
+  // Draw mask to mask out areas before filters
   ctx.save();
   ctx.globalCompositeOperation = 'destination-out';
   ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
   ctx.restore();
 
-  // **2.** Apply the selected filter (if any) to the canvas
+  // Apply the selected filter (if any)
   if (currentFilter === 'dark') {
     applyGradientMapFilter(ctx, canvas.width, canvas.height);
   } else if (currentFilter === 'classic') {
@@ -1181,16 +1129,16 @@ function drawCanvas() {
     applyLightFilter(ctx, canvas.width, canvas.height);
   }
 
-  // **3.** Apply contrast and redness adjustments
+  // Apply contrast and redness adjustments
   applyContrastAndRedness(ctx, canvas.width, canvas.height);
 
-  // **4.** Apply the mask again to restore original image in masked areas
+  // Apply the negative space mask to prevent filters and backgrounds where masked
   ctx.save();
   ctx.globalCompositeOperation = 'destination-out';
   ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
   ctx.restore();
 
-  // **5.** Draw the flag and masked image if the flag is applied
+  // Draw the flag and masked image if the flag is applied
   if (flagApplied && savedMaskImage) {
     const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
     let backgroundWidth, backgroundHeight;
@@ -1213,7 +1161,7 @@ function drawCanvas() {
     ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
   }
 
-  // **6.** Draw lasers in two passes
+  // Draw lasers in two passes
   lasers.forEach(laser => {
     drawLaser(laser, ctx);  // First pass: draw laser
   });
@@ -1222,7 +1170,7 @@ function drawCanvas() {
     drawLaserCenter(laser, ctx);  // Second pass: draw laser center
   });
 
-  // **7.** Draw hats on top of everything
+  // Draw hats on top of everything
   hats.forEach(hat => {
     ctx.save();
     ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
@@ -1230,6 +1178,12 @@ function drawCanvas() {
     ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
     ctx.restore();
   });
+
+  // Re-apply the negative space mask so that background elements won't appear on masked areas either
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
+  ctx.restore();
 }
 
 function drawLaser(laser, context) {
@@ -1239,7 +1193,7 @@ function drawLaser(laser, context) {
 
   // Draw the laser image onto the main context (no cutout here anymore)
   context.drawImage(laser.image, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
-
+  
   context.restore();
 }
 
@@ -1263,3 +1217,235 @@ function drawLaserCenter(laser, context) {
 
   context.restore();
 }
+
+function drawCanvas() {
+  // Clear the canvas before drawing
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw the base image (the original uploaded image)
+  ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
+
+  // Apply the selected filter (if any)
+  if (currentFilter === 'dark') {
+    applyGradientMapFilter(ctx, canvas.width, canvas.height);
+  } else if (currentFilter === 'classic') {
+    applyClassicRedFilter(ctx, canvas.width, canvas.height);
+  } else if (currentFilter === 'light') {
+    applyLightFilter(ctx, canvas.width, canvas.height);
+  }
+
+  // Apply contrast and redness adjustments
+  applyContrastAndRedness(ctx, canvas.width, canvas.height);
+
+  // Draw the flag and masked image if the flag is applied
+  if (flagApplied && savedMaskImage) {
+    const backgroundAspectRatio = selectedBackgroundImage.width / selectedBackgroundImage.height;
+    let backgroundWidth, backgroundHeight;
+
+    if (canvas.width / canvas.height > backgroundAspectRatio) {
+      backgroundWidth = canvas.width;
+      backgroundHeight = backgroundWidth / backgroundAspectRatio;
+    } else {
+      backgroundHeight = canvas.height;
+      backgroundWidth = backgroundHeight * backgroundAspectRatio;
+    }
+
+    const backgroundX = (canvas.width - backgroundWidth) / 2;
+    const backgroundY = (canvas.height - backgroundHeight) / 2;
+
+    ctx.globalAlpha = flagOpacity;
+    ctx.drawImage(selectedBackgroundImage, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
+    ctx.globalAlpha = 1;
+
+    ctx.drawImage(savedMaskImage, 0, 0, canvas.width, canvas.height);
+  }
+
+  // Draw lasers in two passes
+  lasers.forEach(laser => {
+    drawLaser(laser, ctx);  // First pass: draw laser with hole
+  });
+  
+  lasers.forEach(laser => {
+    drawLaserCenter(laser, ctx);  // Second pass: draw centers
+  });
+
+  // Draw hats on top of everything
+  hats.forEach(hat => {
+    ctx.save();
+    ctx.translate(hat.x + hat.width / 2, hat.y + hat.height / 2);
+    ctx.rotate(hat.rotation);
+    ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
+    ctx.restore();
+  });
+}
+
+function applyContrastAndRedness(context, width, height) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    // Apply contrast adjustment
+    data[i] = ((data[i] - 128) * contrastValue + 128);  // Red channel
+    data[i + 1] = ((data[i + 1] - 128) * contrastValue + 128);  // Green channel
+    data[i + 2] = ((data[i + 2] - 128) * contrastValue + 128);  // Blue channel
+
+    // Calculate average intensity (grayscale value)
+    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+
+    // Apply saturation adjustment (rednessValue now represents saturation)
+    data[i] = avg + (data[i] - avg) * rednessValue;  // Red channel
+    data[i + 1] = avg + (data[i + 1] - avg) * rednessValue;  // Green channel
+    data[i + 2] = avg + (data[i + 2] - avg) * rednessValue;  // Blue channel
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
+function applyGradientMapFilter(context, width, height) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  const redColor = [243, 4, 13]; // #f3040d
+  const blueColor = [7, 11, 40]; // #070b28
+
+  // Apply gradient map
+  for (let i = 0; i < data.length; i += 4) {
+    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+
+    const factor = brightness / 255;
+    const adjustedFactor = Math.pow(factor, 0.9);
+
+    data[i] = blueColor[0] + adjustedFactor * (redColor[0] - blueColor[0]);
+    data[i + 1] =
+      blueColor[1] + adjustedFactor * (redColor[1] - blueColor[1]);
+    data[i + 2] =
+      blueColor[2] + adjustedFactor * (redColor[2] - blueColor[2]);
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
+function applyClassicRedFilter(context, width, height) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  // Adjusted colors with reduced saturation
+  const redColor = [210, 50, 60]; // Slightly desaturated and darkened red
+  const blueColor = [5, 8, 20];   // Darker blue
+
+  // Apply gradient map
+  for (let i = 0; i < data.length; i += 4) {
+    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+
+    const factor = brightness / 255;
+    const adjustedFactor = Math.pow(factor, 0.8); // Slightly adjusted gamma for more contrast
+
+    data[i] = blueColor[0] + adjustedFactor * (redColor[0] - blueColor[0]);
+    data[i + 1] =
+      blueColor[1] + adjustedFactor * (redColor[1] - blueColor[1]);
+    data[i + 2] =
+      blueColor[2] + adjustedFactor * (redColor[2] - blueColor[2]);
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
+function applyLightFilter(context, width, height) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  // Adjust these values to fine-tune the effect
+  const redFlareStrength = 0.4;   // Strength of the red flare (0-1)
+  const blueHintStrength = 0.1;   // Strength of the blue hints (0-1)
+  const saturationBoost = 1.2;    // Increase overall color saturation
+  const contrastBoost = 1.1;      // Slight increase in contrast
+
+  for (let i = 0; i < data.length; i += 4) {
+    let r = data[i];
+    let g = data[i + 1];
+    let b = data[i + 2];
+
+    // Apply contrast boost
+    r = Math.min(255, Math.max(0, (r - 128) * contrastBoost + 128));
+    g = Math.min(255, Math.max(0, (g - 128) * contrastBoost + 128));
+    b = Math.min(255, Math.max(0, (b - 128) * contrastBoost + 128));
+
+    // Calculate luminance
+    const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+    
+    // Apply red flare
+    r = Math.min(255, r + (255 - r) * redFlareStrength);
+    
+    // Apply subtle blue hints to darker areas
+    const blueFactor = Math.pow(1 - luminance / 255, 2) * blueHintStrength;
+    b = Math.min(255, b + (255 - b) * blueFactor);
+
+    // Boost saturation
+    const avg = (r + g + b) / 3;
+    r = Math.min(255, avg + (r - avg) * saturationBoost);
+    g = Math.min(255, avg + (g - avg) * saturationBoost);
+    b = Math.min(255, avg + (b - avg) * saturationBoost);
+
+    // Set the new pixel values
+    data[i] = Math.round(r);
+    data[i + 1] = Math.round(g);
+    data[i + 2] = Math.round(b);
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
+function applyFullResContrastAndRedness(context, width, height) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    // Apply contrast adjustment
+    data[i] = ((data[i] - 128) * contrastValue + 128);  // Red channel
+    data[i + 1] = ((data[i + 1] - 128) * contrastValue + 128);  // Green channel
+    data[i + 2] = ((data[i + 2] - 128) * contrastValue + 128);  // Blue channel
+
+    // Apply redness adjustment
+    data[i] = data[i] * rednessValue;  // Only adjust red channel
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
+
+function applyFullResGradientMapFilter(context, width, height) {
+  if (currentFilter === 'dark') {
+    applyGradientMapFilter(context, width, height);
+  } else if (currentFilter === 'classic') {
+    applyClassicRedFilter(context, width, height);
+  } else if (currentFilter === 'light') {
+    applyLightFilter(context, width, height);
+  }
+}
+
+// Tab functionality
+document.querySelectorAll('.tab-link').forEach(tab => {
+  tab.addEventListener('click', function() {
+    const tab_id = this.getAttribute('data-tab');
+
+    document.querySelectorAll('.tab-link').forEach(tab => {
+      tab.classList.remove('current');
+    });
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.remove('current');
+    });
+
+    this.classList.add('current');
+    document.getElementById(tab_id).classList.add('current');
+  });
+});
+
+document.getElementById("remove-all-lasers-button").addEventListener("click", function () {
+  lasers = [];
+  drawCanvas();
+});
+
+document.getElementById("remove-all-hats-button").addEventListener("click", function () {
+  hats = [];
+  drawCanvas();
+});
