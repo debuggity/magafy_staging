@@ -24,12 +24,6 @@ let isDragging = false;
 let currentLaser = null;
 let offsetX, offsetY;
 
-let maskCanvas = document.createElement('canvas');
-let maskCtx = maskCanvas.getContext('2d');
-let isMasking = false;
-let brushSize = 20;
-let brushShape = 'circle';
-
 let selectedHatImage = null;
 let hats = [];
 let currentHat = null;
@@ -412,10 +406,6 @@ document.getElementById("image-upload").addEventListener("change", function (e) 
           // Set canvas dimensions based on the scaled image
           canvas.width = canvasImage.width * scale;
           canvas.height = canvasImage.height * scale;
-
-          maskCanvas.width = canvas.width;
-          maskCanvas.height = canvas.height;
-          clearMask();  // Clears any existing mask for a fresh start
 
           // Clear the canvas before drawing the new image
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -973,101 +963,6 @@ canvas.addEventListener("drop", function (e) {
   }
 });
 
-// For mask drawing (negative space)
-canvas.addEventListener("mousedown", function (e) {
-  if (document.querySelector('.tab-link[data-tab="tab-5"]').classList.contains('current')) {
-    isMasking = true;
-    applyMask(e.offsetX, e.offsetY);
-  }
-});
-
-canvas.addEventListener("mousemove", function (e) {
-  if (isMasking) {
-    applyMask(e.offsetX, e.offsetY);
-  }
-});
-
-canvas.addEventListener("mouseup", function (e) {
-  if (isMasking) {
-    isMasking = false;
-  }
-});
-
-canvas.addEventListener("mouseleave", function (e) {
-  if (isMasking) {
-    isMasking = false;
-  }
-});
-
-// Touch events for masking
-canvas.addEventListener("touchstart", function (e) {
-  if (document.querySelector('.tab-link[data-tab="tab-5"]').classList.contains('current')) {
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    const offsetX = touch.clientX - rect.left;
-    const offsetY = touch.clientY - rect.top;
-    isMasking = true;
-    applyMask(offsetX, offsetY);
-  }
-});
-
-canvas.addEventListener("touchmove", function (e) {
-  if (isMasking) {
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    const offsetX = touch.clientX - rect.left;
-    const offsetY = touch.clientY - rect.top;
-    applyMask(offsetX, offsetY);
-  }
-});
-
-canvas.addEventListener("touchend", function (e) {
-  if (isMasking) {
-    isMasking = false;
-  }
-});
-
-function applyMask(x, y) {
-  // Convert canvas coordinates based on scaling
-  const scaleX = maskCanvas.width / canvas.offsetWidth;
-  const scaleY = maskCanvas.height / canvas.offsetHeight;
-  const adjustedX = x * scaleX;
-  const adjustedY = y * scaleY;
-
-  maskCtx.globalCompositeOperation = 'destination-out';
-  maskCtx.fillStyle = '#000'; 
-  if (brushShape === 'circle') {
-    maskCtx.beginPath();
-    maskCtx.arc(adjustedX, adjustedY, brushSize * scaleX, 0, 2 * Math.PI);
-    maskCtx.fill();
-  } else if (brushShape === 'square') {
-    maskCtx.fillRect(adjustedX - brushSize * scaleX / 2, adjustedY - brushSize * scaleY / 2, brushSize * scaleX, brushSize * scaleY);
-  }
-  maskCtx.globalCompositeOperation = 'source-over';
-  drawCanvas();
-}
-
-function clearMask() {
-  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-}
-
-// Mask tab event listeners
-document.querySelectorAll('input[name="brushShape"]').forEach(radio => {
-  radio.addEventListener('change', (e) => {
-    brushShape = e.target.value;
-  });
-});
-
-document.getElementById("brush-size-slider").addEventListener("input", function (e) {
-  brushSize = parseInt(e.target.value, 10);
-});
-
-document.getElementById("clear-mask-button").addEventListener("click", function () {
-  clearMask();
-  drawCanvas();
-});
-
 document.getElementById("contrast-slider").addEventListener("input", function (e) {
   contrastValue = e.target.value;
   drawCanvas();
@@ -1389,22 +1284,22 @@ function applyFullResGradientMapFilter(context, width, height) {
   }
 }
 
+// Tab functionality
 document.querySelectorAll('.tab-link').forEach(tab => {
   tab.addEventListener('click', function() {
-    console.log("Tab clicked:", this.getAttribute('data-tab'));
+    const tab_id = this.getAttribute('data-tab');
 
-    // Remove 'current' class from all tabs and content sections
-    document.querySelectorAll('.tab-link').forEach(tab => tab.classList.remove('current'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('current'));
+    document.querySelectorAll('.tab-link').forEach(tab => {
+      tab.classList.remove('current');
+    });
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.remove('current');
+    });
 
-    // Add 'current' to the clicked tab and corresponding content
     this.classList.add('current');
-    const tabId = this.getAttribute('data-tab');
-    console.log("Showing tab content:", tabId);
-    document.getElementById(tabId).classList.add('current');
+    document.getElementById(tab_id).classList.add('current');
   });
 });
-
 
 document.getElementById("remove-all-lasers-button").addEventListener("click", function () {
   lasers = [];

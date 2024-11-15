@@ -653,58 +653,6 @@ h1 {
   z-index: 1000;
 }
 
-/* Mask (Brush) tab content */
-.tab-content#tab-5 {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.brush-shapes {
-  display: flex;
-  gap: 20px;
-}
-
-.brush-shapes label {
-  font-size: 16px;
-  color: white;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  gap: 10px; /* Space between the radio button and label text */
-}
-
-/* Hide the default radio button */
-.brush-shapes input[type="radio"] {
-  appearance: none;            /* Remove the default radio button style */
-  width: 20px;                 /* Fixed width */
-  height: 20px;                /* Fixed height */
-  border: 2px solid #DB0A25;   /* Custom border color */
-  border-radius: 50%;          /* Make it circular */
-  background-color: #333;      /* Dark background to match the style */
-  position: relative;          /* For positioning the custom dot */
-  transition: all 0.3s ease;   /* Smooth transition for effects */
-  flex-shrink: 0;              /* Prevent shrinking inside flexbox */
-}
-
-/* Hover effect for the radio button */
-.brush-shapes input[type="radio"]:hover {
-  background-color: #555;
-}
-
-/* Custom dot inside the radio button when checked */
-.brush-shapes input[type="radio"]:checked::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: #DB0A25;   
-}
-
 @media (max-width: 900px) {
 
   body {
