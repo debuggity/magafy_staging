@@ -1125,7 +1125,7 @@ function hueShiftImageData(imageData, color) {
   if (color === 'red') {
     // Assume original laser color is mostly blue; blue to red hue difference is approximately 120 degrees
     hueOffset = 130;
-  } else if (color === 'yellow') {
+  } else if (color === 'purple') {
     // Blue to yellow hue difference is about 60 degrees
     hueOffset = 60; 
   }
