@@ -858,11 +858,6 @@ document.getElementById("download-button").addEventListener("click", function ()
     fullResCtx.drawImage(savedMaskImage, 0, 0, fullResCanvas.width, fullResCanvas.height);
   }
 
-  // Apply the negative space mask on the full-resolution canvas
-  fullResCtx.globalCompositeOperation = 'destination-out';
-  fullResCtx.drawImage(maskCanvas, 0, 0, fullResCanvas.width, fullResCanvas.height);
-  fullResCtx.globalCompositeOperation = 'source-over';
-
   // Calculate scale factors for full resolution
   const scaleX = fullResCanvas.width / canvas.width;
   const scaleY = fullResCanvas.height / canvas.height;
@@ -927,30 +922,19 @@ window.addEventListener("paste", function (e) {
       const reader = new FileReader();
       reader.onload = function (event) {
         canvasImage.onload = function () {
-            originalImageWidth = canvasImage.width;
-            originalImageHeight = canvasImage.height;
-        
-            const scale = Math.min(
-                MAX_WIDTH / canvasImage.width,
-                MAX_HEIGHT / canvasImage.height,
-                1
-            );
-            canvas.width = canvasImage.width * scale;
-            canvas.height = canvasImage.height * scale;
-        
-            // Ensure maskCanvas matches the main canvas dimensions
-            maskCanvas.width = canvas.width;
-            maskCanvas.height = canvas.height;
-        
-            clearMask();  // Clears any existing mask for a fresh start
-        
-            // Clear the canvas before drawing the new image
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawCanvas(); // Redraw with the new image and reset state
-        
-            document.querySelector(".button-container").style.display = "flex";
+          originalImageWidth = canvasImage.width;
+          originalImageHeight = canvasImage.height;
+
+          const scale = Math.min(
+            MAX_WIDTH / canvasImage.width,
+            MAX_HEIGHT / canvasImage.height,
+            1
+          );
+          canvas.width = canvasImage.width * scale;
+          canvas.height = canvasImage.height * scale;
+          drawCanvas();
+          document.querySelector(".button-container").style.display = "flex";
         };
-        
         canvasImage.src = event.target.result;
       };
       reader.readAsDataURL(file);
@@ -1045,6 +1029,7 @@ canvas.addEventListener("touchend", function (e) {
 });
 
 function applyMask(x, y) {
+  // Convert canvas coordinates based on scaling
   const scaleX = maskCanvas.width / canvas.offsetWidth;
   const scaleY = maskCanvas.height / canvas.offsetHeight;
   const adjustedX = x * scaleX;
@@ -1053,16 +1038,15 @@ function applyMask(x, y) {
   maskCtx.globalCompositeOperation = 'destination-out';
   maskCtx.fillStyle = '#000'; 
   if (brushShape === 'circle') {
-      maskCtx.beginPath();
-      maskCtx.arc(adjustedX, adjustedY, brushSize * scaleX, 0, 2 * Math.PI);
-      maskCtx.fill();
+    maskCtx.beginPath();
+    maskCtx.arc(adjustedX, adjustedY, brushSize * scaleX, 0, 2 * Math.PI);
+    maskCtx.fill();
   } else if (brushShape === 'square') {
-      maskCtx.fillRect(adjustedX - brushSize * scaleX / 2, adjustedY - brushSize * scaleY / 2, brushSize * scaleX, brushSize * scaleY);
+    maskCtx.fillRect(adjustedX - brushSize * scaleX / 2, adjustedY - brushSize * scaleY / 2, brushSize * scaleX, brushSize * scaleY);
   }
   maskCtx.globalCompositeOperation = 'source-over';
   drawCanvas();
 }
-
 
 function clearMask() {
   maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
@@ -1114,12 +1098,6 @@ function drawCanvas() {
   // Draw the base image (the original uploaded image)
   ctx.drawImage(canvasImage, 0, 0, canvas.width, canvas.height);
 
-  // Draw mask to mask out areas before filters
-  ctx.save();
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
-  ctx.restore();
-
   // Apply the selected filter (if any)
   if (currentFilter === 'dark') {
     applyGradientMapFilter(ctx, canvas.width, canvas.height);
@@ -1131,12 +1109,6 @@ function drawCanvas() {
 
   // Apply contrast and redness adjustments
   applyContrastAndRedness(ctx, canvas.width, canvas.height);
-
-  // Apply the negative space mask to prevent filters and backgrounds where masked
-  ctx.save();
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
-  ctx.restore();
 
   // Draw the flag and masked image if the flag is applied
   if (flagApplied && savedMaskImage) {
@@ -1165,7 +1137,7 @@ function drawCanvas() {
   lasers.forEach(laser => {
     drawLaser(laser, ctx);  // First pass: draw laser
   });
-
+  
   lasers.forEach(laser => {
     drawLaserCenter(laser, ctx);  // Second pass: draw laser center
   });
@@ -1178,12 +1150,6 @@ function drawCanvas() {
     ctx.drawImage(hat.image, -hat.width / 2, -hat.height / 2, hat.width, hat.height);
     ctx.restore();
   });
-
-  // Re-apply the negative space mask so that background elements won't appear on masked areas either
-  ctx.save();
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
-  ctx.restore();
 }
 
 function drawLaser(laser, context) {
