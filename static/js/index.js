@@ -1063,35 +1063,29 @@ function drawLaser(laser, context) {
   context.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
   context.rotate(laser.rotation);
 
-  // Create an offscreen canvas to apply hue shift
   const offCanvas = document.createElement('canvas');
   offCanvas.width = laser.width;
   offCanvas.height = laser.height;
   const offCtx = offCanvas.getContext('2d');
   offCtx.drawImage(laser.image, 0, 0, laser.width, laser.height);
 
-  // Apply color transformation if not blue
   if (selectedEyeColor !== 'blue') {
     const imageData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
-    hueShiftImageData(imageData, selectedEyeColor);
+    hueShiftImageData(imageData, selectedEyeColor, laser.image === laserImageTemplate ? 'laser_large' : 'laser_radial');
     offCtx.putImageData(imageData, 0, 0);
   }
 
-  // Draw the offscreen canvas onto the main canvas
   context.drawImage(offCanvas, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
-
   context.restore();
 }
 
-
 function drawLaserCenter(laser, context) {
-  if (!laser.topImage) return;  // Skip if no top image
+  if (!laser.topImage) return;
 
   context.save();
   context.translate(laser.x + laser.width / 2, laser.y + laser.height / 2);
   context.rotate(laser.rotation);
 
-  // Create an offscreen canvas to apply hue shift to the top image
   const offCanvas = document.createElement('canvas');
   offCanvas.width = laser.width;
   offCanvas.height = laser.height;
@@ -1100,34 +1094,32 @@ function drawLaserCenter(laser, context) {
 
   if (selectedEyeColor !== 'blue') {
     const imageData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
-    hueShiftImageData(imageData, selectedEyeColor);
+    hueShiftImageData(imageData, selectedEyeColor, laser.image === laserImageTemplate ? 'laser_large' : 'laser_radial');
     offCtx.putImageData(imageData, 0, 0);
   }
 
-  const topWidth = laser.width;
-  const topHeight = laser.height;
-
-  context.drawImage(
-    offCanvas,
-    -topWidth / 2,
-    -topHeight / 2,
-    topWidth,
-    topHeight
-  );
-
+  context.drawImage(offCanvas, -laser.width / 2, -laser.height / 2, laser.width, laser.height);
   context.restore();
 }
 
-function hueShiftImageData(imageData, color) {
+
+function hueShiftImageData(imageData, color, imageType) {
   const data = imageData.data;
 
+  // Define hue offsets based on the image type and selected eye color
   let hueOffset;
   if (color === 'red') {
-    // Assume original laser color is mostly blue; blue to red hue difference is approximately 120 degrees
-    hueOffset = 130;
+    if (imageType === 'laser_large') {
+      hueOffset = 130; // For laser_large
+    } else if (imageType === 'laser_radial') {
+      hueOffset = 155; // For laser_radial
+    }
   } else if (color === 'purple') {
-    // Blue to yellow hue difference is about 60 degrees
-    hueOffset = 60; 
+    if (imageType === 'laser_large') {
+      hueOffset = 155; // Adjust as needed
+    } else if (imageType === 'laser_radial') {
+      hueOffset = 180; // Adjust as needed
+    }
   }
 
   for (let i = 0; i < data.length; i += 4) {
@@ -1145,6 +1137,7 @@ function hueShiftImageData(imageData, color) {
     data[i + 2] = rgb[2];
   }
 }
+
 
 function rgbToHsv(r, g, b) {
   r /= 255; 
