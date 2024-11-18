@@ -702,13 +702,13 @@ h1 {
 }
 
 /* For Purple color option */
-.eye-color-option[data-color="purple"] {
-  background-color: #800080; /* A purple background */
+.eye-color-option[data-color="gold"] {
+  background-color: #DAA520; /* A purple background */
   color: #fff;
 }
-.eye-color-option[data-color="purple"]:hover,
-.eye-color-option[data-color="purple"].selected {
-  background-color: #9932CC; /* Brighter purple on hover & selected */
+.eye-color-option[data-color="gold"]:hover,
+.eye-color-option[data-color="gold"].selected {
+  background-color: #f3c44f; /* Brighter purple on hover & selected */
 }
 
 
