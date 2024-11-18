@@ -441,11 +441,15 @@ document.getElementById("add-laser-button").addEventListener("click", function (
     ? laserRadialImage.width / laserRadialImage.height
     : laserImageTemplate.width / laserImageTemplate.height;
 
-  let laserWidth = canvas.width * 0.5; // Increased to 50% of the canvas width
+  // Get the current scale from the slider
+  const currentScale = parseFloat(document.getElementById("resize-slider").value);
+
+  // Calculate laser dimensions using the current scale
+  let laserWidth = (canvas.width * 0.5) * currentScale; // Increased to 50% of the canvas width
   let laserHeight = laserWidth / aspectRatio;
 
   if (laserHeight > canvas.height) {
-    laserHeight = canvas.height * 0.5;
+    laserHeight = (canvas.height * 0.5) * currentScale;
     laserWidth = laserHeight * aspectRatio;
   }
 
@@ -462,7 +466,6 @@ document.getElementById("add-laser-button").addEventListener("click", function (
   lasers.push(laser);
   drawCanvas();
 });
-
 
 document.getElementById("add-hat-button").addEventListener("click", function () {
   if (!selectedHatImage) return;
@@ -490,13 +493,13 @@ document.getElementById("add-hat-button").addEventListener("click", function () 
 });
 
 document.getElementById("resize-slider").addEventListener("input", function (e) {
-  const scale = Math.max(parseFloat(e.target.value), 0.5); // Keep a minimum of 0.5 to avoid negatives
+  const scale = Math.max(parseFloat(e.target.value), 0.05); // Adjusted minimum to 0.05
   lasers.forEach((laser) => {
     const aspectRatio = laser.image.width / laser.image.height;
     const centerX = laser.x + laser.width / 2;
     const centerY = laser.y + laser.height / 2;
 
-    // Increase the multiplier to allow larger lasers
+    // Resize laser with the new scale
     laser.width = (MAX_WIDTH / 5) * scale * 2;
     laser.height = laser.width / aspectRatio;
 
@@ -505,7 +508,6 @@ document.getElementById("resize-slider").addEventListener("input", function (e) 
   });
   drawCanvas();
 });
-
 
 document.getElementById("hat-resize-slider").addEventListener("input", function (e) {
   const scale = e.target.value;
