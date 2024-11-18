@@ -1112,11 +1112,11 @@ function hueShiftImageData(imageData, color, imageType) {
     if (imageType === 'laser_large') {
       hueOffset = 130; // For laser_large
     } else if (imageType === 'laser_radial') {
-      hueOffset = 165; // For laser_radial
+      hueOffset = 155; // For laser_radial
     }
   } else if (color === 'gold') {
     if (imageType === 'laser_large') {
-      hueOffset = 155; // Adjust as needed
+      hueOffset = 165; // Adjust as needed
     } else if (imageType === 'laser_radial') {
       hueOffset = -168; // Adjust as needed
     }
@@ -1129,7 +1129,18 @@ function hueShiftImageData(imageData, color, imageType) {
 
     // Convert to HSV
     const hsv = rgbToHsv(r, g, b);
-    hsv[0] = (hsv[0] + hueOffset / 360) % 1; // Apply hue offset
+
+    // Only apply hue shift if saturation is not zero
+    if (hsv[1] > 0) {
+      hsv[0] = (hsv[0] + hueOffset / 360) % 1;
+
+      // Clamp hue to ensure it's within [0, 1]
+      if (hsv[0] < 0) {
+        hsv[0] += 1;
+      }
+    }
+
+    // Convert back to RGB
     const rgb = hsvToRgb(hsv[0], hsv[1], hsv[2]);
 
     data[i] = rgb[0];
@@ -1137,7 +1148,6 @@ function hueShiftImageData(imageData, color, imageType) {
     data[i + 2] = rgb[2];
   }
 }
-
 
 function rgbToHsv(r, g, b) {
   r /= 255; 
