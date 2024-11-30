@@ -31,6 +31,12 @@
 /goth-side-hat.png
   Access-Control-Allow-Origin: *
 
+/santa-hat.png
+  Access-Control-Allow-Origin: *
+
+/dark-hat.png
+  Access-Control-Allow-Origin: *
+
 /AmericanFlag.png
   Access-Control-Allow-Origin: *
 
