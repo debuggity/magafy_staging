@@ -556,7 +556,9 @@ document.querySelectorAll('.hat-option').forEach(option => {
       'hatLeft': "https://dmagafy-staging.netlify.app/hat_left.png",
       'hatRight': "https://dmagafy-staging.netlify.app/hat_right.png",
       'goth1': "https://dmagafy-staging.netlify.app/goth-front-hat.png",
-      'gothLeft': "https://dmagafy-staging.netlify.app/goth-side-hat.png"
+      'gothLeft': "https://dmagafy-staging.netlify.app/goth-side-hat.png",
+      'santa': "https://dmagafy-staging.netlify.app/santa-hat.png",
+      'dark': "https://dmagafy-staging.netlify.app/dark-hat.png"
     };
 
     const hatType = this.getAttribute('data-hat');
