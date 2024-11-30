@@ -44,6 +44,11 @@ let lightningImage = new Image();
 lightningImage.src = "lightning.png";
 lightningImage.crossOrigin = "anonymous";
 
+let christmasBgImage = new Image();
+christmasBgImage.src = "christmas-bg.png";
+christmasBgImage.crossOrigin = "anonymous";
+
+
 let selectedBackgroundImage = americanFlagImage;  // Default to American Flag
 
 let flagOpacity = .5; // Default opacity
@@ -290,6 +295,8 @@ document.getElementById("add-background-button").addEventListener("click", funct
     selectedBackgroundImage = americanFlagImage;
   } else if (selectedOption === "lightning") {
     selectedBackgroundImage = lightningImage;
+  } else if (selectedOption === "christmasBg") { // Add new case
+    selectedBackgroundImage = christmasBgImage;
   }
 
   addFlagWithBackgroundRemoval();  // Run background removal only when button is clicked
