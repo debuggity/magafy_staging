@@ -1122,6 +1122,12 @@ function hueShiftImageData(imageData, color, imageType) {
     } else if (imageType === 'laser_radial') {
       hueOffset = -168; // Adjust as needed
     }
+  } else if (color === 'green') { // Add green logic
+    if (imageType === 'laser_large') {
+      hueOffset = -116; // Green for laser_large
+    } else if (imageType === 'laser_radial') {
+      hueOffset = -82; // Green for laser_radial
+    }
   }
 
   for (let i = 0; i < data.length; i += 4) {
