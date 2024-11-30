@@ -756,7 +756,7 @@ h1 {
     #1E90FF 15px,
     #1E90FF 20px
   );
-  background-size: 20px 10px; /* Size of each light */
+  background-size: 10px 5px; /* Size of each light */
   z-index: 2; /* Ensure lights are above the string */
   border-radius: 5px; /* Make lights rounded */
   animation: blink 2s infinite;
