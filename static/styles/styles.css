@@ -382,9 +382,10 @@ h1 {
 
 .background-options {
   display: flex;
-  justify-content: center;    /* Center the buttons horizontally */
-  gap: 20px;                  /* Space between each button */
-  margin-bottom: 10px;         /* Space below the options container */
+  justify-content: flex-start; /* Align buttons to the left */
+  gap: 20px;                  /* Space between buttons */
+  margin-bottom: 10px;        /* Add spacing between rows */
+  flex-wrap: wrap;            /* Ensure options wrap to the next row if needed */
 }
 
 /* Background options label */
