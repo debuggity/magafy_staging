@@ -5,19 +5,19 @@ const ctx = canvas.getContext("2d");
 let selectedEyeColor = 'blue';
 
 const laserImageTemplate = new Image();
-laserImageTemplate.src = "https://dmagafy-staging.netlify.app/laser_large.png";
+laserImageTemplate.src = "https://dmagafy.netlify.app/laser_large.png";
 laserImageTemplate.crossOrigin = "anonymous";
 
 let laserRadialImage = new Image();
-laserRadialImage.src = "https://dmagafy-staging.netlify.app/laser_radial.png";
+laserRadialImage.src = "https://dmagafy.netlify.app/laser_radial.png";
 laserRadialImage.crossOrigin = "anonymous";
 
 let laserTopImage = new Image();
-laserTopImage.src = "https://dmagafy-staging.netlify.app/laser_top.png"; // Replace with your actual URL
+laserTopImage.src = "https://dmagafy.netlify.app/laser_top.png"; // Replace with your actual URL
 laserTopImage.crossOrigin = "anonymous";
 
 let radialTopImage = new Image();
-radialTopImage.src = "https://dmagafy-staging.netlify.app/radial_top.png";
+radialTopImage.src = "https://dmagafy.netlify.app/radial_top.png";
 radialTopImage.crossOrigin = "anonymous";
 
 let canvasImage = new Image();
@@ -558,14 +558,14 @@ document.querySelectorAll('.hat-option').forEach(option => {
     
     // Set the URL of the hat image
     const hatUrl = {
-      'hat1': "https://dmagafy-staging.netlify.app/hat_front_1.png",
-      'hat2': "https://dmagafy-staging.netlify.app/hat_front_2.png",
-      'hatLeft': "https://dmagafy-staging.netlify.app/hat_left.png",
-      'hatRight': "https://dmagafy-staging.netlify.app/hat_right.png",
-      'goth1': "https://dmagafy-staging.netlify.app/goth-front-hat.png",
-      'gothLeft': "https://dmagafy-staging.netlify.app/goth-side-hat.png",
-      'santa': "https://dmagafy-staging.netlify.app/santa-hat.png",
-      'dark': "https://dmagafy-staging.netlify.app/dark-hat.png"
+      'hat1': "https://dmagafy.netlify.app/hat_front_1.png",
+      'hat2': "https://dmagafy.netlify.app/hat_front_2.png",
+      'hatLeft': "https://dmagafy.netlify.app/hat_left.png",
+      'hatRight': "https://dmagafy.netlify.app/hat_right.png",
+      'goth1': "https://dmagafy.netlify.app/goth-front-hat.png",
+      'gothLeft': "https://dmagafy.netlify.app/goth-side-hat.png",
+      'santa': "https://dmagafy.netlify.app/santa-hat.png",
+      'dark': "https://dmagafy.netlify.app/dark-hat.png"
     };
 
     const hatType = this.getAttribute('data-hat');

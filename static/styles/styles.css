@@ -720,49 +720,6 @@ h1 {
   overflow: visible; /* Ensure the lights are not cut off */
 }
 
-/* Lights String using ::before */
-.eye-color-option[data-color="green"]::before {
-  content: '';
-  position: absolute;
-  top: -10px; /* Position above the button */
-  left: 5px;
-  width: 60px; /* Length of the string */
-  height: 2px;
-  background-color: #444; /* String color */
-  border-radius: 1px; /* Slightly rounded edges for the string */
-  z-index: 1; /* Place it above the button */
-}
-
-@keyframes blink {
-  0%, 50%, 100% { opacity: 1; }
-  25%, 75% { opacity: 0.5; }
-}
-
-/* Lights using ::after */
-.eye-color-option[data-color="green"]::after {
-  content: '';
-  position: absolute;
-  top: -15px; /* Position lights slightly above the string */
-  left: 5px;
-  width: 60px;
-  height: 10px;
-  background: repeating-linear-gradient(
-    90deg,
-    #FF0000 0,
-    #FF0000 5px,
-    #fcfaed 5px,
-    #faf8ea 10px,
-    #32CD32 10px,
-    #32CD32 15px,
-    #1E90FF 15px,
-    #1E90FF 20px
-  );
-  background-size: 10px 5px; /* Size of each light */
-  z-index: 2; /* Ensure lights are above the string */
-  border-radius: 5px; /* Make lights rounded */
-  animation: blink 2s infinite;
-}
-
 /* Hover and Selected States */
 .eye-color-option[data-color="green"]:hover,
 .eye-color-option[data-color="green"].selected {
