@@ -5,19 +5,19 @@ const ctx = canvas.getContext("2d");
 let selectedEyeColor = 'blue';
 
 const laserImageTemplate = new Image();
-laserImageTemplate.src = "https://dmagafy.netlify.app/laser_large.png";
+laserImageTemplate.src = "https://dmagafy-staging.netlify.app/laser_large.png";
 laserImageTemplate.crossOrigin = "anonymous";
 
 let laserRadialImage = new Image();
-laserRadialImage.src = "https://dmagafy.netlify.app/laser_radial.png";
+laserRadialImage.src = "https://dmagafy-staging.netlify.app/laser_radial.png";
 laserRadialImage.crossOrigin = "anonymous";
 
 let laserTopImage = new Image();
-laserTopImage.src = "https://dmagafy.netlify.app/laser_top.png"; // Replace with your actual URL
+laserTopImage.src = "https://dmagafy-staging.netlify.app/laser_top.png"; // Replace with your actual URL
 laserTopImage.crossOrigin = "anonymous";
 
 let radialTopImage = new Image();
-radialTopImage.src = "https://dmagafy.netlify.app/radial_top.png";
+radialTopImage.src = "https://dmagafy-staging.netlify.app/radial_top.png";
 radialTopImage.crossOrigin = "anonymous";
 
 let canvasImage = new Image();
