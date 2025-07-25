@@ -836,8 +836,7 @@ h1 {
     width: 100%; /* Makes sure canvas container fills the width */
   }
 
-  button, label {
+  button, label, #auto-laser-button {
     padding: 10px 20px;  /* Adjust padding for smaller screens */
   }
-
 }

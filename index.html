@@ -7,6 +7,7 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Jockey+One&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="static/styles/styles.css" />
@@ -52,6 +53,10 @@
       <i class="fa fa-download" style="margin-right: 8px;"></i> <!-- Font Awesome download icon -->
       Download
     </button>
+    <button id="auto-laser-button">
+      <i class="fa fa-magic" style="margin-right: 8px;"></i> <!-- Font Awesome magic wand icon -->
+      Auto Lasers
+    </button>
   </div>
   <br>
 
@@ -88,8 +93,8 @@
         <div class="control">
           <span>Select Laser Type</span>
           <div class="laser-options">
-            <img class="laser-option selected" src="https://dmagafy-staging.netlify.app/laser_large.png" alt="Default Laser" data-laser-type="default" />
-            <img class="laser-option" src="https://dmagafy-staging.netlify.app/laser_radial.png" alt="Radial Laser" data-laser-type="radial" />
+            <img class="laser-option selected" src="https://dmagafy.netlify.app/laser_large.png" alt="Default Laser" data-laser-type="default" />
+            <img class="laser-option" src="https://dmagafy.netlify.app/laser_radial.png" alt="Radial Laser" data-laser-type="radial" />
           </div>
         </div>
 
