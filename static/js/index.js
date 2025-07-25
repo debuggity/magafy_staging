@@ -632,14 +632,14 @@ document.querySelectorAll('.hat-option').forEach(option => {
     
     // Set the URL of the hat image
     const hatUrl = {
-      'hat1': "https://dmagafy.netlify.app/hat_front_1.png",
-      'hat2': "https://dmagafy.netlify.app/hat_front_2.png",
-      'hatLeft': "https://dmagafy.netlify.app/hat_left.png",
-      'hatRight': "https://dmagafy.netlify.app/hat_right.png",
-      'goth1': "https://dmagafy.netlify.app/goth-front-hat.png",
-      'gothLeft': "https://dmagafy.netlify.app/goth-side-hat.png",
-      'santa': "https://dmagafy.netlify.app/santa-hat.png",
-      'dark': "https://dmagafy.netlify.app/dark-hat.png"
+      'hat1': "https://dmagafy-staging.netlify.app/hat_front_1.png",
+      'hat2': "https://dmagafy-staging.netlify.app/hat_front_2.png",
+      'hatLeft': "https://dmagafy-staging.netlify.app/hat_left.png",
+      'hatRight': "https://dmagafy-staging.netlify.app/hat_right.png",
+      'goth1': "https://dmagafy-staging.netlify.app/goth-front-hat.png",
+      'gothLeft': "https://dmagafy-staging.netlify.app/goth-side-hat.png",
+      'santa': "https://dmagafy-staging.netlify.app/santa-hat.png",
+      'dark': "https://dmagafy-staging.netlify.app/dark-hat.png"
     };
 
     const hatType = this.getAttribute('data-hat');
