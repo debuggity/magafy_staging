@@ -199,6 +199,80 @@ function hideMagnifier() {
 }
 
 
+// ── FACE‑API MODEL LOADING ───────────────────────────────────
+async function loadFaceApiModels() {
+  // assumes your models folder is served at /models
+  await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+  await faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models');
+}
+window.addEventListener('DOMContentLoaded', loadFaceApiModels);
+
+// ── MAGIC WAND BUTTON ────────────────────────────────────────
+const magicWandButton = document.getElementById("magic-wand-button");
+
+magicWandButton.addEventListener("click", async () => {
+  if (!canvasImage.src) return;
+
+  // Detect single face + landmarks on the canvas
+  const detection = await faceapi
+    .detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions())
+    .withFaceLandmarks(true);
+
+  if (!detection) {
+    console.warn("No face found.");
+    return;
+  }
+
+  const landmarks = detection.landmarks;
+  const leftEyePts = landmarks.getLeftEye();
+  const rightEyePts = landmarks.getRightEye();
+
+  // Compute eye centers
+  const avgPoint = pts => pts.reduce((a,p) => ({ x:a.x+p.x, y:a.y+p.y }), {x:0,y:0});
+  const left = avgPoint(leftEyePts);
+  left.x /= leftEyePts.length; left.y /= leftEyePts.length;
+  const right = avgPoint(rightEyePts);
+  right.x /= rightEyePts.length; right.y /= rightEyePts.length;
+
+  // Compute roll angle from left→right eye
+  const eyeAngle = Math.atan2(right.y - left.y, right.x - left.x);
+
+  // Clear existing lasers
+  lasers = [];
+
+  // Helper to add a single laser at (cx,cy)
+  const addLaserAt = (cx, cy) => {
+    const aspectRatio = (selectedLaserType === 'radial') 
+      ? (laserRadialImage.width / laserRadialImage.height)
+      : (laserImageTemplate.width / laserImageTemplate.height);
+
+    const scaleVal = parseFloat(document.getElementById("resize-slider").value);
+    let lw = (canvas.width * 0.5) * scaleVal;
+    let lh = lw / aspectRatio;
+    if (lh > canvas.height) {
+      lh = (canvas.height * 0.5) * scaleVal;
+      lw = lh * aspectRatio;
+    }
+
+    lasers.push({
+      image: (selectedLaserType === 'radial') ? laserRadialImage : laserImageTemplate,
+      width: lw,
+      height: lh,
+      x: cx - lw/2,
+      y: cy - lh/2,
+      rotation: eyeAngle,
+      topImage: (selectedLaserType === 'radial') ? radialTopImage : laserTopImage,
+      color: selectedEyeColor
+    });
+  };
+
+  addLaserAt(left.x, left.y);
+  addLaserAt(right.x, right.y);
+
+  drawCanvas();
+});
+
+
 let modelLoaded = false;
 const loadingOverlay = document.getElementById("loading-overlay");
 const errorIndicator = document.getElementById("error-indicator");
