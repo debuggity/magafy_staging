@@ -720,6 +720,7 @@ h1 {
   overflow: visible; /* Ensure the lights are not cut off */
 }
 
+
 /* Hover and Selected States */
 .eye-color-option[data-color="green"]:hover,
 .eye-color-option[data-color="green"].selected {
@@ -836,7 +837,8 @@ h1 {
     width: 100%; /* Makes sure canvas container fills the width */
   }
 
-  button, label, #auto-laser-button {
+  button, label {
     padding: 10px 20px;  /* Adjust padding for smaller screens */
   }
+
 }

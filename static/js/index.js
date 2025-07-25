@@ -205,28 +205,20 @@ const errorIndicator = document.getElementById("error-indicator");
 
 let u2netSession = null; // Initialize only once
 
-async function loadModels() {
+async function loadModel() {
   if (u2netSession) return; // Avoid reloading if already loaded
 
   try {
-    // Load ONNX model
     u2netSession = await ort.InferenceSession.create('./u2netp.onnx');
-    
-    // Load face-api.js models
-    await Promise.all([
-      faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-      faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models')
-    ]);
-    
     modelLoaded = true;
   } catch (error) {
-    console.error("Failed to load models:", error);
+    console.error("Failed to load ONNX model:", error);
     showErrorIndicator();
   }
 }
 
 // Call this only once during page load
-window.addEventListener('DOMContentLoaded', loadModels);
+window.addEventListener('DOMContentLoaded', loadModel);
 
 
 // Show loading overlay only during background removal
@@ -323,7 +315,7 @@ document.getElementById("remove-flag-button").addEventListener("click", function
 });
 
 // Load the ONNX model when the page loads
-window.addEventListener('DOMContentLoaded', loadModels);
+window.addEventListener('DOMContentLoaded', loadModel);
 
 // Preprocessing function for the ONNX model input
 function preprocessImageForONNX(imageElement) {
@@ -933,75 +925,6 @@ document.getElementById("download-button").addEventListener("click", function ()
     link.click();
     document.body.removeChild(link);
   }, 'image/png');
-});
-
-// Auto-laser button event listener
-document.getElementById("auto-laser-button").addEventListener("click", async () => {
-  if (!modelLoaded || !canvasImage.src) {
-    console.log("Models not loaded or no image uploaded.");
-    return;
-  }
-
-  showLoadingOverlay();
-
-  const detections = await faceapi.detectAllFaces(canvasImage, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
-
-  if (detections.length > 0) {
-    // Clear existing lasers
-    lasers = [];
-
-    detections.forEach(detection => {
-      const landmarks = detection.landmarks;
-      const leftEye = landmarks.getLeftEye();
-      const rightEye = landmarks.getRightEye();
-
-      // Calculate the center of each eye
-      const leftEyeCenter = leftEye.reduce((acc, curr) => ({ x: acc.x + curr.x / leftEye.length, y: acc.y + curr.y / leftEye.length }), { x: 0, y: 0 });
-      const rightEyeCenter = rightEye.reduce((acc, curr) => ({ x: acc.x + curr.x / rightEye.length, y: acc.y + curr.y / rightEye.length }), { x: 0, y: 0 });
-
-      // Calculate the angle between the eyes
-      const angle = Math.atan2(rightEyeCenter.y - leftEyeCenter.y, rightEyeCenter.x - leftEyeCenter.x);
-
-      const scale = Math.min(
-        MAX_WIDTH / originalImageWidth,
-        MAX_HEIGHT / originalImageHeight,
-        1
-      );
-
-      const addLaserToEye = (eyeCenter) => {
-        const aspectRatio = (selectedLaserType === 'radial')
-          ? laserRadialImage.width / laserRadialImage.height
-          : laserImageTemplate.width / laserImageTemplate.height;
-
-        const currentScale = parseFloat(document.getElementById("resize-slider").value);
-        let laserWidth = (canvas.width * 0.5) * currentScale;
-        let laserHeight = laserWidth / aspectRatio;
-
-        if (laserHeight > canvas.height) {
-          laserHeight = (canvas.height * 0.5) * currentScale;
-          laserWidth = laserHeight * aspectRatio;
-        }
-        
-        const laser = {
-          image: (selectedLaserType === 'radial') ? laserRadialImage : laserImageTemplate,
-          width: laserWidth,
-          height: laserHeight,
-          x: (eyeCenter.x * scale) - (laserWidth / 2),
-          y: (eyeCenter.y * scale) - (laserHeight / 2),
-          rotation: angle,
-          topImage: (selectedLaserType === 'radial') ? radialTopImage : laserTopImage,
-          color: selectedEyeColor
-        };
-        lasers.push(laser);
-      };
-
-      addLaserToEye(leftEyeCenter);
-      addLaserToEye(rightEyeCenter);
-    });
-  }
-
-  hideLoadingOverlay();
-  drawCanvas();
 });
 
 window.addEventListener("paste", function (e) {
