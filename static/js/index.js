@@ -207,42 +207,51 @@ async function loadFaceApiModels() {
 }
 window.addEventListener('DOMContentLoaded', loadFaceApiModels);
 
-// ── MAGIC WAND BUTTON ────────────────────────────────────────
+// ── MAGIC WAND (with falling thresholds) ─────────────────────────────────
 const magicWandButton = document.getElementById("magic-wand-button");
 
 magicWandButton.addEventListener("click", async () => {
   if (!canvasImage.src) return;
 
-  // Detect single face + landmarks on the canvas
-  const detection = await faceapi
-    .detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions())
-    .withFaceLandmarks(true);
+  let detection = null;
+  const thresholds = [0.5, 0.4, 0.3, 0.2];
+
+  // try each threshold until we find a face
+  for (const t of thresholds) {
+    detection = await faceapi
+      .detectSingleFace(
+        canvas,
+        new faceapi.TinyFaceDetectorOptions({ scoreThreshold: t })
+      )
+      .withFaceLandmarks(true);
+    if (detection) {
+      console.log(`Face found at threshold ${t}`);
+      break;
+    }
+  }
 
   if (!detection) {
-    console.warn("No face found.");
+    console.warn("No face detected at any threshold ≥ 0.2");
     return;
   }
 
+  // compute eye centers
   const landmarks = detection.landmarks;
-  const leftEyePts = landmarks.getLeftEye();
+  const leftEyePts  = landmarks.getLeftEye();
   const rightEyePts = landmarks.getRightEye();
-
-  // Compute eye centers
   const avgPoint = pts => pts.reduce((a,p) => ({ x:a.x+p.x, y:a.y+p.y }), {x:0,y:0});
-  const left = avgPoint(leftEyePts);
-  left.x /= leftEyePts.length; left.y /= leftEyePts.length;
-  const right = avgPoint(rightEyePts);
-  right.x /= rightEyePts.length; right.y /= rightEyePts.length;
+  let left  = avgPoint(leftEyePts);  left.x/=leftEyePts.length;  left.y/=leftEyePts.length;
+  let right = avgPoint(rightEyePts); right.x/=rightEyePts.length; right.y/=rightEyePts.length;
 
-  // Compute roll angle from left→right eye
+  // roll angle between eyes
   const eyeAngle = Math.atan2(right.y - left.y, right.x - left.x);
 
-  // Clear existing lasers
+  // clear previous lasers
   lasers = [];
 
-  // Helper to add a single laser at (cx,cy)
+  // helper to place a laser
   const addLaserAt = (cx, cy) => {
-    const aspectRatio = (selectedLaserType === 'radial') 
+    const aspectRatio = (selectedLaserType === 'radial')
       ? (laserRadialImage.width / laserRadialImage.height)
       : (laserImageTemplate.width / laserImageTemplate.height);
 
@@ -255,18 +264,19 @@ magicWandButton.addEventListener("click", async () => {
     }
 
     lasers.push({
-      image: (selectedLaserType === 'radial') ? laserRadialImage : laserImageTemplate,
-      width: lw,
-      height: lh,
-      x: cx - lw/2,
-      y: cy - lh/2,
-      rotation: eyeAngle,
-      topImage: (selectedLaserType === 'radial') ? radialTopImage : laserTopImage,
-      color: selectedEyeColor
+      image:       (selectedLaserType === 'radial') ? laserRadialImage : laserImageTemplate,
+      width:       lw,
+      height:      lh,
+      x:           cx - lw/2,
+      y:           cy - lh/2,
+      rotation:    eyeAngle,
+      topImage:    (selectedLaserType === 'radial') ? radialTopImage : laserTopImage,
+      color:       selectedEyeColor
     });
   };
 
-  addLaserAt(left.x, left.y);
+  // place on both eyes
+  addLaserAt(left.x,  left.y);
   addLaserAt(right.x, right.y);
 
   drawCanvas();
