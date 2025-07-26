@@ -202,7 +202,9 @@ function hideMagnifier() {
 // ── FACE‑API MODEL LOADING ───────────────────────────────────
 async function loadFaceApiModels() {
   // assumes your models folder is served at /models
-  await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+  // ——— Load SSD Mobilenet V1 instead of tinyFaceDetector ———
+  await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
+  //await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
   await faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models');
 }
 window.addEventListener('DOMContentLoaded', loadFaceApiModels);
@@ -216,16 +218,16 @@ magicWandButton.addEventListener("click", async () => {
   let detection = null;
   const thresholds = [0.5, 0.4, 0.3, 0.2];
 
-  // try each threshold until we find a face
-  for (const t of thresholds) {
+  for (const minConfidence of confidences) {
     detection = await faceapi
       .detectSingleFace(
         canvas,
-        new faceapi.TinyFaceDetectorOptions({ scoreThreshold: t })
+        new faceapi.SsdMobilenetv1Options({ minConfidence })
       )
       .withFaceLandmarks(true);
+
     if (detection) {
-      console.log(`Face found at threshold ${t}`);
+      console.log(`Face found at confidence ${minConfidence}`);
       break;
     }
   }
