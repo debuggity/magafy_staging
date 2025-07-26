@@ -487,6 +487,10 @@ document.querySelector(".upload-btn").addEventListener("click", () => {
 });
 
 document.getElementById("image-upload").addEventListener("change", function (e) {
+
+  // Clear any existing eye lasers when a new image is uploaded
+  lasers = [];
+
   const reader = new FileReader();
   reader.onload = function (event) {
       // Hide the initial load screen
